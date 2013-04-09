@@ -8,7 +8,7 @@ This was inspired by brackets-continuous-compilation extension (https://github.c
 How to
 ===============
 
-* Install, please download the zip file and place it under the user directory.  Brackets makes this really simple by going to Help > Show Extensions Folder.  Drop in the uncompressed zip file, restart brackets and you should see Editor Theme in the main menu.
+* Install, please download the zip file and place it under the user directory.  Brackets makes this really simple by going to Help > Show Extensions Folder.  Drop in the uncompressed zip file, restart brackets and you should start getting feedback on your code.
 
 
 Links
