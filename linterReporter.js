@@ -22,13 +22,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-
 /*jslint plusplus: true, nomen: true, regexp: true, maxerr: 50 */
 
 define(function (require, exports, module) {
     'use strict';
 
-    var jshintMessages = require('jshintMessages');
     require('string');
 
 
@@ -47,9 +45,9 @@ define(function (require, exports, module) {
     * @param settings {Object} jshint settings to further refine what does and doesn't
     *                       get reported
     */
-    reporter.prototype.report = function(cm, messages, settings) {
+    reporter.prototype.report = function(cm, messages, settings, groomer) {
         var _self = this;
-        var token, handlerFunction;
+        var token;
         _self.clearMarks();
         _self.checkFatal(messages);
         _self.cm = cm;
@@ -60,46 +58,17 @@ define(function (require, exports, module) {
                 return;
             }
 
-            jshintMessages.ensureCode(message);
+            // Process message with the groomer to make sure we are getting a token
+            // that code mirror can use
+            token = groomer.groom(message, settings);
 
-            // Get the handler for the code type
-            handlerFunction = message.code[0].toLowerCase();
-
-            if ( _self[handlerFunction] ) {
-                token = _self.tokenize(message, settings);
-                if ( !token ){
-                    return;
-                }
-
-                // Do special handling for the message if need be
-                _self[handlerFunction](message, token);
-
+            if (token){
                 // Add marks to gutter and line
                 _self.addMarks(message, token);
             }
         });
 
         return this;
-    };
-
-
-    /**
-    * Used for reporting errors.  The name is shorter to more directly match
-    * to the code from jshint
-    */
-    reporter.prototype.e = function(message, token) {
-        message.type = "error";
-        //console.log("error", message, token);
-    };
-
-
-    /**
-    * Used for reporting warnings.  The name is shorter to more directly match
-    * to the code from jshint
-    */
-    reporter.prototype.w = function(message, token) {
-        message.type = "warning";
-        //console.log("warning", message, token);
     };
 
 
@@ -115,18 +84,18 @@ define(function (require, exports, module) {
                 errors: [],
                 lineMarks:[],
                 gutterMark: {
-                    element: $("<div class='interactive-jshint-gutter-messages' title='Click for details'>&nbsp;</div>")
+                    element: $("<div class='interactive-linter-gutter-messages' title='Click for details'>&nbsp;</div>")
                 }
             };
 
             mark = _self.marks[token.start.line];
-            mark.gutterMark.line = _self.cm.setGutterMarker(token.start.line, "interactive-jshint-gutter", mark.gutterMark.element[0]);
+            mark.gutterMark.line = _self.cm.setGutterMarker(token.start.line, "interactive-linter-gutter", mark.gutterMark.element[0]);
         }
 
         // Add marks to the line that is reporting messages
         mark = _self.marks[token.start.line];
         mark.lineMarks.push({
-            line: _self.cm.markText(token.start, token.end, {className: "interactive-jshint-" + message.code}),
+            line: _self.cm.markText(token.start, token.end, {className: "interactive-linter-" + message.code}),
             message: message
         });
 
@@ -138,7 +107,7 @@ define(function (require, exports, module) {
         // If we have errors in this line, then we will add a class to the gutter to
         //highlight this fact.  Further more, I make sure I add this class only once...
         if ( message.type === "error" && mark.errors.length === 1 ) {
-            mark.gutterMark.element.addClass('interactive-jshint-gutter-errors');
+            mark.gutterMark.element.addClass('interactive-linter-gutter-errors');
         }
     };
 
@@ -153,7 +122,7 @@ define(function (require, exports, module) {
             return;
         }
 
-        _self.cm.clearGutter("interactive-jshint-gutter");
+        _self.cm.clearGutter("interactive-linter-gutter");
         $.each( _self.marks, function( index, mark ) {
             $.each( mark.lineMarks.slice(0), function(i1, textMark) {
                 textMark.line.clear();
@@ -185,11 +154,11 @@ define(function (require, exports, module) {
         if (!mark.lineWidget) {
             mark.lineWidget = {
                 visible: false,
-                element: $("<div class='interactive-jshint-line-messages'></div>")
+                element: $("<div class='interactive-linter-line-messages'></div>")
             };
 
             $.each([].concat(mark.errors, mark.warnings), function(index, message) {
-                mark.lineWidget.element.append("<div class='interactive-jshint-line-{0} interactive-jshint-line-{1}'>{2}</div>".format(message.type, message.code, message.reason));
+                mark.lineWidget.element.append("<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}</div>".format(message.type, message.code, message.reason));
             });
         }
 
@@ -233,107 +202,11 @@ define(function (require, exports, module) {
     };
 
 
-    /**
-    * Breaks up the message from jshint into something that can be used
-    * by codemirror.
-    *
-    * @param message {Object} jshint message
-    * @param settings {Object} jshint settings
-    */
-    reporter.prototype.tokenize = function(message, settings) {
-        // Not sure why some characters are at 0...
-        if (message.character === 0) {
-            message.character = 1;
-        }
-
-        var evidence = message.evidence.substr(message.character - 1);
-        var items = [];
-
-        switch (message.code) {
-            case "W015": {
-                //evidence = message.evidence.substr(message.b, Math.abs(message.c - message.b) + message.a.length);
-                evidence = message.evidence.substr(message.b);
-                message.character = message.c;
-                break;
-            }
-
-            case "W117": {
-                evidence = message.a;
-                break;
-            }
-
-            case "W033": {
-                message.character--;
-                evidence = message.evidence.substr(message.character - 1, 1);
-                break;
-            }
-
-            case "W040": {
-                items  = evidence.split(/[\s;.]/);
-                if ( items.length !== 0 ) {
-                    evidence = evidence.substr(0, items[0].length);
-                }
-                break;
-            }
-
-            case "W055": {
-                items = evidence.split(/[(\s;]/);
-                if ( items.length !== 0 ) {
-                    evidence = evidence.substr(0, items[0].length);
-                }
-                break;
-            }
-
-            case "W086": {
-                if ( settings.laxcasebreak ) {
-                    return;
-                }
-                break;
-            }
-
-            case "W004":
-            case "W098": {
-                message.character -= message.a.length;
-                evidence = message.a;
-                break;
-            }
-
-            default: {
-                break;
-            }
-        }
-
-        //console.log(items, evidence);
-
-        var start = {
-            line: (message.line - 1),
-            ch: (message.character - 1)
-        };
-
-        var end = {
-            line: (message.line - 1),
-            ch: (message.character - 1) + evidence.length
-        };
-
-        // For performance reasons, don't figure out the text out
-        // of code mirror... I use only for debugging purposes to verify
-        // that codemirror is getting the correct piece of data
-        //var text = this.cm.getDoc().getRange(start, end);
-        var text = evidence;
-
-        return {
-            text: text,
-            start: start,
-            end: end
-        };
-    };
-
-
-    var jshintReporter = (function () {
+    var linterReporter = (function () {
         var _reporter = new reporter();
 
-        function report(cm, messages, settings) {
-            return _reporter.report(cm, messages, settings || {});
+        function report(cm, messages, settings, groomer) {
+            return _reporter.report(cm, messages, settings || {}, groomer);
         }
 
         function showLineDetails(cm, lineNumber, gutterId, event) {
@@ -347,5 +220,5 @@ define(function (require, exports, module) {
     })();
 
 
-    return jshintReporter;
+    return linterReporter;
 });

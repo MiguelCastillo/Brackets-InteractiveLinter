@@ -39,8 +39,8 @@ define(function (require, exports, module) {
         NativeFileSystem = brackets.getModule("file/NativeFileSystem").NativeFileSystem,
         ProjectManager   = brackets.getModule("project/ProjectManager");
 
-    var jshintManager = require('jshintManager');
-    var jshintDefaultSettings = require('jshintrc');
+    var linterManager         = require('linterManager'),
+        linterDefaultSettings = require('linterSettings');
 
     ExtensionUtils.loadStyleSheet(module, "style.css");
 
@@ -48,19 +48,19 @@ define(function (require, exports, module) {
     function setDocument() {
         var editor = EditorManager.getActiveEditor();
         if (!editor || !editor._codeMirror) {
-            jshintManager.setDocument(null);
+            linterManager.setDocument(null);
             return;
         }
 
-        jshintManager.setDocument(editor._codeMirror);
+        linterManager.setDocument(editor._codeMirror);
         setTimeout(function() {
-            jshintManager.run();
+            linterManager.run();
         }, 1000);
     }
 
 
     function setSettings(settings) {
-        jshintManager.setSettings(settings || jshintDefaultSettings);
+        linterManager.setSettings(settings || linterDefaultSettings);
     }
 
 
@@ -86,22 +86,21 @@ define(function (require, exports, module) {
                 var directoryEntry = new NativeFileSystem.DirectoryEntry(projectPath);
 
                 // Create jshintrc file
-                directoryEntry.getFile( ".jshintrc", {
+                directoryEntry.getFile( ".interactiveLinter", {
                         create: true,
                         exclusive: true
                     }, function( fileEntry ) {
                         fileEntry.createWriter( function(fileWriter) {
-                            fileWriter.write( JSON.stringify(jshintDefaultSettings) );
+                            fileWriter.write( JSON.stringify(linterDefaultSettings) );
                         });
                     });
             }
         }
 
         function open(project) {
-            // Try to load up the jshintrc file that JSHint will use.  This file
-            // is per project.
+            // Try to load up the linterSettings file, which is per project.
             projectPath = FileUtils.canonicalizeFolderPath(project.fullPath);
-            var jshintFile  = projectPath + "/.jshintrc";
+            var jshintFile  = projectPath + "/.interactiveLinter";
 
             // Start the process of figuring out if we already have a .jshintrc file
             NativeFileSystem.resolveNativeFileSystemPath(jshintFile, successCallback, errorCallback);
@@ -115,7 +114,7 @@ define(function (require, exports, module) {
 
 
     function ready () {
-        $(EditorManager).on("activeEditorChange.interactive-jshint", setDocument);
+        $(EditorManager).on("activeEditorChange.interactive-linter", setDocument);
         setDocument();
     }
 

@@ -27,20 +27,21 @@
 define(function (require, exports, module) {
     'use strict';
 
-    var jshintReporter = require('jshintReporter'),
-        jshintSettings = require('jshintrc');
+    var linterReporter = require('linterReporter'),
+        linterSettings = require('linterSettings'),
+        jshintGroomer = require('jshintGroomer');
 
     // Running a modified version of jshint to fix the issue with unused function parameters.
-    require('lib/jshint-1.1.0-stable-mod');
-
-
     /**
     * BUG: jshint gives the wrong character index when dealing with tabs.
     * https://github.com/jshint/jshint/issues/430
     * I am stuck only expecting correct results when the files uses white
     * spaces. Arrrggh!
     */
-    var jshintManager = (function(){
+    require('lib/jshint-1.1.0-stable-mod');
+
+
+    var linterManager = (function(){
         var _cm = null, _timer = null;
 
         function run() {
@@ -49,15 +50,14 @@ define(function (require, exports, module) {
             }
 
             // Get document as a string to be passed into JSHint
-            var docValue = _cm.getDoc().getValue();
+            var docValue = _cm.getDoc().getValue(), jshintSettings = linterSettings.jshint;
 
-            // I could let JSHint pick up .jshintrc, but since I am already reading it
-            // I am just going to feed that data directly into JSHint.
+            // Run JSHint
             var result = JSHINT(docValue, jshintSettings, jshintSettings.globals);
 
             // If result is false, then JSHint has some errors it needs to report
             if (result === false) {
-                jshintReporter.report(_cm, JSHINT.errors, jshintSettings);
+                linterReporter.report(_cm, JSHINT.errors, jshintSettings, jshintGroomer);
             }
         }
 
@@ -79,11 +79,11 @@ define(function (require, exports, module) {
         * Show line details
         */
         function gutterClick(cm, lineIndex, gutterId, event) {
-            if (gutterId !== "interactive-jshint-gutter"){
+            if (gutterId !== "interactive-linter-gutter"){
                 return;
             }
 
-            jshintReporter.showLineDetails(cm, lineIndex, gutterId, event);
+            linterReporter.showLineDetails(cm, lineIndex, gutterId, event);
         }
 
 
@@ -100,14 +100,14 @@ define(function (require, exports, module) {
             if (cm && cm.getDoc().getMode().name === 'javascript') {
                 CodeMirror.on(cm.getDoc(), "change", trackChanges);
                 _cm = cm;
-                _cm.setOption("gutters", ["interactive-jshint-gutter"]);
+                _cm.setOption("gutters", ["interactive-linter-gutter"]);
                 _cm.on('gutterClick', gutterClick);
             }
         }
 
 
         function setSettings(settings) {
-            jshintSettings = settings;
+            linterSettings = settings;
         }
 
 
@@ -120,6 +120,6 @@ define(function (require, exports, module) {
     })();
 
 
-    return jshintManager;
+    return linterManager;
 });
 
