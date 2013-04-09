@@ -9,7 +9,7 @@
 define(function(require, exports, module){
     "use strict";
 
-    require("underscore");
+    require("lib/underscore");
     var _ = window._;
 
     var errors = {

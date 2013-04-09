@@ -23,7 +23,7 @@
 
 /*icon image from http://findicons.com/icon/184668/light_bulb*/
 .CodeMirror .interactive-jshint-gutter-messages {
-    background-image: url(light_bulb.png);
+    background-image: url(img/light_bulb.png);
     background-size: 15px 15px;
     background-repeat: no-repeat;
 }

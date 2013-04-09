@@ -35,7 +35,7 @@ define(function (require, exports, module) {
     var jshintReporter = require('jshintReporter'), jshintSettings = {};
 
     // Running a modified version of jshint to fix the issue with unused function parameters.
-    require('jshint-1.1.0-stable-mod');
+    require('lib/jshint-1.1.0-stable-mod');
 
     //
     //  This logc below is to load up per project settings for jshint.
