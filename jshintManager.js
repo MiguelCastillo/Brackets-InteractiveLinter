@@ -27,60 +27,11 @@
 define(function (require, exports, module) {
     'use strict';
 
-    var FileUtils        = brackets.getModule("file/FileUtils"),
-        NativeFileError  = brackets.getModule("file/NativeFileError"),
-        NativeFileSystem = brackets.getModule("file/NativeFileSystem").NativeFileSystem,
-        ProjectManager   = brackets.getModule("project/ProjectManager");
-
-    var jshintReporter = require('jshintReporter'), jshintSettings = {};
+    var jshintReporter = require('jshintReporter'),
+        jshintSettings = require('jshintrc');
 
     // Running a modified version of jshint to fix the issue with unused function parameters.
     require('lib/jshint-1.1.0-stable-mod');
-
-    //
-    //  This logc below is to load up per project settings for jshint.
-    //
-    $(ProjectManager).on("projectOpen", function openProject(event, project) {
-
-        // Try to load up the jshintrc file that JSHint will use.  This file
-        // is per project.
-        var projectPath = FileUtils.canonicalizeFolderPath(project.fullPath),
-            jshintFile = projectPath + "/.jshintrc";
-
-        // Load default settings everytime we load up a project so that if a
-        // project does not have a jshintrc file, we can create one with all
-        // default settings
-        jshintSettings = require('jshintrc');
-
-        // If the file exists, then we load that file up and use it as the settings
-        // for JSHint
-        function successCallback (fileEntry) {
-            FileUtils.readAsText(fileEntry).done(function (text) {
-                jshintSettings = JSON.parse(text);
-            });
-        }
-
-        // If the jshint file does not exist for the particular project we are
-        // loading, we will attempt to create a jshintrc file with the default
-        // settings that will be loaded next time this project gets loaded.
-        function errorCallback( err ) {
-            if ( err.name === NativeFileError.NOT_FOUND_ERR ) {
-                var directoryEntry = new NativeFileSystem.DirectoryEntry(projectPath);
-
-                // Create jshintrc file
-                directoryEntry.getFile( ".jshintrc", {
-                        create: true,
-                        exclusive: true
-                    }, function( fileEntry ) {
-                        fileEntry.createWriter( function(fileWriter){
-                            fileWriter.write( JSON.stringify(jshintSettings) );
-                        });
-                    });
-            }
-        }
-
-        NativeFileSystem.resolveNativeFileSystemPath(jshintFile, successCallback, errorCallback);
-    });
 
 
     /**
@@ -139,7 +90,7 @@ define(function (require, exports, module) {
         /**
         * We will only handle one document at a time
         */
-        function registerDocument(cm) {
+        function setDocument(cm) {
             if (_cm) {
                 CodeMirror.off(_cm.getDoc(), "change", trackChanges);
                 _cm.setOption("gutters", []);
@@ -155,8 +106,14 @@ define(function (require, exports, module) {
         }
 
 
+        function setSettings(settings) {
+            jshintSettings = settings;
+        }
+
+
         return {
-            registerDocument: registerDocument,
+            setDocument: setDocument,
+            setSettings: setSettings,
             run: run
         };
 

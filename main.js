@@ -33,30 +33,94 @@ define(function (require, exports, module) {
 
     var EditorManager   = brackets.getModule("editor/EditorManager"),
         AppInit         = brackets.getModule("utils/AppInit"),
-        ExtensionUtils  = brackets.getModule("utils/ExtensionUtils");
+        ExtensionUtils  = brackets.getModule("utils/ExtensionUtils"),
+        FileUtils        = brackets.getModule("file/FileUtils"),
+        NativeFileError  = brackets.getModule("file/NativeFileError"),
+        NativeFileSystem = brackets.getModule("file/NativeFileSystem").NativeFileSystem,
+        ProjectManager   = brackets.getModule("project/ProjectManager");
 
     var jshintManager = require('jshintManager');
-    require('string');
+    var jshintDefaultSettings = require('jshintrc');
 
     ExtensionUtils.loadStyleSheet(module, "style.css");
 
-    AppInit.appReady(function () {
 
-        function registerDocument() {
-            var editor = EditorManager.getActiveEditor();
-            if (!editor || !editor._codeMirror) {
-                jshintManager.registerDocument(null);
-                return;
-            }
-
-            jshintManager.registerDocument(editor._codeMirror);
-            setTimeout(function() {
-                jshintManager.run();
-            }, 1000);
+    function setDocument() {
+        var editor = EditorManager.getActiveEditor();
+        if (!editor || !editor._codeMirror) {
+            jshintManager.setDocument(null);
+            return;
         }
 
-        $(EditorManager).on("activeEditorChange.interactive-jshint", registerDocument);
-        registerDocument();
-    });
+        jshintManager.setDocument(editor._codeMirror);
+        setTimeout(function() {
+            jshintManager.run();
+        }, 1000);
+    }
+
+
+    function setSettings(settings) {
+        jshintManager.setSettings(settings || jshintDefaultSettings);
+    }
+
+
+    var projectManager = (function(){
+        var projectPath;
+
+        // If the file exists, then we load that file up and use it as the settings
+        // for JSHint
+        function successCallback (fileEntry) {
+            FileUtils.readAsText(fileEntry).done(function (text) {
+                setSettings(JSON.parse(text));
+            });
+        }
+
+        // If the jshint file does not exist for the particular project we are
+        // loading, we will attempt to create a jshintrc file with the default
+        // settings that will be loaded next time this project gets loaded.
+        function errorCallback ( err ) {
+            // Load up default settings
+            setSettings();
+
+            if ( err.name === NativeFileError.NOT_FOUND_ERR ) {
+                var directoryEntry = new NativeFileSystem.DirectoryEntry(projectPath);
+
+                // Create jshintrc file
+                directoryEntry.getFile( ".jshintrc", {
+                        create: true,
+                        exclusive: true
+                    }, function( fileEntry ) {
+                        fileEntry.createWriter( function(fileWriter) {
+                            fileWriter.write( JSON.stringify(jshintDefaultSettings) );
+                        });
+                    });
+            }
+        }
+
+        function open(project) {
+            // Try to load up the jshintrc file that JSHint will use.  This file
+            // is per project.
+            projectPath = FileUtils.canonicalizeFolderPath(project.fullPath);
+            var jshintFile  = projectPath + "/.jshintrc";
+
+            // Start the process of figuring out if we already have a .jshintrc file
+            NativeFileSystem.resolveNativeFileSystemPath(jshintFile, successCallback, errorCallback);
+        }
+
+        return {
+            open: open
+        };
+
+    })();
+
+
+    function ready () {
+        $(EditorManager).on("activeEditorChange.interactive-jshint", setDocument);
+        setDocument();
+    }
+
+
+    $(ProjectManager).on("projectOpen", function(e, project){projectManager.open(project);});
+    AppInit.appReady(ready);
 
 });

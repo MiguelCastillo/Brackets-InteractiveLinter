@@ -29,6 +29,7 @@ define(function (require, exports, module) {
     'use strict';
 
     var jshintMessages = require('jshintMessages');
+    require('string');
 
 
     function reporter() {
@@ -114,7 +115,7 @@ define(function (require, exports, module) {
                 errors: [],
                 lineMarks:[],
                 gutterMark: {
-                    element: $("<div class='interactive-jshint-gutter-messages'>&nbsp;</div>")
+                    element: $("<div class='interactive-jshint-gutter-messages' title='Click for details'>&nbsp;</div>")
                 }
             };
 
