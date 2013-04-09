@@ -8,7 +8,7 @@ This was inspired by brackets-continuous-compilation extension (https://github.c
 How to
 ===============
 
-* Install, please download the zip file and place it under the user directory.  Brackets makes this really simple by going to Help > Show Extensions Folder.  Drop in the uncompressed zip file, restart brackets and you should start getting feedback on your code.
+* Install... Open Brackets then copy and paste https://github.com/MiguelCastillo/Brackets-Interactive-JSHint into File->Install Extension.  You don't need to restart Brackets.
 
 
 Links
