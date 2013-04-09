@@ -135,8 +135,7 @@ define(function (require, exports, module) {
         }
 
         // If we have errors in this line, then we will add a class to the gutter to
-        // to highlight this fact.  Further more, I make sure I only add this class
-        // only once...
+        //highlight this fact.  Further more, I make sure I add this class only once...
         if ( message.type === "error" && mark.errors.length === 1 ) {
             mark.gutterMark.element.addClass('interactive-jshint-gutter-errors');
         }
