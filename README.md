@@ -1,7 +1,8 @@
 Brackets-Interactive-JSHint
 ===========================
 
-Brackets integration with JSHint.  Interactive JSHint will provide feedback as JavaScript files are modified, and JSHint details are easily accessible from the line gutter of the editor.  Interactive JSHint also keeps its settings per project (.jshintrc), which you can manually modify to customize JSHint settings for the entire project.  Of course, JSHint annotation in your files will continue to work.
+Brackets integration with JSHint.  Interactive JSHint will provide feedback as JavaScript files are modified, and JSHint details are easily accessible from the line gutter of the editor.  Interactive JSHint also keeps its settings per project (.jshintrc), which you can manually modify to customize JSHint settings for the entire project.  Of course, JSHint annotation in your files will continue to work.<br><br>
+This was inspired by brackets-continuous-compilation extension (https://github.com/JoachimK/brackets-continuous-compilation), so thank you for that
 
 
 How to
