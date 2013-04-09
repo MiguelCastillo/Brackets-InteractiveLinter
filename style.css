@@ -1,0 +1,54 @@
+.CodeMirror *[class*="interactive-jshint"] {
+    z-index: 5;
+}
+
+.CodeMirror *[class*="interactive-jshint-W015"] {
+    border-bottom: 2px dotted #3a87ad;
+}
+
+.CodeMirror *[class*="interactive-jshint-W"] {
+    border-bottom: 2px dotted #f89406;
+    z-index: 6;
+}
+
+.CodeMirror *[class*="interactive-jshint-E"] {
+    border-bottom: 2px dotted #bd362f;
+    z-index: 7;
+}
+
+.CodeMirror .interactive-jshint-gutter {
+    width: 15px;
+    margin-left: 7px;
+}
+
+/*icon image from http://findicons.com/icon/184668/light_bulb*/
+.CodeMirror .interactive-jshint-gutter-messages {
+    background-image: url(light_bulb.png);
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+}
+
+.CodeMirror .interactive-jshint-gutter-errors {
+    background-color: red;
+    border-color: #f2dede;
+    border-radius: 10px;
+}
+
+.CodeMirror .interactive-jshint-gutter-messages:hover {
+    cursor: pointer;
+}
+
+
+/* twitter bootstrap alert colors */
+.CodeMirror .interactive-jshint-line-error {
+    color: #b94a48;
+    background-color: #f2dede;
+    border-color: #eed3d7;
+}
+
+.CodeMirror .interactive-jshint-line-warning {
+    color: #c09853;
+    background-color: #fcf8e3;
+    border: 1px solid #fbeed5;
+}
+
