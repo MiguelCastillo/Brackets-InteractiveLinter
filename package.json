@@ -1,0 +1,10 @@
+{
+    "name": "interactive-jshint",
+    "description": "Interactive JSHint brings code feedback into brackets as you work on your JavaScript",
+    "version": "0.1.0",
+    "author": "Miguel Castillo <mahchagnu@gmail.com>",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/MiguelCastillo/Brackets-Interactive-JSHint.git"
+    }
+}
