@@ -29,7 +29,8 @@ define(function (require, exports, module) {
 
     var linterReporter = require('linterReporter'),
         linterSettings = require('linterSettings'),
-        jshintGroomer = require('jshintGroomer');
+        jshintGroomer = require('jshintGroomer'),
+        jslintGroomer = require('jslintGroomer');
 
     // Running a modified version of jshint to fix the issue with unused function parameters.
     /**
@@ -39,6 +40,7 @@ define(function (require, exports, module) {
     * spaces. Arrrggh!
     */
     require('lib/jshint-1.1.0-stable-mod');
+    var JSLINT = require('lib/jslint');
 
 
     var linterManager = (function(){
@@ -59,6 +61,17 @@ define(function (require, exports, module) {
             if (result === false) {
                 linterReporter.report(_cm, JSHINT.errors, jshintSettings, jshintGroomer);
             }
+
+            /**
+            * this will run JSLint
+            */
+            /*
+            var result = JSLINT(docValue, null);
+
+            if (result === false){
+                linterReporter.report(_cm, JSLINT.errors, docValue, jslintGroomer);
+            }
+            */
         }
 
 

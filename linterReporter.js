@@ -133,6 +133,8 @@ define(function (require, exports, module) {
                 delete mark.lineWidget;
             }
 
+            delete mark.errors;
+            delete mark.warnings;
             delete mark.lineMarks;
             delete mark.gutterMarks;
         });
