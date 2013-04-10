@@ -42,6 +42,13 @@ define(function (require, exports, module) {
     require('lib/jshint-1.1.0-stable-mod');
     var JSLINT = require('lib/jslint');
 
+    var linterTypes = {
+        jshint: 0,
+        jslint: 1
+    };
+
+    var linterType = linterTypes.jshint;
+
 
     var linterManager = (function(){
         var _cm = null, _timer = null;
@@ -53,25 +60,25 @@ define(function (require, exports, module) {
 
             // Get document as a string to be passed into JSHint
             var docValue = _cm.getDoc().getValue(), jshintSettings = linterSettings.jshint;
+            var result;
 
             // Run JSHint
-            var result = JSHINT(docValue, jshintSettings, jshintSettings.globals);
+            if ( linterType === linterTypes.jshint ){
+                result = JSHINT(docValue, jshintSettings, jshintSettings.globals);
 
-            // If result is false, then JSHint has some errors it needs to report
-            if (result === false) {
-                linterReporter.report(_cm, JSHINT.errors, jshintSettings, jshintGroomer);
+                // If result is false, then JSHint has some errors it needs to report
+                if (result === false) {
+                    linterReporter.report(_cm, JSHINT.errors, jshintSettings, jshintGroomer);
+                }
             }
+            else if ( linterType === linterTypes.jslint ) {
+                // Run JSLint
+                result = JSLINT(docValue, jshintSettings.jslint);
 
-            /**
-            * this will run JSLint
-            */
-            /*
-            var result = JSLINT(docValue, null);
-
-            if (result === false){
-                linterReporter.report(_cm, JSLINT.errors, docValue, jslintGroomer);
+                if (result === false){
+                    linterReporter.report(_cm, JSLINT.errors, docValue, jslintGroomer);
+                }
             }
-            */
         }
 
 
@@ -101,6 +108,14 @@ define(function (require, exports, module) {
 
 
         /**
+        * Change which linter type to run
+        */
+        function setLinterType(type) {
+            linterType = type;
+        }
+
+
+        /**
         * We will only handle one document at a time
         */
         function setDocument(cm) {
@@ -125,8 +140,10 @@ define(function (require, exports, module) {
 
 
         return {
+            setLinterType: setLinterType,
             setDocument: setDocument,
             setSettings: setSettings,
+            linterTypes: linterTypes,
             run: run
         };
 

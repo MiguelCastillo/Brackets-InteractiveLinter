@@ -31,9 +31,9 @@ define(function (require, exports, module) {
     // Reference for jshint errors/warnings
     // http://jslinterrors.com/?utm_source=javascriptweekly&utm_medium=email
 
-    var EditorManager   = brackets.getModule("editor/EditorManager"),
-        AppInit         = brackets.getModule("utils/AppInit"),
-        ExtensionUtils  = brackets.getModule("utils/ExtensionUtils"),
+    var EditorManager    = brackets.getModule("editor/EditorManager"),
+        AppInit          = brackets.getModule("utils/AppInit"),
+        ExtensionUtils   = brackets.getModule("utils/ExtensionUtils"),
         FileUtils        = brackets.getModule("file/FileUtils"),
         NativeFileError  = brackets.getModule("file/NativeFileError"),
         NativeFileSystem = brackets.getModule("file/NativeFileSystem").NativeFileSystem,
@@ -41,6 +41,9 @@ define(function (require, exports, module) {
 
     var linterManager         = require('linterManager'),
         linterDefaultSettings = require('linterSettings');
+
+    linterManager.setLinterType( linterManager.linterTypes.jshint );
+    //linterManager.setLinterType( linterManager.linterTypes.jslint );
 
     ExtensionUtils.loadStyleSheet(module, "style.css");
 
