@@ -68,7 +68,13 @@ define(function (require, exports, module) {
 
                 // If result is false, then JSHint has some errors it needs to report
                 if (result === false) {
-                    linterReporter.report(_cm, JSHINT.errors, jshintSettings, jshintGroomer);
+                    linterReporter.report(_cm, JSHINT.errors, {
+                        // Groom is a callback from the reporter to give a chance at
+                        // massaging the message and return a CodeMirror token.
+                        groom: function(message) {
+                            return jshintGroomer.groom(message, jshintSettings);
+                        }
+                    });
                 }
             }
             else if ( linterType === linterTypes.jslint ) {
@@ -76,7 +82,13 @@ define(function (require, exports, module) {
                 result = JSLINT(docValue, jshintSettings.jslint);
 
                 if (result === false){
-                    linterReporter.report(_cm, JSLINT.errors, docValue, jslintGroomer);
+                    linterReporter.report(_cm, JSLINT.errors, {
+                        // Groom is a callback from the reporter to give a chance at
+                        // massaging the message and return a CodeMirror token.
+                        groom: function(message) {
+                            return jslintGroomer.groom(message, docValue);
+                        }
+                    });
                 }
             }
         }

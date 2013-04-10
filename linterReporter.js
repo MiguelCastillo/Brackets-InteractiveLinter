@@ -29,6 +29,18 @@ define(function (require, exports, module) {
 
     require('string');
 
+    /**
+    * Bypass groomer that simply returns the message that is passed it.
+    * Used in situations where the messages that need to be reported do
+    * not need further processing and all the information needed by the
+    * reporter is in the message itself
+    */
+    var noopGroomer = {
+            groom: function(message){
+                return message;
+            }
+        };
+
 
     function reporter() {
         var _self = this;
@@ -45,7 +57,7 @@ define(function (require, exports, module) {
     * @param settings {Object} jshint settings to further refine what does and doesn't
     *                       get reported
     */
-    reporter.prototype.report = function(cm, messages, settings, groomer) {
+    reporter.prototype.report = function(cm, messages, groomer) {
         var _self = this;
         var token;
         _self.clearMarks();
@@ -60,7 +72,7 @@ define(function (require, exports, module) {
 
             // Process message with the groomer to make sure we are getting a token
             // that code mirror can use
-            token = groomer.groom(message, settings);
+            token = groomer.groom(message);
 
             if (token){
                 // Add marks to gutter and line
@@ -123,6 +135,7 @@ define(function (require, exports, module) {
         }
 
         _self.cm.clearGutter("interactive-linter-gutter");
+
         $.each( _self.marks, function( index, mark ) {
             $.each( mark.lineMarks.slice(0), function(i1, textMark) {
                 textMark.line.clear();
@@ -207,8 +220,12 @@ define(function (require, exports, module) {
     var linterReporter = (function () {
         var _reporter = new reporter();
 
-        function report(cm, messages, settings, groomer) {
-            return _reporter.report(cm, messages, settings || {}, groomer);
+        function report(cm, messages, groomer) {
+            if( !groomer ){
+                groomer = noopGroomer;
+            }
+
+            return _reporter.report(cm, messages, groomer);
         }
 
         function showLineDetails(cm, lineNumber, gutterId, event) {
