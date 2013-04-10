@@ -173,7 +173,7 @@ define(function (require, exports, module) {
             };
 
             $.each([].concat(mark.errors, mark.warnings), function(index, message) {
-                mark.lineWidget.element.append("<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}</div>".format(message.type, message.code, message.reason));
+                mark.lineWidget.element.append("<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2} - {1}</div>".format(message.type, message.code, message.reason));
             });
         }
 
