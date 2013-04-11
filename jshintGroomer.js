@@ -61,7 +61,6 @@ define(function (require, exports, module) {
         * @param settings {Object} jshint settings
         */
         function groom(message, settings) {
-
             // Make sure the jshintMessage has a valid error code
             jshintMessages.ensureCode(message);
 
@@ -71,7 +70,7 @@ define(function (require, exports, module) {
             }
 
             var evidence = message.evidence.substr(message.character - 1);
-            var items = [];
+            var index;
 
             switch (message.code) {
                 case "W015": {
@@ -93,17 +92,55 @@ define(function (require, exports, module) {
                 }
 
                 case "W040": {
-                    items  = evidence.split(/[\s;.]/);
-                    if ( items.length !== 0 ) {
-                        evidence = evidence.substr(0, items[0].length);
+                    index = evidence.search(/[\s;.]/);
+                    if ( index !== -1 ) {
+                        evidence = evidence.substr(0, index);
                     }
                     break;
                 }
 
+                case "W051":{
+                    // Find the last occurence of 'delete' starting from where the
+                    // error was reported.  Skip six characters because thats how
+                    // long 'delete' is; we need the string after delete and before
+                    // where the error was reported...
+                    var start, end;
+                    end = message.character - 1;
+
+                    // Find the first valid charater
+                    while (/[\w]/.test(message.evidence[end]) === false) {
+                        if( end <= 0) {
+                            break;
+                        }
+
+                        end--;
+                    }
+
+                    // Find the first white space and that should give us our offending
+                    // token range.
+                    start = end;
+                    while (/[\s]/.test(message.evidence[start]) === false) {
+                        if( start <= 0) {
+                            break;
+                        }
+
+                        start--;
+                    }
+
+                    // We have to move one up to get to the beginning of the word because the
+                    // start marker currently points to the characters that stopped the search
+                    start++;
+                    end++;
+
+                    evidence = message.evidence.substr(start, end - start);
+                    message.character = start + 1;
+                    break;
+                }
+
                 case "W055": {
-                    items = evidence.split(/[(\s;]/);
-                    if ( items.length !== 0 ) {
-                        evidence = evidence.substr(0, items[0].length);
+                    index = evidence.search(/[(\s;]/);
+                    if ( index !== -1 ) {
+                        evidence = evidence.substr(0, index);
                     }
                     break;
                 }
@@ -157,6 +194,7 @@ define(function (require, exports, module) {
                 helper[helperFunction](message, token);
             }
 
+            //console.log(token, message);
             return token;
         }
 
