@@ -53,16 +53,11 @@ define(function (require, exports, module) {
         };
 
 
-        /**
-        * Breaks up the message from jshint into something that can be used
-        * by codemirror.
-        *
-        * @param message {Object} jshint message
-        * @param settings {Object} jshint settings
-        */
-        function groom(message, settings) {
+
+        function processMessage(message, settings) {
             // Make sure the jshintMessage has a valid error code
             jshintMessages.ensureCode(message);
+
 
             // Not sure why some characters are at 0...
             if (message.character === 0) {
@@ -70,18 +65,11 @@ define(function (require, exports, module) {
             }
 
             var evidence = message.evidence.substr(message.character - 1);
-            var index;
+            var index, start, end;
 
             switch (message.code) {
-                case "W015": {
-                    //evidence = message.evidence.substr(message.b, Math.abs(message.c - message.b) + message.a.length);
-                    evidence = message.evidence.substr(message.b);
-                    message.character = message.c;
-                    break;
-                }
-
-                case "W117": {
-                    evidence = message.a;
+                case "W032": {
+                    evidence = ";";
                     break;
                 }
 
@@ -99,12 +87,11 @@ define(function (require, exports, module) {
                     break;
                 }
 
-                case "W051":{
+                case "W051": {
                     // Find the last occurence of 'delete' starting from where the
                     // error was reported.  Skip six characters because thats how
                     // long 'delete' is; we need the string after delete and before
                     // where the error was reported...
-                    var start, end;
                     end = message.character - 1;
 
                     // Find the first valid charater
@@ -147,15 +134,27 @@ define(function (require, exports, module) {
 
                 case "W086": {
                     if ( settings.laxcasebreak ) {
-                        return;
+                        return false;
                     }
                     break;
                 }
 
                 case "W004":
-                case "W098": {
+                case "W015":
+                case "W098":
+                case "W117": {
+                    start = message.evidence.lastIndexOf(message.a, message.character);
+                    message.character = start + 1;
+                    evidence = message.a;
+
+                    /* The bit below is obviously much more efficient, but JSHint reports
+                    * the wrong character position when dealing with tabs.  So I have to
+                    * manually go through and figure out the proper character position.
+                    * Somehow W098 also reports the wrong position, whether using tabs or
+                    * spaces.
                     message.character -= message.a.length;
                     evidence = message.a;
+                    */
                     break;
                 }
 
@@ -164,26 +163,38 @@ define(function (require, exports, module) {
                 }
             }
 
-            var start = {
-                line: (message.line - 1),
-                ch: (message.character - 1)
-            };
+            return evidence;
+        }
 
-            var end = {
-                line: (message.line - 1),
-                ch: (message.character - 1) + evidence.length
-            };
 
-            // For performance reasons, don't figure out the text out
-            // of code mirror... I use only for debugging purposes to verify
-            // that codemirror is getting the correct piece of data
-            //var text = this.cm.getDoc().getRange(start, end);
-            var text = evidence;
+
+        /**
+        * Breaks up the message from jshint into something that can be used
+        * by codemirror.
+        *
+        * @param message {Object} jshint message
+        * @param settings {Object} jshint settings
+        */
+        function groom(message, settings) {
+            // Don't inline this call in token because message gets changed in
+            // processMessage, so all the message properties will not be correct
+            // in the rest of the token
+            var text = processMessage(message, settings);
+
+            if (text === false){
+                return false;
+            }
 
             var token = {
                 text: text,
-                start: start,
-                end: end
+                start: {
+                    line: (message.line - 1),
+                    ch: (message.character - 1)
+                },
+                end: {
+                    line: (message.line - 1),
+                    ch: (message.character - 1) + text.length
+                }
             };
 
             // Get the handler for the code type
