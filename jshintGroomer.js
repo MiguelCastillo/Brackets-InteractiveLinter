@@ -87,6 +87,11 @@ define(function (require, exports, module) {
                     break;
                 }
 
+                case "W041": {
+                    evidence = message.a;
+                    break;
+                }
+
                 case "W051": {
                     // Find the last occurence of 'delete' starting from where the
                     // error was reported.  Skip six characters because thats how
@@ -139,6 +144,7 @@ define(function (require, exports, module) {
                     break;
                 }
 
+                /*
                 case "W004":
                 case "W015":
                 case "W098":
@@ -146,6 +152,17 @@ define(function (require, exports, module) {
                     start = message.evidence.lastIndexOf(message.a, message.character);
                     message.character = start + 1;
                     evidence = message.a;
+
+                    break;
+                }
+                */
+
+                default: {
+                    if ( message.a ) {
+                        start = message.evidence.lastIndexOf(message.a, message.character);
+                        message.character = start + 1;
+                        evidence = message.a;
+                    }
 
                     /* The bit below is obviously much more efficient, but JSHint reports
                     * the wrong character position when dealing with tabs.  So I have to
@@ -155,17 +172,13 @@ define(function (require, exports, module) {
                     message.character -= message.a.length;
                     evidence = message.a;
                     */
-                    break;
-                }
 
-                default: {
                     break;
                 }
             }
 
             return evidence;
         }
-
 
 
         /**
