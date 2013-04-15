@@ -34,13 +34,11 @@ define(function (require, exports, module) {
     var EditorManager    = brackets.getModule("editor/EditorManager"),
         AppInit          = brackets.getModule("utils/AppInit"),
         ExtensionUtils   = brackets.getModule("utils/ExtensionUtils"),
-        FileUtils        = brackets.getModule("file/FileUtils"),
-        NativeFileError  = brackets.getModule("file/NativeFileError"),
-        NativeFileSystem = brackets.getModule("file/NativeFileSystem").NativeFileSystem,
-        ProjectManager   = brackets.getModule("project/ProjectManager");
+        NativeFileError  = brackets.getModule("file/NativeFileError");
 
     var linterManager         = require('linterManager'),
-        linterDefaultSettings = require('linterSettings');
+        linterDefaultSettings = require('linterSettings'),
+        ProjectFiles          = require('ProjectFiles');
 
     linterManager.setLinterType( linterManager.linterTypes.jshint );
     //linterManager.setLinterType( linterManager.linterTypes.jslint );
@@ -67,62 +65,21 @@ define(function (require, exports, module) {
     }
 
 
-    var projectManager = (function(){
-        var projectPath;
-
-        // If the file exists, then we load that file up and use it as the settings
-        // for JSHint
-        function successCallback (fileEntry) {
-            FileUtils.readAsText(fileEntry).done(function (text) {
+    $(ProjectFiles).on('projectOpen', function() {
+        ProjectFiles.openFile(".interactiveLinter").done(function( fileReader ) {
+            fileReader.readAsText().done(function (text) {
                 setSettings(JSON.parse(text));
             });
-        }
-
-        // If the jshint file does not exist for the particular project we are
-        // loading, we will attempt to create a jshintrc file with the default
-        // settings that will be loaded next time this project gets loaded.
-        function errorCallback ( err ) {
-            // Load up default settings
-            setSettings();
-
-            if ( err.name === NativeFileError.NOT_FOUND_ERR ) {
-                var directoryEntry = new NativeFileSystem.DirectoryEntry(projectPath);
-
-                // Create jshintrc file
-                directoryEntry.getFile( ".interactiveLinter", {
-                        create: true,
-                        exclusive: true
-                    }, function( fileEntry ) {
-                        fileEntry.createWriter( function(fileWriter) {
-                            fileWriter.write( JSON.stringify(linterDefaultSettings) );
-                        });
-                    });
+        }).fail(function(err){
+            if( err.name === NativeFileError.NOT_FOUND_ERR ) {
+                ProjectFiles.openFile( ".interactiveLinter", "write", true ).done(function( fileWriter ) {
+                    fileWriter.write( JSON.stringify(linterDefaultSettings) );
+                });
             }
-        }
-
-        function open(project) {
-            // Try to load up the linterSettings file, which is per project.
-            projectPath = FileUtils.canonicalizeFolderPath(project.fullPath);
-            var jshintFile  = projectPath + "/.interactiveLinter";
-
-            // Start the process of figuring out if we already have a .jshintrc file
-            NativeFileSystem.resolveNativeFileSystemPath(jshintFile, successCallback, errorCallback);
-        }
-
-        return {
-            open: open
-        };
-
-    })();
+        });
+    });
 
 
-    function ready () {
-        $(EditorManager).on("activeEditorChange.interactive-linter", setDocument);
-        setDocument();
-    }
-
-
-    $(ProjectManager).on("projectOpen", function(e, project){projectManager.open(project);});
-    AppInit.appReady(ready);
+    AppInit.appReady(setDocument);
 
 });
