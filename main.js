@@ -80,6 +80,9 @@ define(function (require, exports, module) {
     });
 
 
-    AppInit.appReady(setDocument);
+    AppInit.appReady(function(){
+        $(EditorManager).on("activeEditorChange.interactive-linter", setDocument);
+        setDocument();
+    });
 
 });
