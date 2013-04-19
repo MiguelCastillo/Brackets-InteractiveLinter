@@ -54,7 +54,7 @@ define(function (require, exports, module) {
                 // Fallback to manually match codes...
                 if (!_code) {
                     if (message.raw.indexOf("Expected a 'break' statement before") === 0) {
-                        _code = messages.warnings["W086"];
+                        _code = messages.warnings.W086;
                     }
                 }
 

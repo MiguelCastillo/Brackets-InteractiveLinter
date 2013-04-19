@@ -22,9 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
-/*global define, $, brackets */
-
 define(function (require, exports, module) {
     'use strict';
 
@@ -33,15 +30,10 @@ define(function (require, exports, module) {
 
     var EditorManager    = brackets.getModule("editor/EditorManager"),
         AppInit          = brackets.getModule("utils/AppInit"),
-        ExtensionUtils   = brackets.getModule("utils/ExtensionUtils"),
-        NativeFileError  = brackets.getModule("file/NativeFileError");
+        ExtensionUtils   = brackets.getModule("utils/ExtensionUtils");
 
-    var linterManager         = require('linterManager'),
-        linterDefaultSettings = require('linterSettings'),
-        ProjectFiles          = require('ProjectFiles');
-
-    linterManager.setLinterType( linterManager.linterTypes.jshint );
-    //linterManager.setLinterType( linterManager.linterTypes.jslint );
+    var linterManager   = require('linterManager');
+    require("linterSettings");
 
     ExtensionUtils.loadStyleSheet(module, "style.css");
 
@@ -54,30 +46,8 @@ define(function (require, exports, module) {
         }
 
         linterManager.setDocument(editor._codeMirror);
-        setTimeout(function() {
-            linterManager.run();
-        }, 1000);
+        linterManager.lint();
     }
-
-
-    function setSettings(settings) {
-        linterManager.setSettings(settings || linterDefaultSettings);
-    }
-
-
-    $(ProjectFiles).on('projectOpen', function() {
-        ProjectFiles.openFile(".interactiveLinter").done(function( fileReader ) {
-            fileReader.readAsText().done(function (text) {
-                setSettings(JSON.parse(text));
-            });
-        }).fail(function(err){
-            if( err.name === NativeFileError.NOT_FOUND_ERR ) {
-                ProjectFiles.openFile( ".interactiveLinter", "write", true ).done(function( fileWriter ) {
-                    fileWriter.write( JSON.stringify(linterDefaultSettings) );
-                });
-            }
-        });
-    });
 
 
     AppInit.appReady(function(){
@@ -86,3 +56,4 @@ define(function (require, exports, module) {
     });
 
 });
+

@@ -28,61 +28,54 @@ define(function (require, exports, module) {
     'use strict';
 
     var linterReporter = require('linterReporter'),
-        linterSettings = require('linterSettings'),
-        jshintGroomer = require('jshintGroomer'),
-        jslintGroomer = require('jslintGroomer');
+        jshintGroomer  = require('jshintGroomer'),
+        jslintGroomer  = require('jslintGroomer');
 
-    // Running a modified version of jshint to fix the issue with unused function parameters.
     /**
     * BUG: jshint gives the wrong character index when dealing with tabs.
     * https://github.com/jshint/jshint/issues/430
     * I am stuck only expecting correct results when the files uses white
     * spaces. Arrrggh!
     */
+
+    // Running a modified version of jshint to fix the issue with unused function parameters.
     require('lib/jshint-1.1.0-stable-mod');
     var JSLINT = require('lib/jslint');
 
-    var linterTypes = {
-        jshint: 0,
-        jslint: 1
+
+    var types = {
+        "jshint": "jshint",
+        "jslint": "jslint"
     };
 
-    var linterType = linterTypes.jshint;
 
-
-    var linterManager = (function(){
-        var _cm = null, _timer = null;
-
-        function run() {
-            if (!_cm) {
-                return;
-            }
-
-            // Get document as a string to be passed into JSHint
-            var docValue = _cm.getDoc().getValue(), jshintSettings = linterSettings.jshint;
-            var result;
-
-            // Run JSHint
-            if ( linterType === linterTypes.jshint ){
-                result = JSHINT(docValue, jshintSettings, jshintSettings.globals);
+    var linters = {
+        "jshint": {
+            lint: function(cm, settings) {
+                // Get document as a string to be passed into JSHint
+                var docValue = cm.getDoc().getValue();
+                var result = JSHINT(docValue, settings, settings.globals);
 
                 // If result is false, then JSHint has some errors it needs to report
                 if (result === false) {
-                    linterReporter.report(_cm, JSHINT.errors, {
+                    linterReporter.report(cm, JSHINT.errors, {
                         // Groom is a callback from the reporter to give a chance at
                         // massaging the message and return a CodeMirror token.
                         groom: function(message) {
-                            return jshintGroomer.groom(message, jshintSettings);
+                            return jshintGroomer.groom(message, settings);
                         }
                     });
                 }
             }
-            else if ( linterType === linterTypes.jslint ) {
-                // Run JSLint
-                result = JSLINT(docValue, jshintSettings.jslint);
+        },
+        "jslint": {
+            lint: function(cm, settings) {
+                // Get document as a string to be passed into JSHint
+                var docValue = cm.getDoc().getValue();
+                var result = JSLINT(docValue, settings);
 
                 if (result === false){
-                    linterReporter.report(_cm, JSLINT.errors, {
+                    linterReporter.report(cm, JSLINT.errors, {
                         // Groom is a callback from the reporter to give a chance at
                         // massaging the message and return a CodeMirror token.
                         groom: function(message) {
@@ -92,9 +85,17 @@ define(function (require, exports, module) {
                 }
             }
         }
+    };
 
 
-        function trackChanges() {
+    var linterManager = (function() {
+        var _cm = null, _timer = null,
+            _type = types.jshint,
+            _settings = {},
+            _linter = linters[_type];
+
+
+        function lint( ) {
             if (_timer) {
                 clearTimeout(_timer);
                 _timer = null;
@@ -102,7 +103,10 @@ define(function (require, exports, module) {
 
             _timer = setTimeout(function () {
                 _timer = null;
-                run();
+
+                if (_cm) {
+                    _linter.lint(_cm, _settings);
+                }
             }, 1000);
         }
 
@@ -120,25 +124,17 @@ define(function (require, exports, module) {
 
 
         /**
-        * Change which linter type to run
-        */
-        function setLinterType(type) {
-            linterType = type;
-        }
-
-
-        /**
         * We will only handle one document at a time
         */
         function setDocument(cm) {
             if (_cm) {
-                CodeMirror.off(_cm.getDoc(), "change", trackChanges);
+                CodeMirror.off(_cm.getDoc(), "change", lint);
                 _cm.setOption("gutters", []);
                 _cm.off('gutterClick', gutterClick);
             }
 
             if (cm && cm.getDoc().getMode().name === 'javascript') {
-                CodeMirror.on(cm.getDoc(), "change", trackChanges);
+                CodeMirror.on(cm.getDoc(), "change", lint);
                 _cm = cm;
                 _cm.setOption("gutters", ["interactive-linter-gutter"]);
                 _cm.on('gutterClick', gutterClick);
@@ -146,22 +142,40 @@ define(function (require, exports, module) {
         }
 
 
+        function setType(type) {
+            if (types.hasOwnProperty(type)) {
+                _type = type;
+                _linter = linters[_type];
+            }
+        }
+
+
+        function getType() {
+            return _type;
+        }
+
+
         function setSettings(settings) {
-            linterSettings = settings;
+            _settings = settings;
         }
 
 
         return {
-            setLinterType: setLinterType,
+            // Properties
+            types: types,
+
+            // Functions
+            lint: lint,
+            setType: setType,
+            getType: getType,
             setDocument: setDocument,
-            setSettings: setSettings,
-            linterTypes: linterTypes,
-            run: run
+            setSettings: setSettings
         };
 
     })();
 
 
     return linterManager;
+
 });
 
