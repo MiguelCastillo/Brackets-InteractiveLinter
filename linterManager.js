@@ -127,17 +127,30 @@ define(function (require, exports, module) {
         * We will only handle one document at a time
         */
         function setDocument(cm) {
+            var gutters, index;
+
             if (_cm) {
                 CodeMirror.off(_cm.getDoc(), "change", lint);
-                _cm.setOption("gutters", []);
                 _cm.off('gutterClick', gutterClick);
+
+                gutters = _cm.getOption("gutters").slice(0);
+                index = gutters.indexOf("interactive-linter-gutter");
+                if ( index !== -1 ) {
+                    gutters.splice(index, 1);
+                    _cm.setOption("gutters", gutters);
+                }
             }
 
             if (cm && cm.getDoc().getMode().name === 'javascript') {
                 CodeMirror.on(cm.getDoc(), "change", lint);
                 _cm = cm;
-                _cm.setOption("gutters", ["interactive-linter-gutter"]);
                 _cm.on('gutterClick', gutterClick);
+
+                gutters = _cm.getOption("gutters").slice(0);
+                if ( gutters.indexOf("interactive-linter-gutter") === -1 ) {
+                    gutters.unshift("interactive-linter-gutter");
+                    cm.setOption("gutters", gutters);
+                }
             }
         }
 

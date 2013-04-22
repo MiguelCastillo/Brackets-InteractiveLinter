@@ -76,7 +76,7 @@ define(function (require, exports, module) {
 
             if (token){
                 // Add marks to gutter and line
-                _self.addMarks(message, token);
+                _self.addGutterMarks(message, token);
             }
         });
 
@@ -87,7 +87,7 @@ define(function (require, exports, module) {
     /**
     * Add reporting information in code mirror's document
     */
-    reporter.prototype.addMarks = function(message, token) {
+    reporter.prototype.addGutterMarks = function(message, token) {
         var _self = this, mark;
 
         if( !_self.marks[token.start.line] ) {
