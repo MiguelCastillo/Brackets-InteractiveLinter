@@ -22,7 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-/*jslint plusplus: true, nomen: true, regexp: true, maxerr: 50 */
 
 define(function (require, exports, module) {
     'use strict';

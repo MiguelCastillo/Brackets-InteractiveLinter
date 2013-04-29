@@ -48,16 +48,11 @@ define(function (require, exports, module) {
     //linterManager.setType( linterManager.types.jslint );
 
     function getLinterInfo () {
-        switch ( linterManager.getType() ){
-            case linterManager.types.jshint: {
-                return linterInfo.jshint;
-            }
-            case linterManager.types.jslint: {
-                return linterInfo.jslint;
-            }
+        var info = linterInfo[linterManager.getType()];
+        if (!info){
+            throw "Unknown linter type";
         }
-
-        throw "Unknown linter type";
+        return info;
     }
 
 
@@ -70,16 +65,20 @@ define(function (require, exports, module) {
         var info = getLinterInfo();
         setSettings(info.defaultSettings);
 
-        ProjectFiles.openFile( info.configFile ).done(function( fileReader ) {
+        ProjectFiles.openFile( info.configFile )
+        .done(function( fileReader ) {
             fileReader.readAsText().done(function (text) {
                 setSettings( JSON.parse(text) );
             });
-        }).fail(function(err){
-            if( err.name === NativeFileError.NOT_FOUND_ERR ) {
-                ProjectFiles.openFile( info.configFile, "write", true ).done(function( fileWriter ) {
-                    fileWriter.write( JSON.stringify( info.defaultSettings ) );
-                });
+        })
+        .fail(function(err){
+            if( err.name !== NativeFileError.NOT_FOUND_ERR ) {
+                return;
             }
+
+            ProjectFiles.openFile( info.configFile, "write", true ).done(function( fileWriter ) {
+                fileWriter.write( JSON.stringify( info.defaultSettings ) );
+            });
         });
     });
 
