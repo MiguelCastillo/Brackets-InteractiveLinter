@@ -38,7 +38,7 @@ define(function (require, exports, module) {
     */
 
     // Running a modified version of jshint to fix the issue with unused function parameters.
-    require('lib/jshint-1.1.0-stable-mod');
+    require('lib/jshint-2.0.1');
     var JSLINT = require('lib/jslint');
 
 

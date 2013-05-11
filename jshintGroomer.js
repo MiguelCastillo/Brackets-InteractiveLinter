@@ -27,9 +27,6 @@
 define(function (require, exports, module) {
     'use strict';
 
-    var jshintMessages = require('jshintMessages');
-
-
     var jshintGroomer = (function () {
 
         /**
@@ -55,10 +52,6 @@ define(function (require, exports, module) {
 
 
         function processMessage(message, settings) {
-            // Make sure the jshintMessage has a valid error code
-            jshintMessages.ensureCode(message);
-
-
             // Not sure why some characters are at 0...
             if (message.character === 0) {
                 message.character = 1;
