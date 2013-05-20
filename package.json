@@ -1,4 +1,5 @@
 {
+    "title": "Interactive Linter",
     "name": "interactive-linter",
     "description": "Interactive Linter brings code feedback into brackets as you work on your JavaScript",
     "version": "0.1.0",
