@@ -33,6 +33,7 @@ define(function (require, exports, module) {
         ExtensionUtils   = brackets.getModule("utils/ExtensionUtils");
 
     var linterManager   = require('linterManager');
+    linterManager.setType(linterManager.types.jshint);
     require("linterSettings");
 
     ExtensionUtils.loadStyleSheet(module, "style.css");
