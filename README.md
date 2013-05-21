@@ -17,12 +17,13 @@ FAQ
 ===============
 
 * Use JSLint instead of JSHint? Yes, it is possible. Although it requires manual intervention.
-    <ul>
-    <li>1. Open main.js</li>
-    <li>2. Locate line 36</li>
-    <li>3. Replace with linterManager.setType(linterManager.types.jslint);</li>
-    <li>4. Refresh Brackets.IO and you should now be getting jslint reports</li>
-    </ul>
+    - 1. Open main.js
+    - 2. Locate line 36
+    - 3. Replace with linterManager.setType(linterManager.types.jslint);
+    - 4. Refresh Brackets.IO and you should now be getting jslint reports
+
+* Are .jshintrc supported?
+    - Yes, they are supported but they will only be applied when a project is currently open.
 
 
 Links
