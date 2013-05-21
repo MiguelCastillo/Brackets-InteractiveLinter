@@ -13,6 +13,18 @@ How to
 * Install... Open Brackets then copy and paste https://github.com/MiguelCastillo/Brackets-Interactive-JSHint into File->Install Extension.  You don't need to restart Brackets.
 
 
+FAQ
+===============
+
+* Use JSLint instead of JSHint? Yes, it is possible. Although it requires manual intervention.
+    <ul>
+    <li>1. Open main.js</li>
+    <li>2. Locate line 36</li>
+    <li>3. Replace with linterManager.setType(linterManager.types.jslint);</li>
+    <li>4. Refresh Brackets.IO and you should now be getting jslint reports</li>
+    </ul>
+
+
 Links
 ===============
 Brackets? Right here... http://brackets.io/ <br>
