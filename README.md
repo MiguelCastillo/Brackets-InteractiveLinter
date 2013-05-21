@@ -1,7 +1,11 @@
 Brackets-Interactive-Linter
 ===========================
 
-Brackets integration with JSHint.  Interactive Linter will provide feedback as JavaScript files are modified with JSHint details easily accessible from the line gutter of the editor.  Interactive Linter also keeps its settings per project (.interactiveLinter), which you can manually modify to customize JSHint settings for the entire project.  Of course, JSHint annotation in your files will continue to work.<br><br>
+Brackets integration with JSHint.  Interactive Linter runs JSHint are you work on your JavaScript files, and gives instant feedback right on your document.  You can access the details of the JSHint reports by clicking on the light bulbs on the line gutters.<br>
+Interactive Linter also loads .jshintrc files that are found in your root directory (your project). If one doesn't already found, Interactive Linter will create one for you so that you can easily customize JSHint for each project.  Further more, all jshint settings that already exists inline in your JavaScript files will also work.<br><br>
+
+You can use http://jslinterrors.com/ to find out details about what's reported by JSHint.
+
 This was inspired by brackets-continuous-compilation extension (https://github.com/JoachimK/brackets-continuous-compilation), so thank you for that
 
 
