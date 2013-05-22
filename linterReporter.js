@@ -173,8 +173,8 @@ define(function (require, exports, module) {
             };
 
             $.each([].concat(mark.errors, mark.warnings), function(index, message) {
-                var href = "http://jslinterrors.com/" + (message.raw || "").replace(/'*{([a-z])+}'*/, "$1").replace(/\s/g, '-').replace(/\.$/, '').toLowerCase();
-                mark.lineWidget.element.append("<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2} - {1} - <a href='{3}' target='_blank'>Details</a></div>".format(message.type, message.code, message.reason, href));
+                var href = "http://jslinterrors.com/" + (message.raw || "").replace(/'*\{*(\w*)\}*'*/g, "$1").replace(/\s/g, '-').replace(/\.$/, '').toLowerCase();
+                mark.lineWidget.element.append("<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2} - {1} - <a href='{3}' target='interactivelinter'>Details</a></div>".format(message.type, message.code, message.reason, href));
             });
         }
 
