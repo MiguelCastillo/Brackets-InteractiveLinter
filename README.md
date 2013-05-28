@@ -10,7 +10,7 @@ Brackets-Interactive-Linter
 How to
 ===============
 
-* Install... Open Brackets then copy and paste https://github.com/MiguelCastillo/Brackets-Interactive-JSHint into File->Install Extension.  You don't need to restart Brackets.
+* Install... Open Brackets then copy and paste https://github.com/MiguelCastillo/Brackets-Interactive-Linter into File->Install Extension.  You don't need to restart Brackets.
 
 
 FAQ
