@@ -19,8 +19,6 @@
 .CodeMirror .interactive-linter-gutter {
     width: 8px;
     margin-left: 8px;
-    position: absolute;
-    left: 0;
 }
 
 .CodeMirror .interactive-linter-gutter-messages {
