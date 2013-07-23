@@ -27,7 +27,8 @@
 define(function (require, exports, module) {
     'use strict';
 
-    var NativeFileError = brackets.getModule("file/NativeFileError");
+    var NativeFileError = brackets.getModule("file/NativeFileError"),
+        Dialogs         = brackets.getModule("widgets/Dialogs");
 
     var linterManager   = require('linterManager'),
         defaultSettings = require('defaultSettings'),
@@ -68,7 +69,16 @@ define(function (require, exports, module) {
         ProjectFiles.openFile( info.configFile )
         .done(function( fileReader ) {
             fileReader.readAsText().done(function (text) {
-                setSettings( JSON.parse(text) );
+                try {
+                    setSettings( JSON.parse(text) );
+                }
+                catch( ex ) {
+                    Dialogs.showModalDialog(
+                        "interactiveLinterErr",
+                        "Interactive Linter Error",
+                        "Error processing jshint settings<br>" +
+                        ex.toString());
+                }
             });
         })
         .fail(function(err){
