@@ -38,6 +38,11 @@ define(function (require, exports, module) {
 
     ExtensionUtils.loadStyleSheet(module, "style.css");
 
+    $(document).on("click", "a[target=interactivelinter]", function(evt) {
+        evt.preventDefault();
+        window.open($(this).attr("href"), "interactivelinter");
+    });
+
 
     function setDocument() {
         var editor = EditorManager.getActiveEditor();
