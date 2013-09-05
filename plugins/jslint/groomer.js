@@ -29,7 +29,7 @@ define(function (require, exports, module) {
 
     var JSLintError = require('JSLintError');
 
-    var jslintGroomer = (function () {
+    var groomer = (function () {
 
         /**
         * Used for reporting errors.  The name is shorter to more directly match
@@ -91,5 +91,5 @@ define(function (require, exports, module) {
     })();
 
 
-    return jslintGroomer;
+    return groomer;
 });

@@ -26,72 +26,14 @@
 define(function (require, exports, module) {
     'use strict';
 
-    var linterReporter = require('linterReporter'),
-        jshintGroomer  = require('jshintGroomer'),
-        jslintGroomer  = require('jslintGroomer');
-
-    /**
-    * BUG: jshint gives the wrong character index when dealing with tabs.
-    * https://github.com/jshint/jshint/issues/430
-    * I am stuck only expecting correct results when the files uses white
-    * spaces. Arrrggh!
-    */
-
-    // Running a modified version of jshint to fix the issue with unused function parameters.
-    require('lib/jshint-2.1.9');
-    var JSLINT = require('lib/jslint');
-
-
-    var types = {
-        "jshint": "jshint",
-        "jslint": "jslint"
-    };
-
-
-    var linters = {
-        "jshint": {
-            lint: function(cm, settings) {
-                // Get document as a string to be passed into JSHint
-                var docValue = cm.getDoc().getValue();
-                var result = JSHINT(docValue, settings, settings.globals);
-
-                // If result is false, then JSHint has some errors it needs to report
-                if (result === false) {
-                    linterReporter.report(cm, JSHINT.errors, {
-                        // Groom is a callback from the reporter to give a chance at
-                        // massaging the message and return a CodeMirror token.
-                        groom: function(message) {
-                            return jshintGroomer.groom(message, settings);
-                        }
-                    });
-                }
-            }
-        },
-        "jslint": {
-            lint: function(cm, settings) {
-                // Get document as a string to be passed into JSHint
-                var docValue = cm.getDoc().getValue();
-                var result = JSLINT(docValue, settings);
-
-                if (result === false){
-                    linterReporter.report(cm, JSLINT.errors, {
-                        // Groom is a callback from the reporter to give a chance at
-                        // massaging the message and return a CodeMirror token.
-                        groom: function(message) {
-                            return jslintGroomer.groom(message, docValue);
-                        }
-                    });
-                }
-            }
-        }
-    };
-
+    var linterSettings = require("linterSettings");
+    var linterReporter  = require("linterReporter");
+    var languages = {};
+    var linters = {};
 
     var linterManager = (function() {
         var _cm = null, _timer = null,
-            _type = types.jshint,
-            _settings = {},
-            _linter = linters[_type];
+            _mode = '';
 
 
         function lint( ) {
@@ -103,8 +45,8 @@ define(function (require, exports, module) {
             _timer = setTimeout(function () {
                 _timer = null;
 
-                if (_cm) {
-                    _linter.lint(_cm, _settings);
+                if (_cm && languages[_mode]) {
+                    languages[_mode].lint(_cm, languages[_mode].settings);
                 }
             }, 1000);
         }
@@ -127,6 +69,7 @@ define(function (require, exports, module) {
         */
         function setDocument(cm) {
             var gutters, index;
+            _mode = cm && cm.getDoc().getMode().name;
 
             if (_cm) {
                 CodeMirror.off(_cm.getDoc(), "change", lint);
@@ -140,7 +83,7 @@ define(function (require, exports, module) {
                 }
             }
 
-            if (cm && cm.getDoc().getMode().name === 'javascript') {
+            if (cm && (_mode === 'javascript' || _mode =='coffeescript')) {
                 CodeMirror.on(cm.getDoc(), "change", lint);
                 _cm = cm;
                 _cm.on('gutterClick', gutterClick);
@@ -154,34 +97,18 @@ define(function (require, exports, module) {
         }
 
 
-        function setType(type) {
-            if (types.hasOwnProperty(type)) {
-                _type = type;
-                _linter = linters[_type];
-            }
-        }
-
-
-        function getType() {
-            return _type;
-        }
-
-
-        function setSettings(settings) {
-            _settings = settings;
+        function register( linter ) {
+            languages[linter.language] = linter;
+            linters[linter.name] = linter;
+            linterSettings.register(linter);
         }
 
 
         return {
-            // Properties
-            types: types,
-
             // Functions
             lint: lint,
-            setType: setType,
-            getType: getType,
-            setDocument: setDocument,
-            setSettings: setSettings
+            register: register,
+            setDocument: setDocument
         };
 
     })();

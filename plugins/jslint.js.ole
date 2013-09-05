@@ -1,0 +1,27 @@
+define(function(require, exports, module) {
+
+    var JSLINT = require('lib/jslint');
+    var linterReporter = require("linterReporter"),
+        groomer  = require("plugins/jslint/groomer");
+
+    function lint(cm, settings) {
+        // Get document as a string to be passed into JSHint
+        var docValue = cm.getDoc().getValue();
+        var result = JSLINT(docValue, settings);
+
+        if (result === false){
+            linterReporter.report(cm, JSLINT.errors, {
+                // Groom is a callback from the reporter to give a chance at
+                // massaging the message and return a CodeMirror token.
+                groom: function(message) {
+                    return groomer.groom(message, docValue);
+                }
+            });
+        }
+    }
+
+    return {
+        language: "javascript",
+        lint: lint
+    };
+});
