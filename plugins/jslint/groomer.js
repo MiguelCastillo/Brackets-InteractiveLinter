@@ -22,74 +22,37 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-/*jslint plusplus: true, nomen: true, regexp: true, maxerr: 50 */
 
 define(function (require, exports, module) {
     'use strict';
 
     var JSLintError = require('JSLintError');
 
-    var groomer = (function () {
 
-        /**
-        * Used for reporting errors.  The name is shorter to more directly match
-        * to the code from jshint
-        */
-        var helper = {
-            e: function(message, token) {
-                message.etype = message.type;
-                message.type = "error";
-                //console.log("error", message, token);
-            },
+    /**
+    * Breaks up the message from jshint into something that can be used
+    * by codemirror.
+    *
+    * @param message {Object} jshint message
+    * @param settings {Object} jshint settings
+    */
+    function groom(message, settings) {
+        var token = new JSLintError(message, settings);
+        message.type = message.type || "warning";
 
-            /**
-            * Used for reporting warnings.  The name is shorter to more directly match
-            * to the code from jshint
-            */
-            w: function(message, token) {
-                message.etype = message.type;
-                message.type = "warning";
-                //console.log("warning", message, token);
-            }
-        };
-
-
-        /**
-        * Breaks up the message from jshint into something that can be used
-        * by codemirror.
-        *
-        * @param message {Object} jshint message
-        * @param settings {Object} jshint settings
-        */
-        function groom(message, settings) {
-            var token = new JSLintError(message, settings);
-
-            if (!message.code) {
-                message.code = "W000";
-            }
-
-            // Get the handler for the code type
-            var helperFunction = message.code[0].toLowerCase();
-
-            if ( helper[helperFunction] ) {
-                // Do special handling for the message if a handler exists
-                helper[helperFunction](message, token);
-            }
-
-            return {
-                text: token.evidence,
-                start: token.startPosition,
-                end: token.endPosition
-            };
-        }
-
+        // Add href for help
+        message.href = "http://jslinterrors.com/" + (message.raw || "").replace(/'*\{*(\w*)\}*'*/g, "$1").replace(/\s/g, '-').replace(/\.$/, '').toLowerCase();
 
         return {
-            groom: groom
+            text: token.evidence,
+            start: token.startPosition,
+            end: token.endPosition
         };
+    }
 
-    })();
 
+    return {
+        groom: groom
+    };
 
-    return groomer;
 });

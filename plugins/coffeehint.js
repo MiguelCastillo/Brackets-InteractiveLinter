@@ -18,6 +18,7 @@ define(function(require, exports, module) {
         var docValue = cm.getDoc().getValue(), result;
 
         try {
+            console.log(settings);
             result = coffeelint.lint(docValue, settings);
 
             // If result is false, then JSHint has some errors it needs to report

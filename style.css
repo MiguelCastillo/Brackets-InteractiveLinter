@@ -6,12 +6,12 @@
     border-bottom: 2px dotted #3a87ad;
 }
 
-.CodeMirror *[class*="interactive-linter-W"] {
+.CodeMirror *[class*="interactive-linter-w"] {
     border-bottom: 2px dotted #f89406;
     z-index: 6;
 }
 
-.CodeMirror *[class*="interactive-linter-E"] {
+.CodeMirror *[class*="interactive-linter-e"] {
     border-bottom: 2px dotted #bd362f;
     z-index: 7;
 }

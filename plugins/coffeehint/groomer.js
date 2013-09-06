@@ -3,10 +3,16 @@ define(function(require, exports, module) {
 
 
     function groom(message, settings) {
-        console.log(message);
+        message.type   = message.level;
+        message.reason = message.message;
 
-        message.type = message.level;
-        message.reason = message.message + " - " + message.context;
+        if ( message.context ) {
+            message.reason += " - " + message.context;
+        }
+
+        if ( message.type === "warn" ) {
+            message.type += "ing";
+        }
 
         if ( !message.code ) {
             if ( message.type === "error" ) {

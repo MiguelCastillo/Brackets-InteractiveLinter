@@ -9,7 +9,7 @@ define(function(require, exports, module) {
         var docValue = cm.getDoc().getValue();
         var result = JSLINT(docValue, settings);
 
-        if (result === false){
+        if (result === false) {
             linterReporter.report(cm, JSLINT.errors, {
                 // Groom is a callback from the reporter to give a chance at
                 // massaging the message and return a CodeMirror token.

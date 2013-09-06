@@ -114,7 +114,7 @@ define(function (require, exports, module) {
         // Add marks to the line that is reporting messages
         mark = _self.marks[token.start.line];
         mark.lineMarks.push({
-            line: _self.cm.markText(token.start, token.end, {className: "interactive-linter-" + message.code}),
+            line: _self.cm.markText(token.start, token.end, {className: "interactive-linter-" + message.type}),
             message: message
         });
 
@@ -180,7 +180,7 @@ define(function (require, exports, module) {
             };
 
             $.each([].concat(mark.errors, mark.warnings), function(index, message) {
-                var messageContent = "<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2} - {1}</div>".format(message.type, message.code, message.reason);
+                var messageContent = "<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}</div>".format(message.type, message.code, message.reason);
                 var $messageContent = $(messageContent);
 
                 if (message.href) {
