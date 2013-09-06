@@ -66,7 +66,7 @@ define(function (require, exports, module) {
         _self.messages = messages;
 
         $.each(messages.slice(0), function (index, message) {
-            if (!message || !message.evidence) {
+            if (!message) {
                 return;
             }
 
@@ -86,6 +86,13 @@ define(function (require, exports, module) {
 
     /**
     * Add reporting information in code mirror's document
+    *
+    * Message requires:
+    * - type,
+    * - code,
+    * - raw,
+    * - reason,
+    * - href
     */
     reporter.prototype.addGutterMarks = function(message, token) {
         var _self = this, mark;
@@ -173,8 +180,14 @@ define(function (require, exports, module) {
             };
 
             $.each([].concat(mark.errors, mark.warnings), function(index, message) {
-                var href = "http://jslinterrors.com/" + (message.raw || "").replace(/'*\{*(\w*)\}*'*/g, "$1").replace(/\s/g, '-').replace(/\.$/, '').toLowerCase();
-                mark.lineWidget.element.append("<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2} - {1} - <a href='{3}' target='interactivelinter'>Details</a></div>".format(message.type, message.code, message.reason, href));
+                var messageContent = "<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2} - {1}</div>".format(message.type, message.code, message.reason);
+                var $messageContent = $(messageContent);
+
+                if (message.href) {
+                    $messageContent.append(" - <a href='{3}' target='interactivelinter'>Details</a>".format(message.href));
+                }
+
+                mark.lineWidget.element.append($messageContent);
             });
         }
 

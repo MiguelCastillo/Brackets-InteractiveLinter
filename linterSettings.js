@@ -30,53 +30,24 @@ define(function (require, exports, module) {
     var NativeFileError = brackets.getModule("file/NativeFileError"),
         Dialogs         = brackets.getModule("widgets/Dialogs");
 
-    var linterManager   = require('linterManager'),
-        defaultSettings = require('defaultSettings'),
-        ProjectFiles    = require('ProjectFiles');
-
-    var linterInfo = {
-        "jshint": {
-            configFile: ".jshintrc",
-            defaultSettings: defaultSettings.jshint
-        },
-        "jslint": {
-            configFile: ".jslintrc",
-            defaultSettings: defaultSettings.jslint
-        }
-    };
-
-    //linterManager.setType( linterManager.types.jshint );
-    //linterManager.setType( linterManager.types.jslint );
-
-    function getLinterInfo () {
-        var info = linterInfo[linterManager.getType()];
-        if (!info){
-            throw "Unknown linter type";
-        }
-        return info;
-    }
+    var ProjectFiles    = require('ProjectFiles');
+    var linters = {};
 
 
-    function setSettings(settings) {
-        linterManager.setSettings(settings);
-    }
+    function loadProjectSettings(linter) {
+        linter.settings = linter.defaultSettings || {};
 
-
-    $(ProjectFiles).on('projectOpen', function() {
-        var info = getLinterInfo();
-        setSettings(info.defaultSettings);
-
-        ProjectFiles.openFile( info.configFile )
+        ProjectFiles.openFile( linter.settingsFile )
         .done(function( fileReader ) {
             fileReader.readAsText().done(function (text) {
                 try {
-                    setSettings( JSON.parse(text) );
+                    linter.settings = JSON.parse(text);
                 }
                 catch( ex ) {
                     Dialogs.showModalDialog(
                         "interactiveLinterErr",
                         "Interactive Linter Error",
-                        "Error processing jshint settings<br>" +
+                        "Error processing linter settings<br>" +
                         ex.toString());
                 }
             });
@@ -86,10 +57,30 @@ define(function (require, exports, module) {
                 return;
             }
 
-            ProjectFiles.openFile( info.configFile, "write", true ).done(function( fileWriter ) {
-                fileWriter.write( JSON.stringify( info.defaultSettings ) );
+            ProjectFiles.openFile( linter.settingsFile, "write", true ).done(function( fileWriter ) {
+                fileWriter.write( JSON.stringify( linter.defaultSettings ) );
             });
         });
+    }
+
+
+    $(ProjectFiles).on('projectOpen', function() {
+        for ( var iLinter in linters ) {
+            if ( linters.hasOwnProperty(iLinter) ) {
+                loadProjectSettings(linters[iLinter]);
+            }
+        }
     });
+
+
+    function register( linter ) {
+        linters[linter.name] = linter;
+        loadProjectSettings( linter );
+    }
+
+
+    return {
+        register: register
+    };
 
 });

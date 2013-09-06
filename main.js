@@ -32,11 +32,12 @@ define(function (require, exports, module) {
         AppInit          = brackets.getModule("utils/AppInit"),
         ExtensionUtils   = brackets.getModule("utils/ExtensionUtils");
 
-    var linterManager   = require('linterManager');
-    linterManager.setType(linterManager.types.jshint);
+    var linterManager = require("linterManager");
+    var pluginManager = require("pluginManager");
     require("linterSettings");
 
     ExtensionUtils.loadStyleSheet(module, "style.css");
+
 
     $(document).on("click", "a[target=interactivelinter]", function(evt) {
         evt.preventDefault();
@@ -59,6 +60,7 @@ define(function (require, exports, module) {
     AppInit.appReady(function(){
         $(EditorManager).on("activeEditorChange.interactive-linter", setDocument);
         setDocument();
+        pluginManager.init();
     });
 
 });
