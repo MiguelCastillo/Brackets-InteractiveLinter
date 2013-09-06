@@ -6,7 +6,7 @@ define(function(require, exports, module) {
         console.log(message);
 
         message.type = message.level;
-        message.reason = message.message;
+        message.reason = message.message + " - " + message.context;
 
         if ( !message.code ) {
             if ( message.type === "error" ) {
