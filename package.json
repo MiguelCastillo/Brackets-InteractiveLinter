@@ -1,8 +1,8 @@
 {
     "title": "Interactive Linter",
     "name": "interactive-linter",
-    "description": "Interactive Linter brings JSHint/JSLint code feedback into brackets as you work on your JavaScript",
-    "version": "0.1.2",
+    "description": "Interactive Linter brings realtime JSHint/JSLint/CoffeeLint reports into brackets as you work on your code",
+    "version": "0.1.3",
     "author": "Miguel Castillo <mahchagnu@gmail.com>",
     "homepage": "https://github.com/MiguelCastillo/Brackets-Interactive-Linter",
     "repository": {
