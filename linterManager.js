@@ -46,7 +46,11 @@ define(function (require, exports, module) {
                 _timer = null;
 
                 if (_cm && languages[_mode]) {
-                    languages[_mode].lint(_cm, languages[_mode].settings);
+                    var result = languages[_mode].lint(_cm.getDoc().getValue(), languages[_mode].settings);
+
+                    if ( result ) {
+                        linterReporter.report(_cm, result, languages[_mode].groomer);
+                    }
                 }
             }, 1000);
         }

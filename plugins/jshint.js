@@ -12,20 +12,11 @@ define(function(require, exports, module) {
         groomer  = require("plugins/jshint/groomer");
 
 
-    function lint( cm, settings) {
+    function lint( text, settings) {
         // Get document as a string to be passed into JSHint
-        var docValue = cm.getDoc().getValue();
-        var result = JSHINT(docValue, settings, settings.globals);
-
-        // If result is false, then JSHint has some errors it needs to report
-        if (result === false) {
-            linterReporter.report(cm, JSHINT.errors, {
-                // Groom is a callback from the reporter to give a chance at
-                // massaging the message and return a CodeMirror token.
-                groom: function(message) {
-                    return groomer.groom(message, settings);
-                }
-            });
+        if ( !JSHINT(text, settings, settings.globals) ) {
+            // If result is false, then JSHint has some errors it needs to report
+            return JSHINT.errors;
         }
     }
 
@@ -33,6 +24,7 @@ define(function(require, exports, module) {
     return {
         language: "javascript",
         lint: lint,
+        groomer: groomer,
 
         // Default settings
         defaultSettings: {

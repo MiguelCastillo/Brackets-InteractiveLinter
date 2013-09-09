@@ -1,7 +1,8 @@
 define(function(require, exports, module) {
 
 
-
+    // Groom is a callback from the reporter to give a chance at
+    // massaging the message and return a CodeMirror token.
     function groom(message, settings) {
         message.type   = message.level;
         message.reason = message.message;
