@@ -26,7 +26,7 @@
 define(function (require, exports, module) {
     'use strict';
 
-    var JSLintError = require('JSLintError');
+    var JSLintError = require('jslint/libs/JSLintError');
 
 
     /**

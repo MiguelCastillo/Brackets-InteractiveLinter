@@ -52,7 +52,7 @@ define(function (require, exports, module) {
             return;
         }
 
-        linterManager.setDocument(editor._codeMirror);
+        linterManager.setDocument(editor._codeMirror, editor.document.file.fullPath);
         linterManager.lint();
     }
 

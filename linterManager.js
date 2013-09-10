@@ -28,8 +28,11 @@ define(function (require, exports, module) {
 
     var linterSettings = require("linterSettings");
     var linterReporter  = require("linterReporter");
+    var ProjectFiles    = require('ProjectFiles');
+
     var languages = {};
     var linters = {};
+    var currentProject;
 
     var linterManager = (function() {
         var _cm = null, _timer = null,
@@ -71,7 +74,7 @@ define(function (require, exports, module) {
         /**
         * We will only handle one document at a time
         */
-        function setDocument(cm) {
+        function setDocument(cm, fullPath) {
             var gutters, index;
             _mode = cm && cm.getDoc().getMode().name;
 
@@ -99,6 +102,11 @@ define(function (require, exports, module) {
                 }
             }
         }
+
+
+        $(ProjectFiles).on("projectOpen", function(evt, project) {
+            currentProject = project;
+        });
 
 
         function register( linter ) {

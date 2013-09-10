@@ -4,12 +4,12 @@
 define(function(require, exports, module) {
 
     // Setup coffee script linting engine.
-    require(["lib/coffee-script"], function(CoffeeScript) {
+    require(["coffeelint/libs/coffee-script"], function(CoffeeScript) {
         window.CoffeeScript = CoffeeScript;
-        require(["lib/coffeelint"], $.noop);
+        require(["coffeelint/libs/coffeelint"], $.noop);
     });
 
-    var groomer = require("plugins/coffeehint/groomer");
+    var groomer = require("coffeelint/groomer");
 
 
     function lint(text, settings) {

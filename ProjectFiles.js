@@ -83,7 +83,7 @@ define(function (require, exports, module) {
     var _projectFiles = new ProjectFiles();
     $(ProjectManager).on("projectOpen", function(e, project){
         currentProject = project;
-        $(_projectFiles).triggerHandler('projectOpen', [project]);
+        $(_projectFiles).trigger('projectOpen', [project]);
     });
 
 

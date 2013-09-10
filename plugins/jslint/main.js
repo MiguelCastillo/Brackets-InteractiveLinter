@@ -1,8 +1,7 @@
 define(function(require, exports, module) {
 
-    var JSLINT = require('lib/jslint');
-    var linterReporter = require("linterReporter"),
-        groomer  = require("plugins/jslint/groomer");
+    var JSLINT = require('jslint/libs/jslint'),
+        groomer  = require("jslint/groomer");
 
     function lint(text, settings) {
         if ( !JSLINT(text, settings) ) {
@@ -11,8 +10,9 @@ define(function(require, exports, module) {
     }
 
     return {
-        language: "javascript",
+        language: "disabled-javascript",
         lint: lint,
         groomer: groomer
     };
+
 });

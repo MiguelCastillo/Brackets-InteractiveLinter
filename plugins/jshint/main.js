@@ -7,9 +7,8 @@ define(function(require, exports, module) {
     * spaces. Arrrggh!
     */
 
-    require('lib/jshint-2.1.9');
-    var linterReporter = require("linterReporter"),
-        groomer  = require("plugins/jshint/groomer");
+    require("jshint/libs/jshint-2.1.9");
+    var groomer = require("jshint/groomer");
 
 
     function lint( text, settings) {
@@ -38,5 +37,4 @@ define(function(require, exports, module) {
         },
         settingsFiles: ".jshintrc"
     };
-
 });

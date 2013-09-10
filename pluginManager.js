@@ -28,7 +28,7 @@ define(function(require, exports, module) {
 
     var NativeFileSystem = brackets.getModule("file/NativeFileSystem").NativeFileSystem;
     var lintManager = require("linterManager");
-
+    var pluginRequire = false;
 
     function loadPlugins (path) {
         var result = $.Deferred();
@@ -44,15 +44,20 @@ define(function(require, exports, module) {
         // Load up the content of the directory
         function loadDirectoryContent(fs) {
             fs.root.createReader().readEntries(function success(entries) {
-                var i, files = [];
+                var i, directories = [], files = [];
 
                 for (i = 0; i < entries.length; i++) {
+                    if (entries[i].isDirectory) {
+                        directories.push(entries[i].name);
+                    }
+
                     if (entries[i].isFile && endsWith(entries[i].name, ".js")) {
-                        files.push(entries[i].name);
+                        directories.push(entries[i].name);
                     }
                 }
 
                 result.resolve({
+                    directories: directories,
                     files: files,
                     path: path
                 });
@@ -67,15 +72,18 @@ define(function(require, exports, module) {
 
     function init() {
         loadPlugins(module.uri.substring(0, module.uri.lastIndexOf("/")) + "/plugins").done(function(plugins) {
-            var plugin, file, name;
-            for ( var iPlugin in plugins.files ) {
-                file = plugins.files[iPlugin], name = file.substring(0, file.lastIndexOf(".js"));
-                plugin = "plugins/" + name;
-                require([plugin], function(_plugin) {
-                    _plugin.name = _plugin.name || name;
-                    lintManager.register(_plugin);
-                });
-            }
+            pluginRequire = requirejs.config({
+                "baseUrl": plugins.path,
+                "packages": plugins.directories
+            });
+
+            pluginRequire(plugins.directories, function() {
+                var _plugins = Array.prototype.slice.call(arguments);
+                for ( var iPlugin in _plugins ) {
+                    _plugins[iPlugin].name = _plugins[iPlugin].name || plugins.directories[iPlugin];
+                    lintManager.register(_plugins[iPlugin]);
+                }
+            });
         });
     }
 

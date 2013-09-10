@@ -36,6 +36,9 @@ define(function (require, exports, module) {
 
     function loadProjectSettings(linter) {
         linter.settings = linter.defaultSettings || {};
+        if ( !linter.settingsFile ) {
+            return;
+        }
 
         ProjectFiles.openFile( linter.settingsFile )
         .done(function( fileReader ) {
@@ -64,7 +67,7 @@ define(function (require, exports, module) {
     }
 
 
-    $(ProjectFiles).on('projectOpen', function() {
+    $(ProjectFiles).on('projectOpen', function(evt, project) {
         for ( var iLinter in linters ) {
             if ( linters.hasOwnProperty(iLinter) ) {
                 loadProjectSettings(linters[iLinter]);
