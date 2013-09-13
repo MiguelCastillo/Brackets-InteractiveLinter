@@ -35,6 +35,6 @@ define(function(require, exports, module) {
             "laxcasebreak": true,
             "globals": { }
         },
-        settingsFiles: ".jshintrc"
+        settingsFile: ".jshintrc"
     };
 });
