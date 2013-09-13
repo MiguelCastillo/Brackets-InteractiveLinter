@@ -28,13 +28,33 @@ define(function(require, exports, module) {
 
     var NativeFileSystem = brackets.getModule("file/NativeFileSystem").NativeFileSystem;
     var lintManager = require("linterManager");
-    var pluginRequire = false;
+    var pluginRequire;
 
     function loadPlugins (path) {
         var result = $.Deferred();
 
         function endsWith(_string, suffix) {
             return _string.indexOf(suffix, _string.length - suffix.length) !== -1;
+        }
+        
+        function handleSuccess( entries ) {
+            var i, directories = [], files = [];
+
+            for (i = 0; i < entries.length; i++) {
+                if (entries[i].isDirectory) {
+                    directories.push(entries[i].name);
+                }
+
+                if (entries[i].isFile && endsWith(entries[i].name, ".js")) {
+                    files.push(entries[i].name);
+                }
+            }
+
+            result.resolve({
+                directories: directories,
+                files: files,
+                path: path
+            });
         }
 
         function handleError(error) {
@@ -43,25 +63,7 @@ define(function(require, exports, module) {
 
         // Load up the content of the directory
         function loadDirectoryContent(fs) {
-            fs.root.createReader().readEntries(function success(entries) {
-                var i, directories = [], files = [];
-
-                for (i = 0; i < entries.length; i++) {
-                    if (entries[i].isDirectory) {
-                        directories.push(entries[i].name);
-                    }
-
-                    if (entries[i].isFile && endsWith(entries[i].name, ".js")) {
-                        directories.push(entries[i].name);
-                    }
-                }
-
-                result.resolve({
-                    directories: directories,
-                    files: files,
-                    path: path
-                });
-            }, handleError);
+            fs.root.createReader().readEntries(handleSuccess, handleError);
         }
 
         // Get directory reader handle
