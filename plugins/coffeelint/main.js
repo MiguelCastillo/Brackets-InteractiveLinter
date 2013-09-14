@@ -34,7 +34,7 @@ define(function(require, exports, module) {
         defaultSettings: {
         },
 
-        settingsFile: ".coffeehintrc"
+        settingsFile: ".coffeelintrc"
     };
 
 });
