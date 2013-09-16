@@ -60,9 +60,13 @@ define(function (require, exports, module) {
                 return;
             }
 
+            /*
+            * Disable writing linter settings file...
+            *
             ProjectFiles.openFile( linter.settingsFile, "write", true ).done(function( fileWriter ) {
                 fileWriter.write( JSON.stringify( linter.defaultSettings ) );
             });
+            */
         });
     }
 
