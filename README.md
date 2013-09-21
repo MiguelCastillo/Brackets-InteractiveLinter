@@ -1,4 +1,4 @@
-Brackets-Interactive-Linter
+Brackets-InteractiveLinter
 ===========================
 
 <p>Brackets integration with JSHint, JSLint, and CoffeeLint!  Interactive Linter runs linters as you work on your code and gives instant feedback right on your document.  You can access the details of the lint report by clicking on the light bulbs on the line gutters.
@@ -28,9 +28,9 @@ FAQ
 ===================
 
 * Use JSLint instead of JSHint? Yes, it is possible. Although it requires manual intervention.
-    - Open up the plugins directory in the Interactive Linter
-    - Rename jshint.js to jshint.js.disabled
-    - Rename jslint.js.disabled to jslint.js
+    - Open up the plugins directory in Interactive Linter
+    - Go into jshint and rename main.js to main.js.disabled
+    - Go into jslint and rename main.js.disabled to main.js
     - Reload Bracket and enjoy JSLint
 
 * Are .jshintrc supported?
