@@ -184,7 +184,7 @@ define(function (require, exports, module) {
                 var $messageContent = $(messageContent);
 
                 if (message.href) {
-                    $messageContent.append(" - <a href='{3}' target='interactivelinter'>Details</a>".format(message.href));
+                    $messageContent.append(" - <a href='{0}' target='interactivelinter'>Details</a>".format(message.href));
                 }
 
                 mark.lineWidget.element.append($messageContent);
