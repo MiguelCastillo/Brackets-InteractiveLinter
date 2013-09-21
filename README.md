@@ -29,8 +29,8 @@ FAQ
 
 * Use JSLint instead of JSHint? Yes, it is possible. Although it requires manual intervention.
     - Open up the plugins directory in Interactive Linter
-    - Go into jshint and rename main.js to main.js.disabled
-    - Go into jslint and rename main.js.disabled to main.js
+    - Go into jshint, find "language: javascript" and rename "language: disabled-javascript"
+    - Go into jslint, find "language: disabled-javascript" and rename "language: javascript"
     - Reload Bracket and enjoy JSLint
 
 * Are .jshintrc supported?
