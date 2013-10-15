@@ -75,8 +75,9 @@ define(function (require, exports, module) {
         * We will only handle one document at a time
         */
         function setDocument(cm, fullPath) {
-            var gutters, index;
+            var gutters, index, jsonMode;
             _mode = cm && cm.getDoc().getMode().name;
+            jsonMode = cm && cm.getDoc().getMode().jsonMode;
 
             if (_cm) {
                 CodeMirror.off(_cm.getDoc(), "change", lint);
@@ -90,7 +91,7 @@ define(function (require, exports, module) {
                 }
             }
 
-            if (cm && (_mode === 'javascript' || _mode =='coffeescript')) {
+            if (cm && (_mode === 'javascript' && !jsonMode || _mode =='coffeescript')) {
                 CodeMirror.on(cm.getDoc(), "change", lint);
                 _cm = cm;
                 _cm.on('gutterClick', gutterClick);
