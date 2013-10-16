@@ -52,8 +52,7 @@ define(function (require, exports, module) {
 
     AppInit.appReady(function(){
         $(EditorManager).on("activeEditorChange.interactive-linter", setDocument);
-        setDocument();
-        pluginManager.init();
+        pluginManager.init().done(setDocument);
     });
 
 });

@@ -27,107 +27,118 @@ define(function (require, exports, module) {
     'use strict';
 
     var linterSettings = require("linterSettings");
-    var linterReporter  = require("linterReporter");
-    var ProjectFiles    = require('ProjectFiles');
+    var linterReporter = require("linterReporter");
+    var fileIO         = require("fileIO");
+
 
     var languages = {};
-    var linters = {};
-    var currentProject;
-
-    var linterManager = (function() {
-        var _cm = null, _timer = null,
-            _mode = '';
+    var _cm = null, _timer = null, _mode = '', _localSettings = false;
 
 
-        function lint( ) {
-            if (_timer) {
-                clearTimeout(_timer);
-                _timer = null;
-            }
-
-            _timer = setTimeout(function () {
-                _timer = null;
-
-                if (_cm && languages[_mode]) {
-                    var result = languages[_mode].lint(_cm.getDoc().getValue(), languages[_mode].settings);
-
-                    if ( result ) {
-                        linterReporter.report(_cm, result, languages[_mode].groomer);
-                    }
-                }
-            }, 1000);
+    function lint( ) {
+        if (_timer) {
+            clearTimeout(_timer);
+            _timer = null;
         }
 
-
-        /**
-        * Show line details
-        */
-        function gutterClick(cm, lineIndex, gutterId, event) {
-            if (gutterId !== "interactive-linter-gutter"){
-                return;
-            }
-
-            linterReporter.showLineDetails(cm, lineIndex, gutterId, event);
+        if ( !_cm || !languages[_mode] ) {
+            return;   
         }
 
+        _timer = setTimeout(function () {
+            _timer = null;
+            var result = languages[_mode].lint(_cm.getDoc().getValue(), _localSettings || languages[_mode].settings);
 
-        /**
-        * We will only handle one document at a time
-        */
-        function setDocument(cm, fullPath) {
-            var gutters, index, jsonMode;
-            _mode = cm && cm.getDoc().getMode().name;
-            jsonMode = cm && cm.getDoc().getMode().jsonMode;
-
-            if (_cm) {
-                CodeMirror.off(_cm.getDoc(), "change", lint);
-                _cm.off('gutterClick', gutterClick);
-
-                gutters = _cm.getOption("gutters").slice(0);
-                index = gutters.indexOf("interactive-linter-gutter");
-                if ( index !== -1 ) {
-                    gutters.splice(index, 1);
-                    _cm.setOption("gutters", gutters);
-                }
+            if ( result ) {
+                linterReporter.report(_cm, result, languages[_mode].groomer);
             }
+        }, 1000);
+    }
 
-            if (cm && (_mode === 'javascript' && !jsonMode || _mode =='coffeescript')) {
-                CodeMirror.on(cm.getDoc(), "change", lint);
-                _cm = cm;
-                _cm.on('gutterClick', gutterClick);
 
-                gutters = _cm.getOption("gutters").slice(0);
-                if ( gutters.indexOf("interactive-linter-gutter") === -1 ) {
-                    gutters.unshift("interactive-linter-gutter");
-                    cm.setOption("gutters", gutters);
-                }
+    /**
+    * Show line details
+    */
+    function gutterClick(cm, lineIndex, gutterId, event) {
+        if (gutterId !== "interactive-linter-gutter"){
+            return;
+        }
+
+        linterReporter.showLineDetails(cm, lineIndex, gutterId, event);
+    }
+
+
+    /**
+    * We will only handle one document at a time
+    */
+    function setDocument(cm, fullPath) {
+        console.log(fullPath);
+        var gutters, index;
+        _mode = cm && cm.getDoc().getMode().name;
+
+        // CodeMirror treats json as javascript, so we gotta do
+        // an extra check just to make we are not feeding json
+        // into jshint/jslint.  Let's leave that to json linters
+        if ( cm && cm.getDoc().getMode().jsonMode ) {
+            _mode = "json";   
+        }
+
+        // Unhook the current instance of code mirror before hooking
+        // up the new one.
+        if (_cm) {
+            CodeMirror.off(_cm.getDoc(), "change", lint);
+            _cm.off('gutterClick', gutterClick);
+
+            gutters = _cm.getOption("gutters").slice(0);
+            index = gutters.indexOf("interactive-linter-gutter");
+            if ( index !== -1 ) {
+                gutters.splice(index, 1);
+                _cm.setOption("gutters", gutters);
             }
         }
 
+        // Setup the new instance of code mirror
+        _cm = cm;
+        if (_cm && languages[_mode]) {
+            CodeMirror.on(_cm.getDoc(), "change", lint);
+            _cm.on('gutterClick', gutterClick);
 
-        $(ProjectFiles).on("projectOpen", function(evt, project) {
-            currentProject = project;
-        });
+            gutters = _cm.getOption("gutters").slice(0);
+            if ( gutters.indexOf("interactive-linter-gutter") === -1 ) {
+                gutters.unshift("interactive-linter-gutter");
+                cm.setOption("gutters", gutters);
+            }
 
-
-        function register( linter ) {
-            languages[linter.language] = linter;
-            linters[linter.name] = linter;
-            linterSettings.register(linter);
+            var fileInfo = fileIO.fileInfo(fullPath);
+            fileIO.open(fileInfo.path + '/' + languages[_mode].settingsFile)
+                .done(function(fileReader){
+                    fileReader.readAsText()
+                        .done(function(text) {
+                            _localSettings = JSON.parse(text);
+                        })
+                        .fail(function(){
+                            _localSettings = false;
+                        });
+                })
+                .fail(function() {
+                    _localSettings = false;
+                });
         }
+    }
 
 
-        return {
-            // Functions
-            lint: lint,
-            register: register,
-            setDocument: setDocument
-        };
-
-    })();
+    function register( linter ) {
+        languages[linter.language] = linter;
+        linterSettings.register(linter);
+    }
 
 
-    return linterManager;
+    return {
+        // Functions
+        lint: lint,
+        register: register,
+        setDocument: setDocument
+    };
 
 });
 

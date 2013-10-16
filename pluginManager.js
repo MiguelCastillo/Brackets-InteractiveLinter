@@ -31,7 +31,7 @@ define(function(require, exports, module) {
     var pluginRequire;
 
     function loadPlugins (path) {
-        var result = $.Deferred();
+        var promise = $.Deferred();
 
         function endsWith(_string, suffix) {
             return _string.indexOf(suffix, _string.length - suffix.length) !== -1;
@@ -50,7 +50,7 @@ define(function(require, exports, module) {
                 }
             }
 
-            result.resolve({
+            promise.resolve({
                 directories: directories,
                 files: files,
                 path: path
@@ -58,7 +58,7 @@ define(function(require, exports, module) {
         }
 
         function handleError(error) {
-            result.reject(error);
+            promise.reject(error);
         }
 
         // Load up the content of the directory
@@ -68,11 +68,13 @@ define(function(require, exports, module) {
 
         // Get directory reader handle
         NativeFileSystem.requestNativeFileSystem(path, loadDirectoryContent, handleError);
-        return result.promise();
+        return promise.promise();
     }
 
 
     function init() {
+        var promise = $.Deferred();
+
         loadPlugins(module.uri.substring(0, module.uri.lastIndexOf("/")) + "/plugins").done(function(plugins) {
             pluginRequire = requirejs.config({
                 "baseUrl": plugins.path,
@@ -81,12 +83,17 @@ define(function(require, exports, module) {
 
             pluginRequire(plugins.directories, function() {
                 var _plugins = Array.prototype.slice.call(arguments);
+
                 for ( var iPlugin in _plugins ) {
                     _plugins[iPlugin].name = _plugins[iPlugin].name || plugins.directories[iPlugin];
                     lintManager.register(_plugins[iPlugin]);
                 }
+                
+                promise.resolve(_plugins);
             });
         });
+        
+        return promise.promise();
     }
 
 

@@ -22,27 +22,20 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-define(function (require, exports, module) {
+
+define(function(require, exports, module) {
     'use strict';
 
     var FileUtils        = brackets.getModule("file/FileUtils"),
-        NativeFileSystem = brackets.getModule("file/NativeFileSystem").NativeFileSystem,
-        ProjectManager   = brackets.getModule("project/ProjectManager");
+        NativeFileSystem = brackets.getModule("file/NativeFileSystem").NativeFileSystem;
 
-
-    var currentProject;
-
-
-    function ProjectFiles() {
-    }
-
-
-    ProjectFiles.prototype.openFile = function( fileName, type, forceCreate ) {
+    
+    function open( file, type, forceCreate ) {
         var deferred = $.Deferred();
-        var directoryPath = FileUtils.canonicalizeFolderPath(currentProject.fullPath) + "/";
-        var directoryEntry = new NativeFileSystem.DirectoryEntry(directoryPath);
+        var fileInfo = getFileInfo(file);
+        var directoryEntry = new NativeFileSystem.DirectoryEntry(fileInfo.path);
 
-        directoryEntry.getFile( fileName, {
+        directoryEntry.getFile(fileInfo.name, {
             create: forceCreate,
             exclusice: true
         }, function( fileEntry ){
@@ -66,21 +59,27 @@ define(function (require, exports, module) {
 
 
         return deferred;
+    }
+    
+
+    function getFileInfo(file) {
+        if ( file[file.lenght - 1] === '/' ) {
+            throw "Must provide a file";   
+        }
+
+        var offset = file.lastIndexOf("/");
+
+        return {
+            path: file.substr(0, offset),
+            name: file.substr(offset + 1)
+        };
+    }
+
+
+    return {
+        open: open,
+        fileInfo: getFileInfo
     };
-
-
-    ProjectFiles.prototype.resolveName = function(fileName) {
-        return FileUtils.canonicalizeFolderPath(currentProject.fullPath) + "/" + fileName;
-    };
-
-
-    var _projectFiles = new ProjectFiles();
-    $(ProjectManager).on("projectOpen", function(e, project){
-        currentProject = project;
-        $(_projectFiles).trigger('projectOpen', [project]);
-    });
-
-
-    return _projectFiles;
 
 });
+

@@ -9,6 +9,7 @@ define(function(require, exports, module) {
 
     require("jshint/libs/jshint-2.1.9");
     var groomer = require("jshint/groomer");
+    var defaultSettings = require("text!jshint/defaults.json");
 
 
     function lint( text, settings) {
@@ -26,15 +27,7 @@ define(function(require, exports, module) {
         groomer: groomer,
 
         // Default settings
-        defaultSettings: {
-            "undef": true,
-            "unused": true,
-            "curly": true,
-            "indent": 4,
-            "devel": true,
-            "laxcasebreak": true,
-            "globals": { }
-        },
+        defaultSettings: JSON.parse(defaultSettings || "{}"),
         settingsFile: ".jshintrc"
     };
 });
