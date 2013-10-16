@@ -34,7 +34,7 @@ FAQ
     - Reload Bracket and enjoy JSLint
 
 * Are .jshintrc supported?
-    - Yes, they are supported but in the context of a project.
+    - Yes, they are as well as the other correspoding linting config files.
 
 
 Links
