@@ -7,7 +7,7 @@ Brackets-InteractiveLinter
 
 JSHint/JSLint
 ===================
-<p>Interactive Linter loads .jshintrc, .jslintrc, .coffeelint files. Interactive Linter will first look to load any config file in the same directory as the currently open document, otherwise it will try to look to load one defined at the project level.  This allows cascaded config files to be applied in your source.</p>
+<p>Interactive Linter loads .jshintrc, .jslintrc, .coffeelint files. Interactive Linter will first try to load any config file in the same directory as the currently open document, otherwise it will try to load one defined at the project level.  This allows cascaded config files to be applied in your project.</p>
 <p>All jshint settings that already exists inline in your JavaScript files will continue to work along side any .jshintrc/.jslintrc file.</p>
 <p>Integration with http://jslinterrors.com/ to find out details about what's reported by JSHint.</p>
 <p>This was inspired by Joachim's extions brackets-continuous-compilation (https://github.com/JoachimK/brackets-continuous-compilation)</p>
