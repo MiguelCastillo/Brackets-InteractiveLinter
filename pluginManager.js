@@ -1,25 +1,7 @@
-/*
- * Copyright (c) 2013 Miguel Castillo.
+/**
+ * Interactive Linter Copyright (c) 2014 Miguel Castillo.
  *
  * Licensed under MIT
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
  */
 
 
@@ -27,16 +9,125 @@ define(function(require, exports, module) {
     'use strict';
 
     var NativeFileSystem = brackets.getModule("file/NativeFileSystem").NativeFileSystem;
-    var lintManager = require("linterManager");
-    var pluginRequire;
 
-    function loadPlugins (path) {
+
+    /**
+    * pluginManager is the processor for loading up plugins in the plugins directory in
+    * make sure they are smoothly running in a worker thread.
+    */
+    function pluginManager() {
+        if ( this instanceof pluginManager === false ) {
+            return new pluginManager();
+        }
+
+        var _self = this;
+
+        // Setup a ready callback.  This will also trigger an event, so either way is good
+        _self.ready = $.Deferred();
+
+        // Configure the pluginManager intance
+        pluginManager.configure.call(this);
+    }
+
+
+    pluginManager.configure = function() {
+        var _self = this;
+        var pluginsDir = module.uri.substring(0, module.uri.lastIndexOf("/")) + "/plugins",
+            workerFile = module.uri.substring(0, module.uri.lastIndexOf("/")) + "/pluginWorker.js";
+
+        // Queue of pending requests
+        _self._queue = {};
+
+        // Instantiate the worker thread for the linter
+        _self.worker = new Worker(workerFile);
+
+        // Process worker thread messages
+        _self.worker.onmessage = function(evt) {
+            var data = evt.data;
+            var method = (_self.plugins && _self.plugins[data.type]);
+
+            if ( typeof method === 'function' ) {
+                return method.apply(_self, [data || {}]);
+            }
+
+            switch (data.type) {
+                case "ready":
+                    _self.plugins = linterPlugins(_self, data.data);
+                    _self.ready.resolve(_self.plugins);
+                    $(_self).trigger("ready", [_self.plugins]);
+                    break;
+                case "lint":
+                    _self._queue[data.msgId].resolve(data.data.result);
+                    delete _self._queue[data.msgId];
+                    break;
+                case "debug":
+                    console.log(data);
+                    break;
+                default:
+                    throw new Error("Unknown message type: " + data.type);
+            }
+        };
+
+        _self.worker.onerror = function(evt) {
+            console.log("error", evt);
+        };
+
+
+        // Build plugin list that the worker thread needs to load
+        buildPluginList(pluginsDir).done(function(plugins) {
+            _self.worker.postMessage({
+                "type": "init",
+                "data": {
+                    "baseUrl": plugins.path,
+                    "packages": plugins.directories,
+                    "files": plugins.files
+                }
+            });
+        });
+    };
+
+
+    function linterPlugins(manager, plugins) {
+        var plugin, msgId = 0;
+
+        function lint( plugin ) {
+            return function( text, settings ) {
+                var id = msgId++;
+                manager._queue[id] = $.Deferred();
+
+                manager.worker.postMessage({
+                    type: "lint",
+                    msgId: id,
+                    data: {
+                        name: plugin.name,
+                        text: text,
+                        settings: settings
+                    }
+                });
+
+                return manager._queue[id].promise();
+            };
+        }
+
+
+        for ( var iPlugin in plugins ) {
+            plugin = plugins[iPlugin];
+
+            // Add a lint interface that will be just posting a message to the worker thread
+            plugin.lint = lint(plugin);
+        }
+
+        return plugins;
+    }
+
+
+    function buildPluginList (path) {
         var promise = $.Deferred();
 
         function endsWith(_string, suffix) {
             return _string.indexOf(suffix, _string.length - suffix.length) !== -1;
         }
-        
+
         function handleSuccess( entries ) {
             var i, directories = [], files = [];
 
@@ -72,34 +163,6 @@ define(function(require, exports, module) {
     }
 
 
-    function init() {
-        var promise = $.Deferred();
-
-        loadPlugins(module.uri.substring(0, module.uri.lastIndexOf("/")) + "/plugins").done(function(plugins) {
-            pluginRequire = requirejs.config({
-                "baseUrl": plugins.path,
-                "packages": plugins.directories
-            });
-
-            pluginRequire(plugins.directories, function() {
-                var _plugins = Array.prototype.slice.call(arguments);
-
-                for ( var iPlugin in _plugins ) {
-                    _plugins[iPlugin].name = _plugins[iPlugin].name || plugins.directories[iPlugin];
-                    lintManager.register(_plugins[iPlugin]);
-                }
-                
-                promise.resolve(_plugins);
-            });
-        });
-        
-        return promise.promise();
-    }
-
-
-    return {
-        init: init
-    };
-
+    return pluginManager;
 });
 

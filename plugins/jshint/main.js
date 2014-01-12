@@ -1,3 +1,10 @@
+/**
+ * Interactive Linter Copyright (c) 2014 Miguel Castillo.
+ *
+ * Licensed under MIT
+ */
+
+
 define(function(require, exports, module) {
 
     /**
@@ -7,16 +14,19 @@ define(function(require, exports, module) {
     * spaces. Arrrggh!
     */
 
-    require("jshint/libs/jshint-2.1.9");
+    require("jshint/libs/jshint");
     var groomer = require("jshint/groomer");
-    var defaultSettings = require("text!jshint/defaults.json");
 
 
-    function lint( text, settings) {
+    function lint( text, settings ) {
         // Get document as a string to be passed into JSHint
         if ( !JSHINT(text, settings, settings.globals) ) {
-            // If result is false, then JSHint has some errors it needs to report
-            return JSHINT.errors;
+            var errors = JSHINT.errors.slice(0);
+            // If JSHINT.errors is false, then JSHint has some errors it needs to report
+            for ( var error in errors ) {
+                errors[error].token = groomer.groom(errors[error], settings);
+            }
+            return errors;
         }
     }
 
@@ -24,10 +34,16 @@ define(function(require, exports, module) {
     return {
         language: "javascript",
         lint: lint,
-        groomer: groomer,
 
         // Default settings
-        defaultSettings: JSON.parse(defaultSettings || "{}"),
+        defaultSettings: {
+            "undef": true,
+            "unused": true,
+            "curly": true,
+            "indent": 4,
+            "devel": true,
+            "globals": { }
+        },
         settingsFile: ".jshintrc"
     };
 });
