@@ -1,28 +1,9 @@
-/*
- * Copyright (c) 2013 Miguel Castillo.
+/**
+ * Interactive Linter Copyright (c) 2014 Miguel Castillo.
  *
  * Licensed under MIT
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
  */
 
-/*jslint plusplus: true, nomen: true, regexp: true, maxerr: 50 */
 
 define(function (require, exports, module) {
     'use strict';
@@ -57,7 +38,7 @@ define(function (require, exports, module) {
     * @param settings {Object} jshint settings to further refine what does and doesn't
     *                       get reported
     */
-    reporter.prototype.report = function(cm, messages, groomer) {
+    reporter.prototype.report = function(cm, messages) {
         var _self = this;
         var token;
         _self.clearMarks();
@@ -72,7 +53,7 @@ define(function (require, exports, module) {
 
             // Process message with the groomer to make sure we are getting a token
             // that code mirror can use
-            token = groomer.groom(message);
+            token = message.token;
 
             if (token){
                 // Add marks to gutter and line

@@ -7,7 +7,7 @@ Brackets-InteractiveLinter
 
 JSHint/JSLint
 ===================
-<p>Interactive Linter loads .jshintrc, .jslintrc, .coffeelint files. Interactive Linter will first try to load any config file in the same directory as the currently open document, otherwise it will try to load one defined at the project level.  This allows cascaded config files to be applied in your project.</p>
+<p>Interactive Linter loads .jshintrc and .jslintrc files in your project. If one doesn't exist, Interactive Linter will create one so that you can easily customize linting for your projects.</p>
 <p>All jshint settings that already exists inline in your JavaScript files will continue to work along side any .jshintrc/.jslintrc file.</p>
 <p>Integration with http://jslinterrors.com/ to find out details about what's reported by JSHint.</p>
 <p>This was inspired by Joachim's extions brackets-continuous-compilation (https://github.com/JoachimK/brackets-continuous-compilation)</p>
@@ -16,15 +16,6 @@ JSHint/JSLint
  CoffeeLint
 ===================
 <p>CoffeeLinter does not yet have a standard file that's loaded and processed by the linter itself.  So, while this is resolved by CoffeeLint, I have added support for .coffeelintrc to follow analogous system to JSLint and JSHint.</p>
-
-
-Screenshots
-===================
-JShint:
-![JSHint](https://raw.github.com/wiki/MiguelCastillo/Brackets-InteractiveLinter/images/jshint.png)
-
-CoffeeLint:
-![CoffeeLint](https://raw.github.com/wiki/MiguelCastillo/Brackets-InteractiveLinter/images/coffeelint.png)
 
 
 How to
@@ -43,7 +34,7 @@ FAQ
     - Reload Bracket and enjoy JSLint
 
 * Are .jshintrc supported?
-    - Yes, they are as well as the other correspoding linting config files.
+    - Yes, they are supported but in the context of a project.
 
 
 Links
