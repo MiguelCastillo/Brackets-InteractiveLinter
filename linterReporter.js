@@ -10,18 +10,6 @@ define(function (require, exports, module) {
 
     require('string');
 
-    /**
-    * Bypass groomer that simply returns the message that is passed it.
-    * Used in situations where the messages that need to be reported do
-    * not need further processing and all the information needed by the
-    * reporter is in the message itself
-    */
-    var noopGroomer = {
-            groom: function(message){
-                return message;
-            }
-        };
-
 
     function reporter() {
         var _self = this;
@@ -51,8 +39,6 @@ define(function (require, exports, module) {
                 return;
             }
 
-            // Process message with the groomer to make sure we are getting a token
-            // that code mirror can use
             token = message.token;
 
             if (token){
@@ -144,7 +130,7 @@ define(function (require, exports, module) {
     };
 
 
-    reporter.prototype.showLineDetails = function(cm, lineIndex, gutterId, event) {
+    reporter.prototype.showLineDetails = function(cm, lineIndex) {
         var mark = this.marks[lineIndex];
 
         // We don't have mark on this line, so we don't do anything...
@@ -215,12 +201,8 @@ define(function (require, exports, module) {
     var linterReporter = (function () {
         var _reporter = new reporter();
 
-        function report(cm, messages, groomer) {
-            if( !groomer ){
-                groomer = noopGroomer;
-            }
-
-            return _reporter.report(cm, messages, groomer);
+        function report(cm, messages) {
+            return _reporter.report(cm, messages);
         }
 
         function showLineDetails(cm, lineNumber, gutterId, event) {
