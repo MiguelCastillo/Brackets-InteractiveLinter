@@ -23,7 +23,7 @@ define(function (require, exports, module) {
 
         ProjectFiles.openFile( linter.settingsFile )
         .done(function( fileReader ) {
-            fileReader.readAsText().done(function (text) {
+            fileReader.read().done(function (text) {
                 try {
                     linter.settings = JSON.parse(text);
                 }

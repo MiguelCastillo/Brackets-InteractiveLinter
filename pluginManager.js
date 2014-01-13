@@ -8,7 +8,7 @@
 define(function(require, exports, module) {
     'use strict';
 
-    var NativeFileSystem = brackets.getModule("file/NativeFileSystem").NativeFileSystem;
+    var FileSystem = brackets.getModule("filesystem/FileSystem");
 
 
     /**
@@ -122,13 +122,17 @@ define(function(require, exports, module) {
 
 
     function buildPluginList (path) {
-        var promise = $.Deferred();
+        var result = $.Deferred();
 
         function endsWith(_string, suffix) {
             return _string.indexOf(suffix, _string.length - suffix.length) !== -1;
         }
 
-        function handleSuccess( entries ) {
+        FileSystem.getDirectoryForPath(path).getContents(function(err, entries) {
+            if ( err ) {
+                result.reject(err);
+            }
+
             var i, directories = [], files = [];
 
             for (i = 0; i < entries.length; i++) {
@@ -141,25 +145,14 @@ define(function(require, exports, module) {
                 }
             }
 
-            promise.resolve({
+            result.resolve({
                 directories: directories,
                 files: files,
                 path: path
             });
-        }
+        });
 
-        function handleError(error) {
-            promise.reject(error);
-        }
-
-        // Load up the content of the directory
-        function loadDirectoryContent(fs) {
-            fs.root.createReader().readEntries(handleSuccess, handleError);
-        }
-
-        // Get directory reader handle
-        NativeFileSystem.requestNativeFileSystem(path, loadDirectoryContent, handleError);
-        return promise.promise();
+        return result.promise();
     }
 
 

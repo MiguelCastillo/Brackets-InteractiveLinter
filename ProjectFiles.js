@@ -8,9 +8,8 @@
 define(function (require, exports, module) {
     'use strict';
 
-    var FileUtils        = brackets.getModule("file/FileUtils"),
-        NativeFileSystem = brackets.getModule("file/NativeFileSystem").NativeFileSystem,
-        ProjectManager   = brackets.getModule("project/ProjectManager");
+    var ProjectManager  = brackets.getModule("project/ProjectManager"),
+        FileSystem      = brackets.getModule("filesystem/FileSystem");
 
 
     var currentProject;
@@ -20,44 +19,42 @@ define(function (require, exports, module) {
     }
 
 
-    ProjectFiles.prototype.openFile = function( fileName, type, forceCreate ) {
+    ProjectFiles.prototype.openFile = function( fileName, forceCreate ) {
         var deferred = $.Deferred();
+        var directoryPath = currentProject.fullPath;
+        var file = FileSystem.getFileForPath (directoryPath + fileName);
 
-        // Try to load up the linterSettings file, which is per project.
-        var directoryPath = FileUtils.canonicalizeFolderPath(currentProject.fullPath) + "/";
-
-        // Get the directory path handler first, and then try to write to the file
-        var directoryEntry = new NativeFileSystem.DirectoryEntry(directoryPath);
-
-        directoryEntry.getFile( fileName, {
-            create: forceCreate,
-            exclusice: true
-        }, function( fileEntry ){
-
-            if (type === "write") {
-                fileEntry.createWriter(function(fileWriter){
-                    deferred.resolve(fileWriter);
-                });
-            }
-            else {
-                var fileReader = {
-                    readAsText: function() {
-                        return FileUtils.readAsText(fileEntry);
-                    }
-                };
-
-                deferred.resolve(fileReader);
+        file.exists(function( err /*, exists*/ ) {
+            if ( err ) {
+                deferred.reject(err);
             }
 
-        }, deferred.reject);
+            deferred.resolve({
+                read: function() {
+                    var _deferred = $.Deferred();
 
+                    file.read(function( err, content /*, stat*/ ) {
+                        if ( err ) {
+                            _deferred.reject(err);
+                            return;
+                        }
+                        _deferred.resolve(content);
+                    });
+
+                    return _deferred;
+                },
+                write: function() {
+
+                }
+            });
+        });
 
         return deferred;
     };
 
 
     ProjectFiles.prototype.resolveName = function(fileName) {
-        return FileUtils.canonicalizeFolderPath(currentProject.fullPath) + "/" + fileName;
+        return currentProject.fullPath + fileName;
     };
 
 
