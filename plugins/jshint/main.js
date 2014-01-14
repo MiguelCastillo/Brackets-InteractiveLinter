@@ -19,13 +19,23 @@ define(function(require, exports, module) {
 
 
     function lint( text, settings ) {
+        var i, length;
+
         // Get document as a string to be passed into JSHint
         if ( !JSHINT(text, settings, settings.globals) ) {
             var errors = JSHINT.errors.slice(0);
+
             // If JSHINT.errors is false, then JSHint has some errors it needs to report
-            for ( var error in errors ) {
-                errors[error].token = groomer.groom(errors[error], settings);
+            for ( i = 0, length = errors.length; i < length; i++ ) {
+
+                // If an error is empty, it should be the last error in the array which
+                // means that the max number of errors was exceeded or there was a fatal
+                // error while linting the file
+                if ( errors[i] ) {
+                    errors[i].token = groomer.groom(errors[i], settings);
+                }
             }
+
             return errors;
         }
     }
