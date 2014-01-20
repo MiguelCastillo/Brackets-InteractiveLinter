@@ -9,6 +9,7 @@ define(function(require, exports, module) {
     'use strict';
 
     var FileSystem = brackets.getModule("filesystem/FileSystem");
+    var pluginLoader = require("pluginLoader");
 
 
     /**
@@ -20,108 +21,21 @@ define(function(require, exports, module) {
             return new pluginManager();
         }
 
-        var _self = this;
+        // Quick reference to this
+        var _self = this,
+            defered = $.Deferred();
 
         // Setup a ready callback.  This will also trigger an event, so either way is good
-        _self.ready = $.Deferred();
-
-        // Configure the pluginManager intance
-        pluginManager.configure.call(this);
-    }
-
-
-    pluginManager.configure = function() {
-        var _self = this;
-        var pluginsDir = module.uri.substring(0, module.uri.lastIndexOf("/")) + "/plugins",
-            workerFile = module.uri.substring(0, module.uri.lastIndexOf("/")) + "/pluginWorker.js";
-
-        // Queue of pending requests
-        _self._queue = {};
-
-        // Instantiate the worker thread for the linter
-        _self.worker = new Worker(workerFile);
-
-        // Process worker thread messages
-        _self.worker.onmessage = function(evt) {
-            var data = evt.data;
-            var method = (_self.plugins && _self.plugins[data.type]);
-
-            if ( typeof method === 'function' ) {
-                return method.apply(_self, [data || {}]);
-            }
-
-            switch (data.type) {
-                case "ready":
-                    _self.plugins = linterPlugins(_self, data.data);
-                    _self.ready.resolve(_self.plugins);
-                    $(_self).trigger("ready", [_self.plugins]);
-                    break;
-                case "lint":
-                    _self._queue[data.msgId].resolve(data.data.result);
-                    delete _self._queue[data.msgId];
-                    break;
-                case "debug":
-                    console.log(data);
-                    break;
-                default:
-                    throw new Error("Unknown message type: " + data.type);
-            }
-        };
-
-        _self.worker.onerror = function(evt) {
-            console.log("error", evt);
-        };
-
+        _self.ready = defered.done;
 
         // Build plugin list that the worker thread needs to load
-        buildPluginList(pluginsDir).done(function(plugins) {
-            _self.worker.postMessage({
-                "type": "init",
-                "data": {
-                    "baseUrl": plugins.path,
-                    "packages": plugins.directories,
-                    "files": plugins.files
-                }
-            });
+        getPluginsMeta(module.uri.substring(0, module.uri.lastIndexOf("/")) + "/plugins").done(function(pluginsMeta) {
+            pluginLoader(_self, pluginsMeta).done(defered.resolve);
         });
-    };
-
-
-    function linterPlugins(manager, plugins) {
-        var plugin, msgId = 0;
-
-        function lint( plugin ) {
-            return function( text, settings ) {
-                var id = msgId++;
-                manager._queue[id] = $.Deferred();
-
-                manager.worker.postMessage({
-                    type: "lint",
-                    msgId: id,
-                    data: {
-                        name: plugin.name,
-                        text: text,
-                        settings: settings
-                    }
-                });
-
-                return manager._queue[id].promise();
-            };
-        }
-
-
-        for ( var iPlugin in plugins ) {
-            plugin = plugins[iPlugin];
-
-            // Add a lint interface that will be just posting a message to the worker thread
-            plugin.lint = lint(plugin);
-        }
-
-        return plugins;
     }
 
 
-    function buildPluginList (path) {
+    function getPluginsMeta (path) {
         var result = $.Deferred();
 
         function endsWith(_string, suffix) {

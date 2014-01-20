@@ -36,7 +36,7 @@ define(function (require, exports, module) {
     }
 
 
-    $(_pluginManager).on("ready", function(evt, plugins) {
+    _pluginManager.ready(function(plugins) {
         for ( var iPlugin in plugins ) {
             linterManager.register( plugins[iPlugin] );
         }

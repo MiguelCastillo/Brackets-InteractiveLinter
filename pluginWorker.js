@@ -11,23 +11,25 @@ importScripts("libs/js/require.js");
 function PluginLoader( settings ) {
     "use strict";
     var _self = this;
+    var data = settings.data;
+
     var pluginRequire = requirejs.config({
-        "baseUrl": settings.baseUrl,
-        "packages": settings.packages
+        "baseUrl": data.baseUrl,
+        "packages": data.packages
     });
 
     _self.byName = {};
     _self.byLanguage = {};
 
 
-    pluginRequire(settings.packages, function() {
+    pluginRequire(data.packages, function() {
         var _plugins = Array.prototype.slice.call(arguments),
             _result = {},
             plugin = null;
 
         for ( var iPlugin in _plugins ) {
             plugin = _plugins[iPlugin];
-            plugin.name = plugin.name || settings.packages[iPlugin];
+            plugin.name = plugin.name || data.packages[iPlugin];
             _self.byName[plugin.name] = plugin;
             _self.byLanguage[plugin.language] = plugin;
 
@@ -38,7 +40,7 @@ function PluginLoader( settings ) {
             };
         }
 
-        postMessage({ type: "ready", data: _result });
+        postMessage({ type: "ready", data: _result, msgId: settings.msgId });
     });
 }
 
@@ -81,7 +83,7 @@ onmessage = function(evt) {
 
     switch (data.type) {
         case "init":
-            PluginLoader.instance = new PluginLoader(data.data);
+            PluginLoader.instance = new PluginLoader(data);
             break;
         default:
             throw new Error("Unknown message type: " + data.type);

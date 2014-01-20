@@ -8,6 +8,7 @@
 define(function (require, exports, module) {
     'use strict';
 
+    var Timer = require("timer");
     require('string');
 
 
@@ -28,7 +29,6 @@ define(function (require, exports, module) {
     */
     reporter.prototype.report = function(cm, messages) {
         var _self = this;
-        var token;
         _self.clearMarks();
         _self.checkFatal(messages);
         _self.cm = cm;
@@ -39,11 +39,9 @@ define(function (require, exports, module) {
                 return;
             }
 
-            token = message.token;
-
-            if (token){
+            if (message.token){
                 // Add marks to gutter and line
-                _self.addGutterMarks(message, token);
+                _self.addGutterMarks(message, message.token);
             }
         });
 
@@ -60,12 +58,20 @@ define(function (require, exports, module) {
     * - raw,
     * - reason,
     * - href
+    *
+    * Token is a CodeMirror token that specifies start/end information for
+    * the string in CodeMirror's document
     */
     reporter.prototype.addGutterMarks = function(message, token) {
         var _self = this, mark;
 
+        //
+        // gutterMark is the placehoder for the lightbulb
+        // lineMarks are the underlines in the places the errors are reported for
+        //
+
         if( !_self.marks[token.start.line] ) {
-            _self.marks[token.start.line] = {
+            mark = {
                 warnings: [],
                 errors: [],
                 lineMarks:[],
@@ -74,12 +80,14 @@ define(function (require, exports, module) {
                 }
             };
 
-            mark = _self.marks[token.start.line];
+            _self.marks[token.start.line] = mark;
             mark.gutterMark.line = _self.cm.setGutterMarker(token.start.line, "interactive-linter-gutter", mark.gutterMark.element[0]);
         }
 
         // Add marks to the line that is reporting messages
         mark = _self.marks[token.start.line];
+
+        // Add line marks
         mark.lineMarks.push({
             line: _self.cm.markText(token.start, token.end, {className: "interactive-linter-" + message.type}),
             message: message
@@ -146,16 +154,19 @@ define(function (require, exports, module) {
                 element: $("<div class='interactive-linter-line-messages'></div>")
             };
 
-            $.each([].concat(mark.errors, mark.warnings), function(index, message) {
-                var messageContent = "<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}</div>".format(message.type, message.code, message.reason);
-                var $messageContent = $(messageContent);
+            var messages = [].concat(mark.errors, mark.warnings),
+                messageContent = "";
 
+            // Message in line widget messages
+            $.each(messages, function(index, message) {
+                messageContent += "<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}".format(message.type, message.code, message.reason);
                 if (message.href) {
-                    $messageContent.append(" - <a href='{0}' target='interactivelinter'>Details</a>".format(message.href));
+                    messageContent += " - <a href='{0}' target='interactivelinter'>Details</a>".format(message.href);
                 }
-
-                mark.lineWidget.element.append($messageContent);
+                messageContent += "</div>";
             });
+
+            mark.lineWidget.element.append(messageContent);
         }
 
         if (mark.lineWidget.visible !== true) {
