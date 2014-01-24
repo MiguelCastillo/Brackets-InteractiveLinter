@@ -7,6 +7,8 @@
 
 define(function(require, exports, module){
 
+    var Timer = require("timer");
+
     function pluginLoader(manager, pluginsMeta) {
         var msgId = 1,
             plugins, pending, lastRequest;
@@ -43,6 +45,7 @@ define(function(require, exports, module){
                 return;
             }
 
+            //var timer = new Timer(true);
             lastRequest = $.Deferred();
             data.msgId = msgId;
             worker.postMessage(data);
@@ -57,6 +60,7 @@ define(function(require, exports, module){
                     worker.postMessage(data);
                 }
 
+                //console.log(timer.elapsed(), response.msgId);
                 return response.data;
             });
         }

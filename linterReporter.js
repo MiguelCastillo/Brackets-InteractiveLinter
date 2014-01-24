@@ -11,6 +11,8 @@ define(function (require, exports, module) {
     var Timer = require("timer");
     require('string');
 
+    var pending, lastRequest, id = 1;
+
 
     function reporter() {
         var _self = this;
@@ -29,24 +31,56 @@ define(function (require, exports, module) {
     */
     reporter.prototype.report = function(cm, messages) {
         var _self = this;
-        _self.clearMarks();
-        _self.checkFatal(messages);
-        _self.cm = cm;
-        _self.messages = messages;
+        if ( lastRequest && lastRequest.state() === "pending" ) {
+            return this;
+        }
 
-        $.each(messages.slice(0), function (index, message) {
-            if (!message) {
-                return;
-            }
+        pending = {
+            id: id,
+            cm: cm,
+            messages: messages
+        };
 
-            if (message.token){
-                // Add marks to gutter and line
-                _self.addGutterMarks(message, message.token);
+        lastRequest = run( _self, pending ).done(function( done ) {
+            lastRequest = null;
+            if ( pending.id !== done.id ) {
+                console.log( "run pending", pending );
+                _self.report( pending.cm, pending.messages );
             }
         });
 
+        id++;
         return this;
     };
+
+
+    function run( _self, report ) {
+        var deferred = $.Deferred();
+        var cm = report.cm,
+            messages = report.messages;
+
+        setTimeout(function() {
+            _self.clearMarks();
+            _self.checkFatal(messages);
+            _self.cm = cm;
+            _self.messages = messages;
+
+            $.each(messages.slice(0), function (index, message) {
+                if (!message) {
+                    return;
+                }
+
+                if (message.token){
+                    // Add marks to gutter and line
+                    _self.addGutterMarks(message, message.token);
+                }
+            });
+
+            deferred.resolve(report);
+        }, 1);
+
+        return deferred.promise();
+    }
 
 
     /**
