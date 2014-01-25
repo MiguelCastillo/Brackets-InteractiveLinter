@@ -35,9 +35,9 @@ define(function (require, exports, module) {
                 }
 
                 languages[_mode].lint(_cm.getDoc().getValue(), languages[_mode].settings).done(function(result) {
-                    if ( result ) {
-                        linterReporter.report(_cm, result);
-                    }
+
+                    linterReporter.report(_cm, result);
+
                 });
             }, 1000);
         }

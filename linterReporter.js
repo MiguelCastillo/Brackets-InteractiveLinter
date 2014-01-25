@@ -61,21 +61,22 @@ define(function (require, exports, module) {
 
         setTimeout(function() {
             _self.clearMarks();
-            _self.checkFatal(messages);
-            _self.cm = cm;
-            _self.messages = messages;
+            if (messages) {
+                _self.checkFatal(messages);
+                _self.cm = cm;
+                _self.messages = messages;
 
-            $.each(messages.slice(0), function (index, message) {
-                if (!message) {
-                    return;
-                }
+                $.each(messages.slice(0), function (index, message) {
+                    if (!message) {
+                        return;
+                    }
 
-                if (message.token){
-                    // Add marks to gutter and line
-                    _self.addGutterMarks(message, message.token);
-                }
-            });
-
+                    if (message.token){
+                        // Add marks to gutter and line
+                        _self.addGutterMarks(message, message.token);
+                    }
+                });
+            }
             deferred.resolve(report);
         }, 1);
 
