@@ -1,0 +1,40 @@
+{
+   "artists":[
+      {
+         "name":"Pablo",
+         "lastname":"Picasso",
+         "email":"ppicasso@hotmail.com",
+         "birthdate":"October 25, 1881",
+         "art":[
+            {
+               "name":"Guernica",
+               "year":1937
+            },
+            {
+               "name":"The Weeping Woman",
+               "year":1937
+            },
+            {
+               "name":"Les Demoiselles d'Avignon",
+               "year":1907
+            }
+         ]
+      },
+      {
+         "name":"Vincent",
+         "lastname":"van Gogh",
+         "email":"vvangoh@gmail.com",
+         "birthdate":"March 30, 1853",
+         "art":[
+            {
+               "name":"The Starry Night",
+               "year":1889
+            },
+            {
+               "name":"Starry Night Over the Rhone",
+               "year":1888
+            }
+         ]
+      }
+   ]
+}

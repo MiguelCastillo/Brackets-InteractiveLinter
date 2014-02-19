@@ -17,11 +17,16 @@ define(function (require, exports, module) {
     var currentProject;
 
     var linterManager = (function() {
-        var _cm = null, _timer = null,
+        var _cm = null,
+            _timer = null,
             _mode = '';
 
 
         function lint( ) {
+            if ( !_cm || !languages[_mode] ) {
+                return;
+            }
+
             if (_timer) {
                 clearTimeout(_timer);
                 _timer = null;
@@ -29,15 +34,8 @@ define(function (require, exports, module) {
 
             _timer = setTimeout(function () {
                 _timer = null;
-
-                if ( !_cm || !languages[_mode] ) {
-                    return;
-                }
-
                 languages[_mode].lint(_cm.getDoc().getValue(), languages[_mode].settings).done(function(result) {
-
                     linterReporter.report(_cm, result);
-
                 });
             }, 1000);
         }
@@ -58,9 +56,10 @@ define(function (require, exports, module) {
         /**
         * We will only handle one document at a time
         */
-        function setDocument(cm, fullPath) {
+        function setDocument(cm) {
             var gutters, index;
-            _mode = cm && cm.getDoc().getMode().name;
+            var mode = cm && cm.getDoc().getMode();
+            _mode = mode && (mode.helperType || mode.name);
 
             if (_cm) {
                 CodeMirror.off(_cm.getDoc(), "change", lint);
@@ -74,7 +73,7 @@ define(function (require, exports, module) {
                 }
             }
 
-            if (cm && (_mode === 'javascript' || _mode =='coffeescript')) {
+            if (cm && languages[_mode]) {
                 CodeMirror.on(cm.getDoc(), "change", lint);
                 _cm = cm;
                 _cm.on('gutterClick', gutterClick);
