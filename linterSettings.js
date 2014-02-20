@@ -25,7 +25,7 @@ define(function (require, exports, module) {
         .done(function( fileReader ) {
             fileReader.read().done(function (text) {
                 try {
-                    linter.settings = JSON.parse(text);
+                    linter.settings = JSON.parse(stripComments(text));
                 }
                 catch( ex ) {
                     Dialogs.showModalDialog(
@@ -64,6 +64,18 @@ define(function (require, exports, module) {
     function register( linter ) {
         linters[linter.name] = linter;
         loadProjectSettings( linter );
+    }
+
+    /**
+     * Strips all commments from a json string.
+     */
+    function stripComments( text ) {
+        var string = text || '';
+
+        string = string.replace(/\/\*(?:[^\*\/])*\*\//g, '');
+        string = string.replace(/\/\/.*/g, '');
+
+        return string;
     }
 
 
