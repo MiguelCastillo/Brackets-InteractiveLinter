@@ -9,18 +9,17 @@ define(function (require, exports, module) {
     'use strict';
 
     var linterSettings = require("linterSettings");
-    var linterReporter  = require("linterReporter");
-    var ProjectFiles    = require('ProjectFiles');
+    var linterReporter = require("linterReporter");
+    var spromise       = require("libs/js/spromise");
 
     var languages = {};
     var linters = {};
-    var currentProject;
 
     var linterManager = (function() {
-        var _cm = null,
-            _timer = null,
-            _mode = '';
-
+        var _cm       = null,
+            _timer    = null,
+            _mode     = "",
+            _fullPath = "";
 
         function lint( ) {
             if ( !_cm || !languages[_mode] ) {
@@ -34,10 +33,13 @@ define(function (require, exports, module) {
 
             _timer = setTimeout(function () {
                 _timer = null;
-                languages[_mode].lint(_cm.getDoc().getValue(), languages[_mode].settings).done(function(result) {
-                    linterReporter.report(_cm, result);
+                spromise.when(linterSettings.loadSettings(languages[_mode], _fullPath)).always(function(settings) {
+                    languages[_mode].lint(_cm.getDoc().getValue(), settings || {}).done(function(result) {
+                        linterReporter.report(_cm, result);
+                    });
                 });
             }, 1000);
+
         }
 
 
@@ -56,10 +58,11 @@ define(function (require, exports, module) {
         /**
         * We will only handle one document at a time
         */
-        function setDocument(cm) {
+        function setDocument(cm, fullpath) {
             var gutters, index;
-            var mode = cm && cm.getDoc().getMode();
-            _mode = mode && (mode.helperType || mode.name);
+            var mode  = cm && cm.getDoc().getMode();
+            _mode     = mode && (mode.helperType || mode.name);
+            _fullPath = fullpath;
 
             if (_cm) {
                 CodeMirror.off(_cm.getDoc(), "change", lint);
@@ -78,6 +81,8 @@ define(function (require, exports, module) {
                 _cm = cm;
                 _cm.on('gutterClick', gutterClick);
 
+                linterSettings.loadSettings(languages[_mode], _fullPath);
+
                 gutters = _cm.getOption("gutters").slice(0);
                 if ( gutters.indexOf("interactive-linter-gutter") === -1 ) {
                     gutters.unshift("interactive-linter-gutter");
@@ -87,20 +92,13 @@ define(function (require, exports, module) {
         }
 
 
-        $(ProjectFiles).on("projectOpen", function(evt, project) {
-            currentProject = project;
-        });
-
-
         function register( linter ) {
             languages[linter.language] = linter;
             linters[linter.name] = linter;
-            linterSettings.register(linter);
         }
 
 
         return {
-            // Functions
             lint: lint,
             register: register,
             setDocument: setDocument

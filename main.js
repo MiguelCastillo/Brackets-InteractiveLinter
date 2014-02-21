@@ -17,6 +17,7 @@ define(function (require, exports, module) {
 
     var linterManager = require("linterManager"),
         PluginManager = require("pluginManager");
+
     require("linterSettings");
 
     var _pluginManager = new PluginManager();
@@ -31,7 +32,7 @@ define(function (require, exports, module) {
             return;
         }
 
-        linterManager.setDocument(editor._codeMirror, editor.document.file.fullPath);
+        linterManager.setDocument(editor._codeMirror, editor.document.file.parentPath);
         linterManager.lint();
     }
 

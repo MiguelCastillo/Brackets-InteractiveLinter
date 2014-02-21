@@ -8,79 +8,152 @@
 define(function (require, exports, module) {
     'use strict';
 
-    var NativeFileError = brackets.getModule("file/NativeFileError"),
-        Dialogs         = brackets.getModule("widgets/Dialogs");
+    var Dialogs         = brackets.getModule("widgets/Dialogs"),
+        ProjectManager  = brackets.getModule("project/ProjectManager"),
+        FileSystem      = brackets.getModule("filesystem/FileSystem");
 
-    var ProjectFiles    = require('ProjectFiles');
-    var linters = {};
+    var spromise        = require("libs/js/spromise");
+
+    var currentProject  = {},
+        currentSettings = {};
 
 
-    function loadProjectSettings(linter) {
-        linter.settings = linter.defaultSettings || {};
+    function getParentPath( path ) {
+        var result = stripTrailingSlashes( path );
+        return result.substr(0, result.lastIndexOf("/") + 1);
+    }
+
+
+    function findFile( fileName, filePath, traverse ) {
+        var deferred = spromise.defer();
+
+        function find( filePath ) {
+            if ( !filePath ) {
+                return deferred.reject(false);
+            }
+
+            try {
+                var file = FileSystem.getFileForPath (filePath + "/" + fileName);
+                file.exists(function( err, exists ) {
+                    if ( exists ) {
+                        deferred.resolve(file);
+                    }
+                    else if ( err ) {
+                        deferred.reject(false);
+                    }
+                    else if ( filePath.indexOf( currentProject.fullPath ) === -1 || !traverse ) {
+                        deferred.reject(false);
+                    }
+                    else {
+                        find( getParentPath(filePath) );
+                    }
+                });
+            }
+            catch(ex) {
+                deferred.reject(false);
+            }
+        }
+
+        find( filePath );
+        return deferred.promise;
+    }
+
+
+    function readFile( file ) {
+        var deferred = spromise.defer();
+
+        file.read(function( err, content /*, stat*/ ) {
+            if ( err ) {
+                deferred.reject(err);
+                return;
+            }
+
+            deferred.resolve(content);
+        });
+
+        return deferred.promise;
+    }
+
+
+    function setSettings( settings ) {
+        var deferred = spromise.defer();
+
+        try {
+            settings = JSON.parse(stripComments(settings));
+            deferred.resolve(settings);
+        }
+        catch( ex ) {
+            Dialogs.showModalDialog(
+                "interactiveLinterErr",
+                "Interactive Linter Error",
+                "Error processing linter settings<br>" +
+                ex.toString());
+
+            deferred.reject("Error processing linter settings");
+        }
+
+        return deferred.promise;
+    }
+
+
+    function loadSettings(linter, path) {
         if ( !linter.settingsFile ) {
             return;
         }
 
-        ProjectFiles.openFile( linter.settingsFile )
-        .done(function( fileReader ) {
-            fileReader.read().done(function (text) {
-                try {
-                    linter.settings = JSON.parse(stripComments(text));
-                }
-                catch( ex ) {
-                    Dialogs.showModalDialog(
-                        "interactiveLinterErr",
-                        "Interactive Linter Error",
-                        "Error processing linter settings<br>" +
-                        ex.toString());
-                }
-            });
-        })
-        .fail(function(err){
-            if( err.name !== NativeFileError.NOT_FOUND_ERR ) {
-                return;
-            }
-
-            /*
-            * Disable writing linter settings file...
-            *
-            ProjectFiles.openFile( linter.settingsFile, "write", true ).done(function( fileWriter ) {
-                fileWriter.write( JSON.stringify( linter.defaultSettings ) );
-            });
-            */
-        });
-    }
-
-
-    $(ProjectFiles).on('projectOpen', function(evt, project) {
-        for ( var iLinter in linters ) {
-            if ( linters.hasOwnProperty(iLinter) ) {
-                loadProjectSettings(linters[iLinter]);
-            }
+        // Cache so that we are not loading up the same file when navigating in the same directory...
+        if ( path in currentSettings ) {
+            return currentSettings[path];
         }
-    });
 
-
-    function register( linter ) {
-        linters[linter.name] = linter;
-        loadProjectSettings( linter );
+        currentSettings = {};
+        path = normalizePath(path);
+        linter.settings = linter.defaultSettings || {};
+        var traverse = path.indexOf(currentProject.fullPath) !== -1;
+        return findFile(linter.settingsFile, path, traverse)
+                .then(readFile, $.noop)
+                .then(setSettings, $.noop)
+                .always(function(settings) {
+                    currentSettings[path] = settings;
+                });
     }
+
+
+    /**
+    * Make sure we only have forward slashes and we dont have any duplicate slashes
+    */
+    function normalizePath( path ) {
+        return path.replace(/\/+|\\+/g, "/");
+    }
+
+
+    /**
+    * Lets get rid of the trailing slash
+    */
+    function stripTrailingSlashes(path) {
+        return path.replace(/\/$/, "");
+        //return path.charAt(path.length - 1) === "/" ? path.substr(0, path.length - 1) : path;
+    }
+
 
     /**
      * Strips all commments from a json string.
      */
     function stripComments( text ) {
         var string = text || '';
-
         string = string.replace(/\/\*(?:[^\*\/])*\*\//g, '');
         string = string.replace(/\/\/.*/g, '');
-
         return string;
     }
 
 
+    $(ProjectManager).on("projectOpen", function(e, project) {
+        currentProject = project;
+    });
+
+
     return {
-        register: register
+        loadSettings: loadSettings
     };
 
 });

@@ -8,7 +8,8 @@
 define(function (require, exports, module) {
     'use strict';
 
-    var Timer = require("timer");
+    var Timer    = require("timer");
+    var spromise = require("libs/js/spromise");
     require('string');
 
     var pending, lastRequest, id = 1;
@@ -55,7 +56,7 @@ define(function (require, exports, module) {
 
 
     function run( _self, report ) {
-        var deferred = $.Deferred();
+        var deferred = spromise.defer();
         var cm = report.cm,
             messages = report.messages;
 
@@ -80,7 +81,7 @@ define(function (require, exports, module) {
             deferred.resolve(report);
         }, 1);
 
-        return deferred.promise();
+        return deferred.promise;
     }
 
 
