@@ -3,6 +3,7 @@ Brackets-InteractiveLinter
 
 <p>Brackets integration with JSHint, JSLint, and CoffeeLint!  Interactive Linter runs linters as you work on your code and gives instant feedback right on your document.  You can access the details of the lint report by clicking on the light bulbs on the line gutters.
 <p>Interactive linter provides a plugin system to integrate with your own linter.</p>
+<p>Support traversing up the tree hierarchy to load the closest hint config file.</p>
 
 
 JSHint/JSLint
