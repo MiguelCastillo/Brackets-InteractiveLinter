@@ -8,12 +8,11 @@
 define(function (require, exports, module) {
     'use strict';
 
-    var linterSettings = require("linterSettings");
-    var linterReporter = require("linterReporter");
-    var spromise       = require("libs/js/spromise");
+    var linterSettings = require("linterSettings"),
+        linterReporter = require("linterReporter");
 
-    var languages = {};
-    var linters = {};
+    var languages = {},
+        linters = {};
 
     var linterManager = (function() {
         var _cm       = null,
@@ -33,7 +32,7 @@ define(function (require, exports, module) {
 
             _timer = setTimeout(function () {
                 _timer = null;
-                spromise.when(linterSettings.loadSettings(languages[_mode], _fullPath)).always(function(settings) {
+                linterSettings.loadSettings(languages[_mode], _fullPath).always(function(settings) {
                     languages[_mode].lint(_cm.getDoc().getValue(), settings || {}).done(function(result) {
                         linterReporter.report(_cm, result);
                     });
@@ -80,8 +79,6 @@ define(function (require, exports, module) {
                 CodeMirror.on(cm.getDoc(), "change", lint);
                 _cm = cm;
                 _cm.on('gutterClick', gutterClick);
-
-                linterSettings.loadSettings(languages[_mode], _fullPath);
 
                 gutters = _cm.getOption("gutters").slice(0);
                 if ( gutters.indexOf("interactive-linter-gutter") === -1 ) {

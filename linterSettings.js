@@ -38,10 +38,7 @@ define(function (require, exports, module) {
                     if ( exists ) {
                         deferred.resolve(file);
                     }
-                    else if ( err ) {
-                        deferred.reject(false);
-                    }
-                    else if ( filePath.indexOf( currentProject.fullPath ) === -1 || !traverse ) {
+                    else if ( err || !traverse || filePath.indexOf( currentProject.fullPath ) === -1 ) {
                         deferred.reject(false);
                     }
                     else {
@@ -98,12 +95,12 @@ define(function (require, exports, module) {
 
     function loadSettings(linter, path) {
         if ( !linter.settingsFile ) {
-            return;
+            return spromise.resolved();
         }
 
         // Cache so that we are not loading up the same file when navigating in the same directory...
         if ( path in currentSettings ) {
-            return currentSettings[path];
+            return spromise.resolved(currentSettings[path]);
         }
 
         currentSettings = {};
@@ -132,7 +129,6 @@ define(function (require, exports, module) {
     */
     function stripTrailingSlashes(path) {
         return path.replace(/\/$/, "");
-        //return path.charAt(path.length - 1) === "/" ? path.substr(0, path.length - 1) : path;
     }
 
 
