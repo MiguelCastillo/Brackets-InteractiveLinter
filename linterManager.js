@@ -8,11 +8,13 @@
 define(function (require, exports, module) {
     'use strict';
 
-    var linterSettings = require("linterSettings"),
-        linterReporter = require("linterReporter");
+    var CodeInspection = brackets.getModule("language/CodeInspection"),
+        linterSettings = require("linterSettings"),
+        linterReporter = require("linterReporter"),
+        spromise       = require("libs/js/spromise"),
+        languages      = {},
+        linters        = {};
 
-    var languages = {},
-        linters = {};
 
     var linterManager = (function() {
         var _cm       = null,
@@ -32,13 +34,12 @@ define(function (require, exports, module) {
 
             _timer = setTimeout(function () {
                 _timer = null;
-                linterSettings.loadSettings(languages[_mode], _fullPath).always(function(settings) {
+                spromise.when(linterSettings.loadSettings(languages[_mode], _fullPath)).always(function(settings) {
                     languages[_mode].lint(_cm.getDoc().getValue(), settings || {}).done(function(result) {
                         linterReporter.report(_cm, result);
                     });
                 });
             }, 1000);
-
         }
 
 
@@ -92,6 +93,15 @@ define(function (require, exports, module) {
         function register( linter ) {
             languages[linter.language] = linter;
             linters[linter.name] = linter;
+
+            //
+            // Make sure we override the default linters because doing double processing
+            // is extremely expensive
+            //
+            CodeInspection.register(linter.language, {
+                name: linter.language,
+                scanFile: $.noop
+            });
         }
 
 

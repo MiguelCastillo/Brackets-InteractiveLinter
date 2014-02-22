@@ -10,11 +10,9 @@ define(function (require, exports, module) {
 
     var Dialogs         = brackets.getModule("widgets/Dialogs"),
         ProjectManager  = brackets.getModule("project/ProjectManager"),
-        FileSystem      = brackets.getModule("filesystem/FileSystem");
-
-    var spromise        = require("libs/js/spromise");
-
-    var currentProject  = {},
+        FileSystem      = brackets.getModule("filesystem/FileSystem"),
+        spromise        = require("libs/js/spromise"),
+        currentProject  = {},
         currentSettings = {};
 
 
