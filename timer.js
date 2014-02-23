@@ -11,7 +11,7 @@ define([
   "use strict";
 
   function timer(start) {
-    if(start === true){
+    if(start !== false) {
       this.start();
     }
   }
