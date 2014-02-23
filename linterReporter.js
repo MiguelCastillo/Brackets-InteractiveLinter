@@ -11,7 +11,8 @@ define(function (require, exports, module) {
     var spromise = require("libs/js/spromise");
     require('string');
 
-    var pending, lastRequest, id = 1;
+    var msgId = 1;
+    var pending, lastRequest;
 
 
     function Reporter() {
@@ -29,26 +30,20 @@ define(function (require, exports, module) {
     */
     Reporter.prototype.report = function(cm, messages) {
         var _self = this;
-
-        pending = {
-            id: id,
-            cm: cm,
-            messages: messages
-        };
-
+        pending = msgId;
         if ( lastRequest && lastRequest.state() === "pending" ) {
             return this;
         }
 
-        lastRequest = runReport( _self, pending ).done(function( done ) {
+        lastRequest = runReport( _self, pending, cm, messages ).done(function( doneId ) {
             lastRequest = null;
-            if ( pending.id !== done.id ) {
+            if ( pending !== doneId ) {
                 console.log( "run pending", pending );
-                _self.report( pending.cm, pending.messages );
+                _self.report( cm, messages );
             }
         });
 
-        id++;
+        msgId++;
         return this;
     };
 
@@ -215,7 +210,6 @@ define(function (require, exports, module) {
             // Get the last real error...
             var message = messages[messages.length - 2];
             console.log("Fatal failure", message);
-            messages.pop();
             return true;
         }
 
@@ -223,10 +217,8 @@ define(function (require, exports, module) {
     };
 
 
-    function runReport( _self, report ) {
-        var deferred = spromise.defer(),
-            cm       = report.cm,
-            messages = report.messages;
+    function runReport( _self, reportId, cm, messages ) {
+        var deferred = spromise.defer();
 
         setTimeout(function() {
             // Run as operation for best performance
@@ -250,7 +242,7 @@ define(function (require, exports, module) {
                     });
                 }
 
-                deferred.resolve(report);
+                deferred.resolve(reportId);
             });
         }, 0);
 
