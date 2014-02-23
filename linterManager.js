@@ -80,8 +80,6 @@ define(function (require, exports, module) {
                 _cm = cm;
                 _cm.on('gutterClick', gutterClick);
 
-                linterSettings.loadSettings(languages[_mode], _fullPath);
-
                 gutters = _cm.getOption("gutters").slice(0);
                 if ( gutters.indexOf("interactive-linter-gutter") === -1 ) {
                     gutters.unshift("interactive-linter-gutter");
