@@ -13,7 +13,7 @@ define(function (require, exports, module) {
         FileSystem      = brackets.getModule("filesystem/FileSystem"),
         spromise        = require("libs/js/spromise"),
         currentProject  = {},
-        currentSettings = {};
+        currentLinter   = {};
 
 
     function getParentPath( path ) {
@@ -91,26 +91,45 @@ define(function (require, exports, module) {
     }
 
 
-    function loadSettings(linter, path) {
-        if ( !linter.settingsFile ) {
+    FileSystem.on("change", function(evt, file) {
+        if ( currentLinter.file && file && file.path === currentLinter.fileObject.path ) {
+            loadFile().done(currentLinter.manager.lint);
+        }
+    });
+
+
+    function loadFile( ) {
+        var traverse = currentLinter.path.indexOf(currentProject.fullPath) !== -1;
+
+        return findFile(currentLinter.file, currentLinter.path, traverse)
+            .always(function(file) {
+                currentLinter.fileObject = file;
+            })
+            .then(readFile, $.noop)
+            .then(setSettings, $.noop)
+            .always(function(settings) {
+                currentLinter.settings = settings;
+            });
+    }
+
+
+    function loadSettings(file, path, manager) {
+        if ( !file ) {
             return spromise.resolved();
         }
 
         // Cache so that we are not loading up the same file when navigating in the same directory...
-        if ( path in currentSettings ) {
-            return spromise.resolved(currentSettings[path]);
+        if ( path === currentLinter.path ) {
+            return spromise.resolved(currentLinter.settings);
         }
 
-        currentSettings = {};
-        path = normalizePath(path);
-        linter.settings = linter.defaultSettings || {};
-        var traverse = path.indexOf(currentProject.fullPath) !== -1;
-        return findFile(linter.settingsFile, path, traverse)
-                .then(readFile, $.noop)
-                .then(setSettings, $.noop)
-                .always(function(settings) {
-                    currentSettings[path] = settings;
-                });
+        currentLinter = {
+            path: normalizePath(path),
+            file: file,
+            manager: manager
+        };
+
+        return loadFile();
     }
 
 
