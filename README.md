@@ -22,7 +22,7 @@ JSHint/JSLint
 How to
 ===================
 
-* Install... Open Brackets then copy and paste https://github.com/MiguelCastillo/Brackets-Interactive-Linter into File->Install Extension.  You don't need to restart Brackets.
+* Install... Go through the Brackets Extensions Manager.
 
 
 FAQ
