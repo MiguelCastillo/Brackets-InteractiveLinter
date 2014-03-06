@@ -8,10 +8,10 @@ Brackets-InteractiveLinter
 
 JSHint/JSLint
 ===================
-<p>Interactive Linter loads .jshintrc and .jslintrc files in your project. If one doesn't exist, Interactive Linter will create one so that you can easily customize linting for your projects.</p>
+<p>Interactive Linter automatically loads .jshintrc and .jslintrc files in your project.</p>
 <p>All jshint settings that already exists inline in your JavaScript files will continue to work along side any .jshintrc/.jslintrc file.</p>
 <p>Integration with http://jslinterrors.com/ to find out details about what's reported by JSHint.</p>
-<p>This was inspired by Joachim's extions brackets-continuous-compilation (https://github.com/JoachimK/brackets-continuous-compilation)</p>
+<p>This was inspired by Joachim's extensions brackets-continuous-compilation (https://github.com/JoachimK/brackets-continuous-compilation)</p>
 
 
  CoffeeLint
