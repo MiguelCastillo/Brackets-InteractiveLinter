@@ -11,6 +11,8 @@ var window = window || {};
 
 define(function(require, exports, module) {
 
+    var defaultSettings = {};
+
     // Crazy hacks...
     // JSHINT will insert a fake window object...  This completely throws off coffeelint
     // because coffeelint blindly checks to see if window is defined and then it assumes
@@ -36,6 +38,7 @@ define(function(require, exports, module) {
     function lint(text, settings) {
         // Get document as a string to be passed into JSHint
         var result;
+        settings = settings || defaultSettings;
 
         try {
             result = coffeelint.lint(text, settings);
@@ -55,9 +58,7 @@ define(function(require, exports, module) {
         language: "coffeescript",
         lint: lint,
 
-        defaultSettings: {
-        },
-
+        defaultSettings: defaultSettings,
         settingsFile: ".coffeelintrc"
     };
 

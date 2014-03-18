@@ -16,10 +16,22 @@ define(function(require, exports, module) {
 
     require("jshint/libs/jshint");
     var groomer = require("jshint/groomer");
+    var defaultSettings = {
+        "undef":true,
+        "unused":true,
+        "curly":true,
+        "indent":4,
+        "devel":true,
+        "globals":{
+        }
+    };
 
 
     function lint( text, settings ) {
         var i, length;
+
+        // Make we use some good default settings if none have been specified
+        settings = settings || defaultSettings;
 
         // Get document as a string to be passed into JSHint
         if ( !JSHINT(text, settings, settings.globals) ) {
@@ -46,14 +58,7 @@ define(function(require, exports, module) {
         lint: lint,
 
         // Default settings
-        defaultSettings: {
-            "undef": true,
-            "unused": true,
-            "curly": true,
-            "indent": 4,
-            "devel": true,
-            "globals": { }
-        },
+        defaultSettings: defaultSettings,
         settingsFile: ".jshintrc"
     };
 });
