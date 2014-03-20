@@ -7,9 +7,6 @@
 
 define(function(require, exports, module){
 
-    var Timer    = require("timer");
-    var spromise = require("libs/js/spromise");
-
     function pluginLoader(manager, pluginsMeta) {
         var msgId = 1,
             plugins, pending, lastRequest;

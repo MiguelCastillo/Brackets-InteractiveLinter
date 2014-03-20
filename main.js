@@ -11,17 +11,17 @@ define(function (require, exports, module) {
     // Reference for jshint errors/warnings
     // http://jslinterrors.com/?utm_source=javascriptweekly&utm_medium=email
 
+
     var EditorManager    = brackets.getModule("editor/EditorManager"),
         AppInit          = brackets.getModule("utils/AppInit"),
         ExtensionUtils   = brackets.getModule("utils/ExtensionUtils");
 
-    var linterManager = require("linterManager"),
-        PluginManager = require("pluginManager");
-
+    // Lets make sure we have proper string polyfills needed by interactive linters
+    require("string");
     require("linterSettings");
 
-    var _pluginManager = new PluginManager();
-
+    var linterManager = require("linterManager"),
+        pluginManager = require("pluginManager");
 
     ExtensionUtils.loadStyleSheet(module, "style.css");
 
@@ -37,16 +37,15 @@ define(function (require, exports, module) {
     }
 
 
-    _pluginManager.ready(function(plugins) {
-        for ( var iPlugin in plugins ) {
-            linterManager.register( plugins[iPlugin] );
-        }
+    AppInit.appReady(function(){
+        pluginManager.ready(function(plugins) {
+            for ( var iPlugin in plugins ) {
+                linterManager.register( plugins[iPlugin] );
+            }
 
-        AppInit.appReady(function(){
             $(EditorManager).on("activeEditorChange.interactive-linter", setDocument);
             setDocument();
         });
     });
-
 });
 
