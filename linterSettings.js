@@ -72,12 +72,18 @@ define(function (require, exports, module) {
 
     function setSettings( settings ) {
         var deferred = spromise.defer();
+        settings = stripComments(settings);
 
         try {
-            settings = JSON.parse(stripComments(settings));
+            settings = JSON.parse(settings);
             deferred.resolve(settings);
         }
         catch( ex ) {
+            if ( !settings ) {
+                deferred.resolve();
+                return;
+            }
+
             Dialogs.showModalDialog(
                 "interactiveLinterErr",
                 "Interactive Linter Error",
