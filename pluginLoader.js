@@ -7,6 +7,9 @@
 
 define(function(require, exports, module){
 
+    var spromise = require("libs/js/spromise");
+
+
     function pluginLoader(manager, pluginsMeta) {
         var msgId = 1,
             plugins, pending, lastRequest;
@@ -40,11 +43,11 @@ define(function(require, exports, module){
         function postMessage( data ) {
             pending = msgId;
             if ( lastRequest && lastRequest.state() === "pending" ) {
-                return;
+                return spromise.resolved();
             }
 
             //var timer = new Timer(true);
-            lastRequest = $.Deferred();
+            lastRequest = spromise.defer();
             data.msgId  = msgId;
             worker.postMessage(data);
             msgId++;
@@ -86,7 +89,8 @@ define(function(require, exports, module){
                         text: text,
                         settings: settings
                     }
-                }).then(function(response) {
+                })
+                .then(function(response) {
                     return response.result;
                 });
             }
@@ -102,8 +106,7 @@ define(function(require, exports, module){
             "type": "init",
             "data": {
                 "baseUrl": pluginsMeta.path,
-                "packages": pluginsMeta.directories,
-                "files": pluginsMeta.files
+                "packages": pluginsMeta.directories
             }
         })
         .then(function(response) {

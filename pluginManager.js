@@ -11,7 +11,6 @@ define(function(require, exports, module) {
     var FileSystem   = brackets.getModule("filesystem/FileSystem");
     var pluginLoader = require("pluginLoader");
     var spromise     = require("libs/js/spromise");
-    var defered      = spromise.defer();
 
 
     /**
@@ -20,8 +19,8 @@ define(function(require, exports, module) {
     */
     function pluginManager() {
         // Build plugin list that the worker thread needs to load
-        getPluginsMeta(module.uri.substring(0, module.uri.lastIndexOf("/")) + "/plugins").done(function(pluginsMeta) {
-            pluginLoader(pluginManager, pluginsMeta).always(defered.resolve);
+        return getPluginsMeta(module.uri.substring(0, module.uri.lastIndexOf("/")) + "/plugins").then(function(pluginsMeta) {
+            return pluginLoader(pluginManager, pluginsMeta);
         });
     }
 
@@ -34,22 +33,16 @@ define(function(require, exports, module) {
                 result.reject(err);
             }
 
-            var i, directories = [], files = [], entry;
-
+            var i, entry, directories = [];
             for (i = 0; i < entries.length; i++) {
                 entry = entries[i];
                 if (entry.isDirectory) {
                     directories.push(entry.name);
                 }
-
-                if (entry.isFile && entry.name.endsWith(".js")) {
-                    files.push(entry.name);
-                }
             }
 
             result.resolve({
                 directories: directories,
-                files: files,
                 path: path
             });
         });
@@ -57,11 +50,8 @@ define(function(require, exports, module) {
         return result.promise;
     }
 
-
-    pluginManager();
-
     return {
-        ready: defered.done
+        ready: pluginManager().done
     };
 });
 
