@@ -98,7 +98,7 @@ define(function (require, exports, module) {
 
 
     FileSystem.on("change", function(evt, file) {
-        if ( currentLinter.file && file && file.path === currentLinter.fileObject.path ) {
+        if ( currentLinter.file && currentLinter.fileObject && file && file.fullPath === currentLinter.fileObject.fullPath ) {
             loadFile().done(currentLinter.manager.lint);
         }
     });
