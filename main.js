@@ -25,15 +25,11 @@ define(function (require, exports, module) {
 
     ExtensionUtils.loadStyleSheet(module, "style.css");
 
-    function setDocument() {
-        var editor = EditorManager.getActiveEditor();
-        if (!editor || !editor._codeMirror) {
-            linterManager.setDocument(null);
-            return;
+    function setDocument(event, current, previous) {
+        if (current) {
+            linterManager.setDocument(current._codeMirror, current.document.file.parentPath);
+            linterManager.lint();
         }
-
-        linterManager.setDocument(editor._codeMirror, editor.document.file.parentPath);
-        linterManager.lint();
     }
 
 
@@ -44,7 +40,7 @@ define(function (require, exports, module) {
             }
 
             $(EditorManager).on("activeEditorChange.interactive-linter", setDocument);
-            setDocument();
+            setDocument(null, EditorManager.getActiveEditor());
         });
     });
 });
