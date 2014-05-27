@@ -9,6 +9,7 @@ define(function (require, exports, module) {
     'use strict';
 
     var CodeInspection = brackets.getModule("language/CodeInspection"),
+        CodeMirror     = brackets.getModule("thirdparty/CodeMirror2/lib/codemirror"),
         linterSettings = require("linterSettings"),
         linterReporter = require("linterReporter"),
         languages      = {},
