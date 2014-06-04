@@ -50,8 +50,7 @@ define(function(require, exports, module) {
         return result.promise;
     }
 
-    return {
-        ready: pluginManager().done
-    };
+
+    return pluginManager;
 });
 

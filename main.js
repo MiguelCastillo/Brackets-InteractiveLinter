@@ -32,9 +32,8 @@ define(function (require, exports, module) {
         }
     }
 
-
     AppInit.appReady(function(){
-        pluginManager.ready(function(plugins) {
+        pluginManager().done(function(plugins) {
             for ( var iPlugin in plugins ) {
                 linterManager.register( plugins[iPlugin] );
             }
@@ -44,4 +43,3 @@ define(function (require, exports, module) {
         });
     });
 });
-
