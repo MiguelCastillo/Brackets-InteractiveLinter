@@ -18,7 +18,6 @@
 
 .CodeMirror .interactive-linter-gutter {
     width: 15px;
-    margin-left: 7px;
 }
 
 /*icon image from http://findicons.com/icon/184668/light_bulb*/
@@ -26,6 +25,7 @@
     background-image: url(img/light_bulb.png);
     background-size: 15px 15px;
     background-repeat: no-repeat;
+    margin-left: 7px;
 }
 
 .CodeMirror .interactive-linter-gutter-errors {
