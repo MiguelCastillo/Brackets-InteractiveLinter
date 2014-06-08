@@ -59,7 +59,7 @@ define(function(require, exports, module) {
         lint: lint,
 
         defaultSettings: defaultSettings,
-        settingsFile: ".coffeelintrc"
+        settingsFile: "coffeelint.json"
     };
 
 });
