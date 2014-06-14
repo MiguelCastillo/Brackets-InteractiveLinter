@@ -46,8 +46,8 @@ FAQ
 * Can I configure default linter settings?
     - Yes you can.  You will need to file the default.json file located in each linter and replace its content with whatever settings you always want loaded.  For example, if you want to set default settings for jshint, you will need to navigate to the extensions/user/interactive/plugins/jshint/default.json file and modify accordingly.  These settings are mixin in with any other settings found by Interactive Linter.
 
-* Can I configure what linter settings file is loaded?
-   - Yes you can!  You will need to find settings.json for the particular interactive linter plugin, and change the settingsPath.  For example, if you want to configure Interactive Linter to load jshintrc.json instead of default .jshintrc, find the file extensions/user/interactive/plugins/jshint/default.json and modify the settingsPath to the jshintrc.json. 
+* Can I configure the settings file the linters load?
+   - Yes you can!  You will need to find settings.json for the particular interactive linter plugin, and change the settingsPath.  For example, if you want to configure Interactive Linter to load jshintrc.json instead of default .jshintrc, find the file extensions/user/interactive/plugins/jshint/default.json and modify the settingsPath value to jshintrc.json. 
 
 
 Links
