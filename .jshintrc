@@ -1,13 +1,17 @@
 {
-    "undef":true,
-    "unused":true,
-    "curly":true,
-    "indent":4,
-    "devel":true,
+    "undef": true,
+    "unused": true,
+    "curly": true,
+    "indent": 4,
+    "devel": true,
     "laxcasebreak":true,
-    "globals":{
+    "globals": {
         "brackets": true,
         "window": true,
+        "importScripts": true,
+        "postMessage": true,
+        "onmessage": true,
+        "requirejs": true,
         "require": true,
         "define": true,
         "$": true

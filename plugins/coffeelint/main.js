@@ -9,9 +9,7 @@
 // after coffeelint
 var window = window || {};
 
-define(function(require, exports, module) {
-
-    var defaultSettings = {};
+define(function(require /*, exports, module*/) {
 
     // Crazy hacks...
     // JSHINT will insert a fake window object...  This completely throws off coffeelint
@@ -32,13 +30,17 @@ define(function(require, exports, module) {
         });
     });
 
-    var groomer = require("coffeelint/groomer");
+    var utils           = require("libs/utils"),
+        groomer         = require("coffeelint/groomer"),
+        defaultSettings = JSON.parse(require("text!coffeelint/default.json")),
+        settings        = JSON.parse(require("text!coffeelint/settings.json"));
 
 
     function lint(text, settings) {
         // Get document as a string to be passed into JSHint
         var result;
-        settings = settings || defaultSettings;
+
+        settings = utils.mixin(defaultSettings, settings);
 
         try {
             result = coffeelint.lint(text, settings);
@@ -53,13 +55,7 @@ define(function(require, exports, module) {
         return result;
     }
 
-
-    return {
-        language: "coffeescript",
-        lint: lint,
-
-        defaultSettings: defaultSettings,
-        settingsFile: "coffeelint.json"
-    };
-
+    return utils.mixin(settings, {
+        lint: lint
+    });
 });

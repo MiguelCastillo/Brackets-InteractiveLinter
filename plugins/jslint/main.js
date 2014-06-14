@@ -5,17 +5,18 @@
  */
 
 
-define(function(require, exports, module) {
+define(function(require /*, exports, module*/) {
 
-    var JSLINT = require('jslint/libs/jslint'),
-        groomer  = require("jslint/groomer");
-
-    var defaultSettings = {};
-
+    var JSLINT          = require('jslint/libs/jslint'),
+        utils           = require("libs/utils"),
+        groomer         = require("jslint/groomer"),
+        defaultSettings = JSON.parse(require("text!jslint/default.json")),
+        settings        = JSON.parse(require("text!jslint/settings.json"));
 
     function lint(text, settings) {
-        // Make we use some good default settings if none have been specified
-        settings = settings || defaultSettings;
+        var i, length;
+
+        settings = utils.mixin(defaultSettings, settings);
 
         if ( !JSLINT(text, settings) ) {
             var errors = JSLINT.errors.slice(0);
@@ -35,13 +36,7 @@ define(function(require, exports, module) {
         }
     }
 
-    return {
-        language: "disabled-javascript",
-        lint: lint,
-
-        // Settings
-        defaultSettings: defaultSettings,
-        settingsFile: ".jslintrc"
-    };
-
+    return utils.mixin(settings, {
+        lint: lint
+    });
 });

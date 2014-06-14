@@ -5,7 +5,7 @@
  */
 
 
-define(function(require, exports, module) {
+define(function(require /*, exports, module*/) {
 
     /**
     * BUG: jshint gives the wrong character index when dealing with tabs.
@@ -15,23 +15,15 @@ define(function(require, exports, module) {
     */
 
     require("jshint/libs/jshint");
-    var groomer = require("jshint/groomer");
-    var defaultSettings = {
-        "undef":true,
-        "unused":true,
-        "curly":true,
-        "indent":4,
-        "devel":true,
-        "globals":{
-        }
-    };
-
+    var utils           = require("libs/utils"),
+        groomer         = require("jshint/groomer"),
+        defaultSettings = JSON.parse(require("text!jshint/default.json")),
+        settings        = JSON.parse(require("text!jshint/settings.json"));
 
     function lint( text, settings ) {
         var i, length;
 
-        // Make we use some good default settings if none have been specified
-        settings = settings || defaultSettings;
+        settings = utils.mixin(defaultSettings, settings);
 
         // Get document as a string to be passed into JSHint
         if ( !JSHINT(text, settings, settings.globals) ) {
@@ -52,13 +44,7 @@ define(function(require, exports, module) {
         }
     }
 
-
-    return {
-        language: "javascript",
-        lint: lint,
-
-        // Default settings
-        defaultSettings: defaultSettings,
-        settingsFile: ".jshintrc"
-    };
+    return utils.mixin(settings, {
+        lint: lint
+    });
 });

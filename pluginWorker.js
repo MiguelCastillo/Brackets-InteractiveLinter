@@ -10,10 +10,15 @@ importScripts("libs/js/require.js");
 
 function PluginLoader( settings ) {
     "use strict";
+
     var _self = this;
     var data = settings.data;
 
     var pluginRequire = requirejs.config({
+        "paths": {
+            "text": "../libs/js/text",
+            "libs": "../libs/js"
+        },
         "baseUrl": data.baseUrl,
         "packages": data.packages
     });
