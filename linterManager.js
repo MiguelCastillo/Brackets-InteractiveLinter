@@ -5,7 +5,7 @@
  */
 
 
-define(function (require, exports, module) {
+define(function (require /*, exports, module*/) {
     'use strict';
 
     var CodeInspection = brackets.getModule("language/CodeInspection"),
@@ -35,7 +35,7 @@ define(function (require, exports, module) {
             _timer = setTimeout(function () {
                 _timer = null;
                 linterSettings.loadSettings(languages[_mode].settingsFile, _fullPath, linterManager).always(function(settings) {
-                    languages[_mode].lint(_cm.getDoc().getValue(), settings || languages[_mode].defaultSettings).done(function(result) {
+                    languages[_mode].lint(_cm.getDoc().getValue(), settings).done(function(result) {
                         linterReporter.report(_cm, result);
                     });
                 });

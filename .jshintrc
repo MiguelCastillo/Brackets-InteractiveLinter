@@ -14,6 +14,8 @@
         "requirejs": true,
         "require": true,
         "define": true,
-        "$": true
+        "$": true,
+        "clearTimeout": true,
+        "setTimeout": true
     }
 }
