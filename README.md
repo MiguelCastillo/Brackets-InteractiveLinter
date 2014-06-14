@@ -36,12 +36,18 @@ FAQ
 
 * Use JSLint instead of JSHint? Yes, it is possible. Although it requires manual intervention.
     - Open up the plugins directory in Interactive Linter
-    - Go into jshint/main.js, find "language: javascript" and rename to "language: disabled-javascript"
-    - Go into jslint/main.js, find "language: disabled-javascript" and rename to "language: javascript"
+    - Go into jshint/settings.json, find "language": "javascript" and change to "language": "disabled-javascript"
+    - Go into jslint/settings.json, find "language": "disabled-javascript" and change to "language": "javascript"
     - Reload Bracket and enjoy JSLint
 
 * Are .jshintrc supported?
-    - Yes, they are supported but in the context of a project.
+    - Yes, they are!
+
+* Can I configure default linter settings?
+    - Yes you can.  You will need to file the default.json file located in each linter and replace its content with whatever settings you always want loaded.  For example, if you want to set default settings for jshint, you will need to navigate to the extensions/user/interactive/plugins/jshint/default.json file and modify accordingly.  These settings are mixin in with any other settings found by Interactive Linter.
+
+* Can I configure what linter settings file is loaded?
+   - Yes you can!  You will need to find settings.json for the particular interactive linter plugin, and change the settingsPath.  For example, if you want to configure Interactive Linter to load jshintrc.json instead of default .jshintrc, find the file extensions/user/interactive/plugins/jshint/default.json and modify the settingsPath to the jshintrc.json. 
 
 
 Links
