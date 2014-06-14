@@ -6,7 +6,7 @@ Features
 ===================
 * Real time feedback
 * Plugin system that runs plugins in a worker thread
-* Supports traversing up the directory tree to load the most appropriate linter settings file
+* Traverse up the directory tree to load the most appropriate linter settings file
 * Let's you provide default linter settings that get mixed in with project specific ones.  Reduce duplication!
 * Configure the linter settings file that gets loaded. Maybe you want to load jshintrc.json instead of .jshintrc
 
