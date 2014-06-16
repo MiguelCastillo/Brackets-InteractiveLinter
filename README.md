@@ -21,7 +21,7 @@ JSHint/JSLint
 
  CoffeeLint
 ===================
-<p>CoffeeLinter does not yet have a standard file that's loaded and processed by the linter itself.  So, while this is resolved by CoffeeLint, I have added support for .coffeelintrc to follow analogous system to JSLint and JSHint.</p>
+<p>CoffeeLinter does not yet have a standard file that's loaded and processed by the linter itself.  So, while this is resolved by CoffeeLint, I have added support for coffeelint.json to follow analogous system to JSLint and JSHint.</p>
 
 Screenshots
 ===================
