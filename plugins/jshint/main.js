@@ -6,6 +6,7 @@
 
 
 define(function(require /*, exports, module*/) {
+    "use strict";
 
     /**
     * BUG: jshint gives the wrong character index when dealing with tabs.

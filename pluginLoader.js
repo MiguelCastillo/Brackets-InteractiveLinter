@@ -6,6 +6,7 @@
 
 
 define(function(require, exports, module){
+    "use strict";
 
     var spromise = require("libs/js/spromise");
 
@@ -86,7 +87,7 @@ define(function(require, exports, module){
                     type: "lint",
                     data: {
                         name: plugin.name,
-                        text: text,
+                        text: stripMinified(text),
                         settings: settings
                     }
                 })
@@ -113,6 +114,17 @@ define(function(require, exports, module){
             plugins = loadPlugins(response);
             return plugins;
         });
+    }
+
+
+    /**
+     * Strips out any line that longer than 250 characters as a way to guess if the code is minified
+     */
+    function stripMinified(text) {
+        // var regex = /function[ ]?\w*\([\w,]*\)\{(?:\S[\s]?){150,}\}/gm;
+        // var regex = /(?:\S[\s]?){250,}[\n]$/gm;
+        var regex = /(?:.){250,}/gm;
+        return text.replace(regex, function() {return "";});
     }
 
 
