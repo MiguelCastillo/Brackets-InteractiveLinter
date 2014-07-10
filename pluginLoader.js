@@ -123,7 +123,7 @@ define(function(require, exports, module){
     function stripMinified(text) {
         // var regex = /function[ ]?\w*\([\w,]*\)\{(?:\S[\s]?){150,}\}/gm;
         // var regex = /(?:\S[\s]?){250,}[\n]$/gm;
-        var regex = /(?:.){250,}/gm;
+        var regex = /(?:.){500,}/gm;
         return text.replace(regex, function() {return "";});
     }
 
