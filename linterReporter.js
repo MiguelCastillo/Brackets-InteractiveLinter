@@ -10,6 +10,12 @@ define(function (require, exports, module) {
 
     var spromise = require("libs/js/spromise");
     require('string');
+    
+    var CommandManager    = brackets.getModule("command/CommandManager"),
+        EditorManager     = brackets.getModule("editor/EditorManager"),
+        InlineWidget      = brackets.getModule("editor/InlineWidget").InlineWidget,
+        KeyBindingManager = brackets.getModule("command/KeyBindingManager");
+    
 
     var msgId = 1;
     var pending, lastRequest;
@@ -19,7 +25,48 @@ define(function (require, exports, module) {
         var _self = this;
         _self.marks = {};
     }
+    
+    Reporter.prototype.registerKeyBinding = function () {
+        var _self = this;
+        var CMD_SHOW_LINE_DETAILS = "MiguelCastillo.interactive-linter.showLineDetails";
+        CommandManager.register("Show Line Details", CMD_SHOW_LINE_DETAILS, function () {
+            var testing, testing1, testing2, testing3;
 
+            var activeEditor = EditorManager.getActiveEditor();
+            var cursorPos = activeEditor.getCursorPos();
+
+            var mark = _self.marks[cursorPos.line];
+
+            if (!mark) {
+                return;
+            }
+
+            var inlineWidget = new InlineWidget();
+            inlineWidget.load(EditorManager.getActiveEditor());
+            activeEditor.addInlineWidget(cursorPos, inlineWidget, true);
+
+            var errorHtml = $('<div tab-index="0"><div></div></div>');
+            
+            var messages = [].concat(mark.errors, mark.warnings),
+                messageContent = "";
+
+            // Message in line widget messages
+            $.each(messages, function(index, message) {
+//                messageContent += '<div style="">{0}</div>'.format(message.reason);
+                
+                messageContent += "<div style='margin-left: 40px;' class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}".format(message.type, message.code, message.reason);
+                if (message.href) {
+                    messageContent += " - <a href='{0}' target='interactivelinter'>Details</a>".format(message.href);
+                }
+                messageContent += "</div>";
+            });
+            
+            errorHtml.append($(messageContent));
+            inlineWidget.$htmlContent.append(errorHtml);
+            activeEditor.setInlineWidgetHeight(inlineWidget, inlineWidget.$htmlContent.height() + 20);
+        });
+        KeyBindingManager.addBinding(CMD_SHOW_LINE_DETAILS, "Shift-Alt-Z");
+    };
 
     /**
     * Routine that goes through all the jshint messages and adds all the gutter
@@ -260,10 +307,15 @@ define(function (require, exports, module) {
         function showLineDetails(cm, lineNumber, gutterId, event) {
             _reporter.showLineDetails(cm, lineNumber, gutterId, event);
         }
+        
+        function registerKeyBindings() {
+            _reporter.registerKeyBinding();
+        }
 
         return {
             report: report,
-            showLineDetails: showLineDetails
+            showLineDetails: showLineDetails,
+            registerKeyBindings: registerKeyBindings
         };
     })();
 

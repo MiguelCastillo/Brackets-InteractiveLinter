@@ -21,6 +21,8 @@ define(function (require /*, exports, module*/) {
             _timer    = null,
             _mode     = "",
             _fullPath = "";
+        
+        linterReporter.registerKeyBindings();
 
         function lint( ) {
             if ( !_cm || !languages[_mode] ) {
