@@ -14,7 +14,8 @@ define(function (require, exports, module) {
     var CommandManager    = brackets.getModule("command/CommandManager"),
         EditorManager     = brackets.getModule("editor/EditorManager"),
         InlineWidget      = brackets.getModule("editor/InlineWidget").InlineWidget,
-        KeyBindingManager = brackets.getModule("command/KeyBindingManager");
+        KeyBindingManager = brackets.getModule("command/KeyBindingManager"),
+        _                 = brackets.getModule("thirdparty/lodash");
     
 
     var msgId = 1;
@@ -165,16 +166,14 @@ define(function (require, exports, module) {
         var cursorPos = typeof line !== 'undefined' ? {line: line, ch: 0} : activeEditor.getCursorPos();
 
         var inlineWidgets = activeEditor.getInlineWidgets();
-        if (inlineWidgets && inlineWidgets.length) {
-            var foundSelf = false;
-            $.each(inlineWidgets, function (index, widget) {
+        if (inlineWidgets.length > 0) {
+            var foundWidget = _.find(inlineWidgets, function (widget) {
                 if (widget.hasOwnProperty('lineNumber') && widget.lineNumber === cursorPos.line) {
                     activeEditor.removeInlineWidget(widget);
-                    foundSelf = true;
-                    return;
+                    return true;
                 }
             });
-            if (foundSelf) {
+            if (foundWidget) {
                 return;
             }
         }
