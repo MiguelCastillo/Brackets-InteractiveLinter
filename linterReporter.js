@@ -146,9 +146,9 @@ define(function (require, exports, module) {
                 textMark.line.clear();
             });
 
-            if (mark.lineWidget) {
-                mark.lineWidget.widget.clear();
-                delete mark.lineWidget;
+            if (mark.inlineWidget) {
+                _self.hideLineDetails(mark.inlineWidget);
+                delete mark.inlineWidget;
             }
 
             delete mark.errors;
@@ -179,18 +179,17 @@ define(function (require, exports, module) {
     Reporter.prototype.toggleLineDetails = function (line) {
         var activeEditor = EditorManager.getActiveEditor();
         var cursorPos    = typeof line !== 'undefined' ? {line: line, ch: 0} : activeEditor.getCursorPos();
-        var foundWidget;
-
-        var inlineWidgets = activeEditor.getInlineWidgets();
-        if (inlineWidgets.length > 0) {
-            foundWidget = this.getWidgetForLine(cursorPos.line);
-        }
+        var foundWidget = this.getWidgetForLine(cursorPos.line);
 
         if (foundWidget) {
-            activeEditor.removeInlineWidget(foundWidget); // Hide line details
+            this.hideLineDetails(foundWidget);
         } else {
             this.showLineDetails(line);
         }
+    };
+
+    Reporter.prototype.hideLineDetails = function (widget) {
+        EditorManager.getActiveEditor().removeInlineWidget(widget);
     };
 
     Reporter.prototype.showLineDetails = function(line) {
@@ -204,11 +203,19 @@ define(function (require, exports, module) {
         }
 
         var inlineWidget = new InlineWidget();
+        mark.inlineWidget = inlineWidget;
         inlineWidget.load(EditorManager.getActiveEditor());
         inlineWidget.interactiveLinterLineNumber = cursorPos.line;
         activeEditor.addInlineWidget(cursorPos, inlineWidget, true);
 
-        var $errorHtml = $('<div style="margin: 10px 0;"></div>');
+        this.updateLineDetails(mark);
+    };
+
+    Reporter.prototype.updateLineDetails = function (mark) {
+        var activeEditor = EditorManager.getActiveEditor();
+        var inlineWidget = mark.inlineWidget;
+
+        var $errorHtml = $('<div class="interactive-linter-line-widget"></div>');
 
         var messages = [].concat(mark.errors, mark.warnings),
             messageContent = "";
@@ -222,11 +229,10 @@ define(function (require, exports, module) {
             messageContent += "</div>";
         });
 
-        $errorHtml.append($(messageContent));
+        $errorHtml.empty().append($(messageContent));
         inlineWidget.$htmlContent.append($errorHtml);
         activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height() + 20);
     };
-
 
     /**
     * Checks messages to figure out if JSHint report a fatal failue.
