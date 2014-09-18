@@ -48,12 +48,12 @@ define(function (require /*, exports, module*/) {
         /**
         * Show line details
         */
-        function gutterClick(cm, lineIndex, gutterId, event) {
+        function gutterClick(cm, lineIndex, gutterId) {
             if (gutterId !== "interactive-linter-gutter"){
                 return;
             }
 
-            linterReporter.showLineDetails(cm, lineIndex, gutterId, event);
+            linterReporter.showLineDetails(lineIndex);
         }
 
 

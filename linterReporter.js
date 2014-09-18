@@ -30,40 +30,7 @@ define(function (require, exports, module) {
         var _self = this;
         var CMD_SHOW_LINE_DETAILS = "MiguelCastillo.interactive-linter.showLineDetails";
         CommandManager.register("Show Line Details", CMD_SHOW_LINE_DETAILS, function () {
-            var testing, testing1, testing2, testing3, testing4, testing5, testing6;
-
-            var activeEditor = EditorManager.getActiveEditor();
-            var cursorPos = activeEditor.getCursorPos();
-
-            var mark = _self.marks[cursorPos.line];
-
-            if (!mark) {
-                return;
-            }
-
-            var inlineWidget = new InlineWidget();
-            inlineWidget.load(EditorManager.getActiveEditor());
-            activeEditor.addInlineWidget(cursorPos, inlineWidget, true);
-
-            var $errorHtml = $('<div></div>');
-            
-            var messages = [].concat(mark.errors, mark.warnings),
-                messageContent = "";
-
-            // Message in line widget messages
-            $.each(messages, function(index, message) {
-                messageContent += "<div style='margin-left: 40px; height: 20px;' class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}".format(message.type, message.code, message.reason);
-                if (message.href) {
-                    messageContent += " - <a href='{0}' target='interactivelinter'>Details</a>".format(message.href);
-                }
-                messageContent += "</div>";
-            });
-            
-            $errorHtml.append($(messageContent));
-            inlineWidget.$htmlContent.append($errorHtml);
-            console.log(inlineWidget);
-//            inlineWidget.htmlContent.style.height = null;
-            activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height());
+            _self.showLineDetails();
         });
         KeyBindingManager.addBinding(CMD_SHOW_LINE_DETAILS, "Ctrl-Shift-E");
     };
@@ -193,52 +160,53 @@ define(function (require, exports, module) {
     };
 
 
-    Reporter.prototype.showLineDetails = function(cm, lineIndex) {
-        var mark = this.marks[lineIndex];
+    Reporter.prototype.showLineDetails = function(line) {
+        var activeEditor = EditorManager.getActiveEditor();
+        var cursorPos = typeof line !== 'undefined' ? {line: line, ch: 0} : activeEditor.getCursorPos();
 
-        // We don't have mark on this line, so we don't do anything...
-        // This is just a line without any JSHint messages
+        var inlineWidgets = activeEditor.getInlineWidgets();
+        if (inlineWidgets && inlineWidgets.length) {
+            var foundSelf = false;
+            $.each(inlineWidgets, function (index, widget) {
+                if (widget.hasOwnProperty('lineNumber') && widget.lineNumber === cursorPos.line) {
+                    activeEditor.removeInlineWidget(widget);
+                    foundSelf = true;
+                    return;
+                }
+            });
+            if (foundSelf) {
+                return;
+            }
+        }
+
+        var mark = this.marks[cursorPos.line];
+
         if (!mark) {
             return;
         }
 
-        // Check if we have a line widget.  If we don't, then we set one up
-        if (!mark.lineWidget) {
-            mark.lineWidget = {
-                visible: false,
-                element: $("<div class='interactive-linter-line-messages'></div>")
-            };
+        var inlineWidget = new InlineWidget();
+        inlineWidget.load(EditorManager.getActiveEditor());
+        inlineWidget.lineNumber = cursorPos.line;
+        activeEditor.addInlineWidget(cursorPos, inlineWidget, true);
 
-            var messages = [].concat(mark.errors, mark.warnings),
-                messageContent = "";
+        var $errorHtml = $('<div style="margin: 10px 0;"></div>');
 
-            // Message in line widget messages
-            $.each(messages, function(index, message) {
-                messageContent += "<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}".format(message.type, message.code, message.reason);
-                if (message.href) {
-                    messageContent += " - <a href='{0}' target='interactivelinter'>Details</a>".format(message.href);
-                }
-                messageContent += "</div>";
-            });
+        var messages = [].concat(mark.errors, mark.warnings),
+            messageContent = "";
 
-            mark.lineWidget.element.append(messageContent);
-        }
+        // Message in line widget messages
+        $.each(messages, function(index, message) {
+            messageContent += "<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}".format(message.type, message.code, message.reason);
+            if (message.href) {
+                messageContent += " - <a href='{0}' target='interactivelinter'>Details</a>".format(message.href);
+            }
+            messageContent += "</div>";
+        });
 
-        if (mark.lineWidget.visible !== true) {
-            var widgetSettings = {
-                coverGutter: false,
-                noHScroll: false,
-                above: false,
-                showIfHidden: false
-            };
-
-            mark.lineWidget.visible = true;
-            mark.lineWidget.widget = this.cm.addLineWidget(lineIndex, mark.lineWidget.element[0], widgetSettings);
-        }
-        else {
-            mark.lineWidget.visible = false;
-            mark.lineWidget.widget.clear();
-        }
+        $errorHtml.append($(messageContent));
+        inlineWidget.$htmlContent.append($errorHtml);
+        activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height() + 20);
     };
 
 
@@ -304,8 +272,8 @@ define(function (require, exports, module) {
             return _reporter.report(cm, messages);
         }
 
-        function showLineDetails(cm, lineNumber, gutterId, event) {
-            _reporter.showLineDetails(cm, lineNumber, gutterId, event);
+        function showLineDetails(lineNumber) {
+            _reporter.showLineDetails(lineNumber);
         }
         
         function registerKeyBindings() {

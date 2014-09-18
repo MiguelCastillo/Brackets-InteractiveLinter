@@ -38,6 +38,10 @@
     cursor: pointer;
 }
 
+.CodeMirror .interactive-linter-line-error, .CodeMirror .interactive-linter-line-warning {
+    padding: 0 15px;
+    margin-left: 40px;
+}
 
 /* twitter bootstrap alert colors */
 .CodeMirror .interactive-linter-line-error {
