@@ -31,7 +31,7 @@ define(function (require, exports, module) {
         var _self = this;
         var CMD_SHOW_LINE_DETAILS = "MiguelCastillo.interactive-linter.showLineDetails";
         CommandManager.register("Show Line Details", CMD_SHOW_LINE_DETAILS, function () {
-            _self.showLineDetails();
+            _self.toggleLineDetails();
         });
         KeyBindingManager.addBinding(CMD_SHOW_LINE_DETAILS, "Ctrl-Shift-E");
     };
@@ -160,23 +160,42 @@ define(function (require, exports, module) {
         _self.marks = {};
     };
 
+    Reporter.prototype.getWidgetForLine = function (line) {
+        var activeEditor  = EditorManager.getActiveEditor();
+        var inlineWidgets = activeEditor.getInlineWidgets();
+        var foundWidget;
+
+        if (inlineWidgets.length > 0) {
+            foundWidget = _.find(inlineWidgets, function (widget) {
+                if (widget.hasOwnProperty('interactiveLinterLineNumber') && widget.interactiveLinterLineNumber === line) {
+                    return true;
+                }
+            });
+
+        }
+        return foundWidget;
+    };
+
+    Reporter.prototype.toggleLineDetails = function (line) {
+        var activeEditor = EditorManager.getActiveEditor();
+        var cursorPos    = typeof line !== 'undefined' ? {line: line, ch: 0} : activeEditor.getCursorPos();
+        var foundWidget;
+
+        var inlineWidgets = activeEditor.getInlineWidgets();
+        if (inlineWidgets.length > 0) {
+            foundWidget = this.getWidgetForLine(cursorPos.line);
+        }
+
+        if (foundWidget) {
+            activeEditor.removeInlineWidget(foundWidget); // Hide line details
+        } else {
+            this.showLineDetails(line);
+        }
+    };
 
     Reporter.prototype.showLineDetails = function(line) {
         var activeEditor = EditorManager.getActiveEditor();
         var cursorPos = typeof line !== 'undefined' ? {line: line, ch: 0} : activeEditor.getCursorPos();
-
-        var inlineWidgets = activeEditor.getInlineWidgets();
-        if (inlineWidgets.length > 0) {
-            var foundWidget = _.find(inlineWidgets, function (widget) {
-                if (widget.hasOwnProperty('lineNumber') && widget.lineNumber === cursorPos.line) {
-                    activeEditor.removeInlineWidget(widget);
-                    return true;
-                }
-            });
-            if (foundWidget) {
-                return;
-            }
-        }
 
         var mark = this.marks[cursorPos.line];
 
@@ -186,7 +205,7 @@ define(function (require, exports, module) {
 
         var inlineWidget = new InlineWidget();
         inlineWidget.load(EditorManager.getActiveEditor());
-        inlineWidget.lineNumber = cursorPos.line;
+        inlineWidget.interactiveLinterLineNumber = cursorPos.line;
         activeEditor.addInlineWidget(cursorPos, inlineWidget, true);
 
         var $errorHtml = $('<div style="margin: 10px 0;"></div>');
@@ -271,17 +290,17 @@ define(function (require, exports, module) {
             return _reporter.report(cm, messages);
         }
 
-        function showLineDetails(lineNumber) {
-            _reporter.showLineDetails(lineNumber);
+        function toggleLineDetails(line) {
+            _reporter.toggleLineDetails(line);
         }
-        
+
         function registerKeyBindings() {
             _reporter.registerKeyBinding();
         }
 
         return {
             report: report,
-            showLineDetails: showLineDetails,
+            toggleLineDetails: toggleLineDetails,
             registerKeyBindings: registerKeyBindings
         };
     })();

@@ -53,7 +53,7 @@ define(function (require /*, exports, module*/) {
                 return;
             }
 
-            linterReporter.showLineDetails(lineIndex);
+            linterReporter.toggleLineDetails(lineIndex);
         }
 
 
