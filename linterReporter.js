@@ -30,7 +30,7 @@ define(function (require, exports, module) {
         var _self = this;
         var CMD_SHOW_LINE_DETAILS = "MiguelCastillo.interactive-linter.showLineDetails";
         CommandManager.register("Show Line Details", CMD_SHOW_LINE_DETAILS, function () {
-            var testing, testing1, testing2, testing3;
+            var testing, testing1, testing2, testing3, testing4, testing5, testing6;
 
             var activeEditor = EditorManager.getActiveEditor();
             var cursorPos = activeEditor.getCursorPos();
@@ -45,27 +45,27 @@ define(function (require, exports, module) {
             inlineWidget.load(EditorManager.getActiveEditor());
             activeEditor.addInlineWidget(cursorPos, inlineWidget, true);
 
-            var errorHtml = $('<div tab-index="0"><div></div></div>');
+            var $errorHtml = $('<div></div>');
             
             var messages = [].concat(mark.errors, mark.warnings),
                 messageContent = "";
 
             // Message in line widget messages
             $.each(messages, function(index, message) {
-//                messageContent += '<div style="">{0}</div>'.format(message.reason);
-                
-                messageContent += "<div style='margin-left: 40px;' class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}".format(message.type, message.code, message.reason);
+                messageContent += "<div style='margin-left: 40px; height: 20px;' class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}".format(message.type, message.code, message.reason);
                 if (message.href) {
                     messageContent += " - <a href='{0}' target='interactivelinter'>Details</a>".format(message.href);
                 }
                 messageContent += "</div>";
             });
             
-            errorHtml.append($(messageContent));
-            inlineWidget.$htmlContent.append(errorHtml);
-            activeEditor.setInlineWidgetHeight(inlineWidget, inlineWidget.$htmlContent.height() + 20);
+            $errorHtml.append($(messageContent));
+            inlineWidget.$htmlContent.append($errorHtml);
+            console.log(inlineWidget);
+//            inlineWidget.htmlContent.style.height = null;
+            activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height());
         });
-        KeyBindingManager.addBinding(CMD_SHOW_LINE_DETAILS, "Shift-Alt-Z");
+        KeyBindingManager.addBinding(CMD_SHOW_LINE_DETAILS, "Ctrl-Shift-E");
     };
 
     /**
