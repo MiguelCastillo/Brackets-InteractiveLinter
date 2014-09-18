@@ -9,7 +9,7 @@ define(function (require, exports, module) {
     'use strict';
 
     // Reference for jshint errors/warnings
-    // http://jslinterrors.com/?utm_source=javascriptweekly&utm_medium=email
+    // http://jslinterrors.com
 
 
     var EditorManager    = brackets.getModule("editor/EditorManager"),
