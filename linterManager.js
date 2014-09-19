@@ -21,6 +21,8 @@ define(function (require /*, exports, module*/) {
             _timer    = null,
             _mode     = "",
             _fullPath = "";
+        
+        linterReporter.registerKeyBindings();
 
         function lint( ) {
             if ( !_cm || !languages[_mode] ) {
@@ -46,12 +48,12 @@ define(function (require /*, exports, module*/) {
         /**
         * Show line details
         */
-        function gutterClick(cm, lineIndex, gutterId, event) {
+        function gutterClick(cm, lineIndex, gutterId) {
             if (gutterId !== "interactive-linter-gutter"){
                 return;
             }
 
-            linterReporter.showLineDetails(cm, lineIndex, gutterId, event);
+            linterReporter.toggleLineDetails(lineIndex);
         }
 
 

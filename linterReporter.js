@@ -10,6 +10,13 @@ define(function (require, exports, module) {
 
     var spromise = require("libs/js/spromise");
     require('string');
+    
+    var CommandManager    = brackets.getModule("command/CommandManager"),
+        EditorManager     = brackets.getModule("editor/EditorManager"),
+        InlineWidget      = brackets.getModule("editor/InlineWidget").InlineWidget,
+        KeyBindingManager = brackets.getModule("command/KeyBindingManager"),
+        _                 = brackets.getModule("thirdparty/lodash");
+    
 
     var msgId = 1;
     var pending, lastRequest;
@@ -19,7 +26,15 @@ define(function (require, exports, module) {
         var _self = this;
         _self.marks = {};
     }
-
+    
+    Reporter.prototype.registerKeyBinding = function () {
+        var _self = this;
+        var CMD_SHOW_LINE_DETAILS = "MiguelCastillo.interactive-linter.showLineDetails";
+        CommandManager.register("Show Line Details", CMD_SHOW_LINE_DETAILS, function () {
+            _self.toggleLineDetails();
+        });
+        KeyBindingManager.addBinding(CMD_SHOW_LINE_DETAILS, "Ctrl-Shift-E");
+    };
 
     /**
     * Routine that goes through all the jshint messages and adds all the gutter
@@ -131,9 +146,9 @@ define(function (require, exports, module) {
                 textMark.line.clear();
             });
 
-            if (mark.lineWidget) {
-                mark.lineWidget.widget.clear();
-                delete mark.lineWidget;
+            if (mark.inlineWidget) {
+                _self.hideLineDetails(mark.inlineWidget);
+                delete mark.inlineWidget;
             }
 
             delete mark.errors;
@@ -145,55 +160,79 @@ define(function (require, exports, module) {
         _self.marks = {};
     };
 
+    Reporter.prototype.getWidgetForLine = function (line) {
+        var activeEditor  = EditorManager.getActiveEditor();
+        var inlineWidgets = activeEditor.getInlineWidgets();
+        var foundWidget;
 
-    Reporter.prototype.showLineDetails = function(cm, lineIndex) {
-        var mark = this.marks[lineIndex];
+        if (inlineWidgets.length > 0) {
+            foundWidget = _.find(inlineWidgets, function (widget) {
+                if (widget.hasOwnProperty('interactiveLinterLineNumber') && widget.interactiveLinterLineNumber === line) {
+                    return true;
+                }
+            });
 
-        // We don't have mark on this line, so we don't do anything...
-        // This is just a line without any JSHint messages
+        }
+        return foundWidget;
+    };
+
+    Reporter.prototype.toggleLineDetails = function (line) {
+        var activeEditor = EditorManager.getActiveEditor();
+        var cursorPos    = typeof line !== 'undefined' ? {line: line, ch: 0} : activeEditor.getCursorPos();
+        var foundWidget = this.getWidgetForLine(cursorPos.line);
+
+        if (foundWidget) {
+            this.hideLineDetails(foundWidget);
+        } else {
+            this.showLineDetails(line);
+        }
+    };
+
+    Reporter.prototype.hideLineDetails = function (widget) {
+        EditorManager.getActiveEditor().removeInlineWidget(widget);
+    };
+
+    Reporter.prototype.showLineDetails = function(line) {
+        var activeEditor = EditorManager.getActiveEditor();
+        var cursorPos = typeof line !== 'undefined' ? {line: line, ch: 0} : activeEditor.getCursorPos();
+
+        var mark = this.marks[cursorPos.line];
+
         if (!mark) {
             return;
         }
 
-        // Check if we have a line widget.  If we don't, then we set one up
-        if (!mark.lineWidget) {
-            mark.lineWidget = {
-                visible: false,
-                element: $("<div class='interactive-linter-line-messages'></div>")
-            };
+        var inlineWidget = new InlineWidget();
+        mark.inlineWidget = inlineWidget;
+        inlineWidget.load(EditorManager.getActiveEditor());
+        inlineWidget.interactiveLinterLineNumber = cursorPos.line;
+        activeEditor.addInlineWidget(cursorPos, inlineWidget, true);
 
-            var messages = [].concat(mark.errors, mark.warnings),
-                messageContent = "";
-
-            // Message in line widget messages
-            $.each(messages, function(index, message) {
-                messageContent += "<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}".format(message.type, message.code, message.reason);
-                if (message.href) {
-                    messageContent += " - <a href='{0}' target='interactivelinter'>Details</a>".format(message.href);
-                }
-                messageContent += "</div>";
-            });
-
-            mark.lineWidget.element.append(messageContent);
-        }
-
-        if (mark.lineWidget.visible !== true) {
-            var widgetSettings = {
-                coverGutter: false,
-                noHScroll: false,
-                above: false,
-                showIfHidden: false
-            };
-
-            mark.lineWidget.visible = true;
-            mark.lineWidget.widget = this.cm.addLineWidget(lineIndex, mark.lineWidget.element[0], widgetSettings);
-        }
-        else {
-            mark.lineWidget.visible = false;
-            mark.lineWidget.widget.clear();
-        }
+        this.updateLineDetails(mark);
     };
 
+    Reporter.prototype.updateLineDetails = function (mark) {
+        var activeEditor = EditorManager.getActiveEditor();
+        var inlineWidget = mark.inlineWidget;
+
+        var $errorHtml = $('<div class="interactive-linter-line-widget"></div>');
+
+        var messages = [].concat(mark.errors, mark.warnings),
+            messageContent = "";
+
+        // Message in line widget messages
+        $.each(messages, function(index, message) {
+            messageContent += "<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}".format(message.type, message.code, message.reason);
+            if (message.href) {
+                messageContent += " - <a href='{0}' target='interactivelinter'>Details</a>".format(message.href);
+            }
+            messageContent += "</div>";
+        });
+
+        $errorHtml.empty().append($(messageContent));
+        inlineWidget.$htmlContent.append($errorHtml);
+        activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height() + 20);
+    };
 
     /**
     * Checks messages to figure out if JSHint report a fatal failue.
@@ -257,13 +296,18 @@ define(function (require, exports, module) {
             return _reporter.report(cm, messages);
         }
 
-        function showLineDetails(cm, lineNumber, gutterId, event) {
-            _reporter.showLineDetails(cm, lineNumber, gutterId, event);
+        function toggleLineDetails(line) {
+            _reporter.toggleLineDetails(line);
+        }
+
+        function registerKeyBindings() {
+            _reporter.registerKeyBinding();
         }
 
         return {
             report: report,
-            showLineDetails: showLineDetails
+            toggleLineDetails: toggleLineDetails,
+            registerKeyBindings: registerKeyBindings
         };
     })();
 

@@ -20,6 +20,7 @@
     width: 23px;
 }
 
+
 /*icon image from http://findicons.com/icon/184668/light_bulb*/
 .CodeMirror .interactive-linter-gutter-messages {
     background-image: url(img/light_bulb.png);
@@ -38,6 +39,14 @@
     cursor: pointer;
 }
 
+.CodeMirror .interactive-linter-line-widget {
+    margin: 10px 0;
+}
+
+.CodeMirror .interactive-linter-line-error, .CodeMirror .interactive-linter-line-warning {
+    padding: 0 15px;
+    margin-left: 40px;
+}
 
 /* twitter bootstrap alert colors */
 .CodeMirror .interactive-linter-line-error {
