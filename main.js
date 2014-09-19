@@ -32,6 +32,8 @@ define(function (require, exports, module) {
         }
     }
 
+    linterManager.registerKeyBindings();
+
     AppInit.appReady(function(){
         pluginManager().done(function(plugins) {
             for ( var iPlugin in plugins ) {
