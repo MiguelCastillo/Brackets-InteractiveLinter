@@ -21,8 +21,6 @@ define(function (require /*, exports, module*/) {
             _timer    = null,
             _mode     = "",
             _fullPath = "";
-        
-        linterReporter.registerKeyBindings();
 
         function lint( ) {
             if ( !_cm || !languages[_mode] ) {
@@ -106,11 +104,15 @@ define(function (require /*, exports, module*/) {
             });
         }
 
+        function registerKeyBindings() {
+            linterReporter.registerKeyBindings();
+        }
 
         return {
             lint: lint,
             register: register,
-            setDocument: setDocument
+            setDocument: setDocument,
+            registerKeyBindings: registerKeyBindings
         };
 
     })();
