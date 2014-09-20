@@ -141,8 +141,8 @@ define(function (require, exports, module) {
 
         _self.cm.clearGutter("interactive-linter-gutter");
 
-        $.each( _self.marks, function( index, mark ) {
-            $.each( mark.lineMarks.slice(0), function(i1, textMark) {
+        _.forEach( _self.marks, function(mark ) {
+            _.forEach( mark.lineMarks.slice(0), function(textMark) {
                 textMark.line.clear();
             });
 
@@ -221,7 +221,7 @@ define(function (require, exports, module) {
             messageContent = "";
 
         // Message in line widget messages
-        $.each(messages, function(index, message) {
+        _.forEach(messages, function(message) {
             messageContent += "<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}".format(message.type, message.code, message.reason);
             if (message.href) {
                 messageContent += " - <a href='{0}' target='interactivelinter'>Details</a>".format(message.href);
@@ -269,7 +269,7 @@ define(function (require, exports, module) {
                     _self.cm       = cm;
                     _self.messages = messages;
 
-                    $.each(messages, function (index, message) {
+                    _.forEach(messages, function (message) {
                         if (!message) {
                             return;
                         }
