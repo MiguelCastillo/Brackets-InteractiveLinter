@@ -98,10 +98,10 @@ define(function (require /*, exports, module*/) {
             // Make sure we override the default linters because doing double processing
             // is extremely expensive
             //
-            CodeInspection.register(linter.language, {
+            /*CodeInspection.register(linter.language, {
                 name: linter.language,
                 scanFile: $.noop
-            });
+            });*/
         }
 
         function registerKeyBindings() {
