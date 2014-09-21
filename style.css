@@ -61,3 +61,13 @@
     border: 1px solid #fbeed5;
 }
 
+.interactive-linter-status-bar-error-indicator {
+    transition: background-color 1s;
+    background-color: transparent;
+    color: #f74687;
+}
+
+.interactive-linter-status-bar-error-indicator.pulse {
+    background-color: #ffb0cd;
+    color: red;
+}
