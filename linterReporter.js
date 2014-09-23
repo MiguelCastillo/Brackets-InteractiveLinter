@@ -8,16 +8,14 @@
 define(function (require, exports, module) {
     'use strict';
 
-    var spromise = require("libs/js/spromise"),
-        errorIndicator = require("./errorIndicator");
+    var spromise = require("libs/js/spromise");
+
     require('string');
     
     var CommandManager    = brackets.getModule("command/CommandManager"),
         EditorManager     = brackets.getModule("editor/EditorManager"),
         InlineWidget      = brackets.getModule("editor/InlineWidget").InlineWidget,
         KeyBindingManager = brackets.getModule("command/KeyBindingManager"),
-        DefaultDialogs    = brackets.getModule("widgets/DefaultDialogs"),
-        Dialogs           = brackets.getModule("widgets/Dialogs"),
         _                 = brackets.getModule("thirdparty/lodash");
     
 
@@ -244,51 +242,13 @@ define(function (require, exports, module) {
         // If the last message created by jshint is null, that means
         // that we have encoutered a fatal error...
         if (messages.length > 2 && !messages[messages.length - 1]) {
-            // Get the last real error...
-            var message = messages[messages.length - 2];
-            console.log("Fatal failure", message);
-            this.reportFatal(message);
+            $(linterReporter).triggerHandler("fatalError", messages[messages.length - 2]);
             return true;
         }
 
-        errorIndicator.hide();
+        $(linterReporter).triggerHandler("fatalError", null);
         return false;
     };
-
-
-    Reporter.prototype.reportFatal = function (message) {
-        var DIALOG_BTN_GO_TO = "goto";
-        errorIndicator.show();
-        errorIndicator.$statusBarIndicator.addClass('pulse');
-        setTimeout( function () {
-            errorIndicator.$statusBarIndicator.removeClass('pulse');
-        }, 1500);
-        errorIndicator.$statusBarIndicator[0].onclick = function () {
-            var messageContent = "";
-            messageContent += "<div>Fatal Error on line {0}, character {1}.</div>".format(message.line, message.character);
-            messageContent += "<div>Error: {0}".format(message.reason);
-            if (message.href) {
-                messageContent += " - <a href='{0}' target='interactivelinter'>Details</a></div>".format(message.href);
-            }
-            var dialog = Dialogs.showModalDialog(DefaultDialogs.DIALOG_ID_ERROR, "Interactive Linter: Fatal JSHint Error", messageContent, [
-                {
-                    className: Dialogs.DIALOG_BTN_CLASS_PRIMARY,
-                    id: Dialogs.DIALOG_BTN_OK,
-                    text: "OK"
-                },
-                {
-                    className: Dialogs.DIALOG_BTN_CLASS_LEFT,
-                    id: DIALOG_BTN_GO_TO,
-                    text: "Go to Error"
-                }
-            ]);
-
-            dialog.getElement()[0].querySelector('[data-button-id="' + DIALOG_BTN_GO_TO + '"]').onclick = function () {
-                EditorManager.getActiveEditor().setCursorPos(message.line, message.character, true);
-            };
-        };
-    };
-
 
     function runReport( _self, reportId, cm, messages ) {
         var deferred = spromise.defer();
