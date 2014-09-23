@@ -9,6 +9,7 @@ define(function (require, exports, module) {
     'use strict';
 
     var spromise = require("libs/js/spromise");
+
     require('string');
     
     var CommandManager    = brackets.getModule("command/CommandManager"),
@@ -240,21 +241,18 @@ define(function (require, exports, module) {
     Reporter.prototype.checkFatal = function(messages) {
         // If the last message created by jshint is null, that means
         // that we have encoutered a fatal error...
-        //
-        /*
-        * TODO: I would like to report the fact there is a fatal error
-        * in a visual manner to the user
-        */
         if (messages.length > 2 && !messages[messages.length - 1]) {
-            // Get the last real error...
-            var message = messages[messages.length - 2];
-            console.log("Fatal failure", message);
+            $(linterReporter).triggerHandler("fatalError", messages[messages.length - 2]);
             return true;
         }
 
+        this.clearFatalError();
         return false;
     };
 
+    Reporter.prototype.clearFatalError = function() {
+        $(linterReporter).triggerHandler("fatalError", null);
+    };
 
     function runReport( _self, reportId, cm, messages ) {
         var deferred = spromise.defer();
@@ -304,10 +302,15 @@ define(function (require, exports, module) {
             _reporter.registerKeyBinding();
         }
 
+        function clearFatalError() {
+            _reporter.clearFatalError();
+        }
+
         return {
             report: report,
             toggleLineDetails: toggleLineDetails,
-            registerKeyBindings: registerKeyBindings
+            registerKeyBindings: registerKeyBindings,
+            clearFatalError: clearFatalError
         };
     })();
 
