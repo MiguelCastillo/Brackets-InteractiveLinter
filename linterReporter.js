@@ -246,8 +246,12 @@ define(function (require, exports, module) {
             return true;
         }
 
-        $(linterReporter).triggerHandler("fatalError", null);
+        this.clearFatalError();
         return false;
+    };
+
+    Reporter.prototype.clearFatalError = function() {
+        $(linterReporter).triggerHandler("fatalError", null);
     };
 
     function runReport( _self, reportId, cm, messages ) {
@@ -298,10 +302,15 @@ define(function (require, exports, module) {
             _reporter.registerKeyBinding();
         }
 
+        function clearFatalError() {
+            _reporter.clearFatalError();
+        }
+
         return {
             report: report,
             toggleLineDetails: toggleLineDetails,
-            registerKeyBindings: registerKeyBindings
+            registerKeyBindings: registerKeyBindings,
+            clearFatalError: clearFatalError
         };
     })();
 

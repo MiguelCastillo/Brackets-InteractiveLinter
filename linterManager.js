@@ -64,6 +64,8 @@ define(function (require /*, exports, module*/) {
             _mode     = mode && (mode.helperType || mode.name);
             _fullPath = fullpath;
 
+            linterReporter.clearFatalError();
+
             if (_cm) {
                 CodeMirror.off(_cm.getDoc(), "change", lint);
                 _cm.off('gutterClick', gutterClick);
