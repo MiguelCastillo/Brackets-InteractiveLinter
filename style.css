@@ -61,13 +61,24 @@
     border: 1px solid #fbeed5;
 }
 
+/*icon image from http://findicons.com/icon/184668/light_bulb*/
 .interactive-linter-status-bar-error-indicator {
-    transition: background-color 1s;
-    background-color: transparent;
+    background: url(img/light_bulb.png), transparent;
+    background-position: center;
+    background-size: 20px;
+    background-repeat: no-repeat;
     color: #f74687;
 }
 
 .interactive-linter-status-bar-error-indicator.pulse {
-    background-color: #ffb0cd;
-    color: red;
+    -webkit-animation: pulse 2s linear infinite;
+}
+
+@-webkit-keyframes pulse {
+    0% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: #ffb0cd;
+    }
 }
