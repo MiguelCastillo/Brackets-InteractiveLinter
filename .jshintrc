@@ -15,6 +15,7 @@
         "require": true,
         "define": true,
         "$": true,
+        "Mustache": true,
         "clearTimeout": true,
         "setTimeout": true
     }

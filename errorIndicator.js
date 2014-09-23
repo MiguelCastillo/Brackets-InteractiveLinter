@@ -1,5 +1,6 @@
-/* globals Mustache */
 define(function (require, exports, module) {
+    'use strict';
+
     var StatusBar        = brackets.getModule("widgets/StatusBar"),
         DefaultDialogs   = brackets.getModule("widgets/DefaultDialogs"),
         Dialogs          = brackets.getModule("widgets/Dialogs"),
@@ -14,7 +15,6 @@ define(function (require, exports, module) {
     var currentMessage, dialogContent;
 
     var $statusBarIndicator = $('<div>&nbsp;</div>');
-    $statusBarIndicator.on('click', statusIndicatorClickHandler);
 
     StatusBar.addIndicator(INDICATOR_ID, $statusBarIndicator, false, INDICATOR_CLASSES, INDICATOR_TOOLTIP);
 
@@ -29,6 +29,7 @@ define(function (require, exports, module) {
 
         Dialogs.showModalDialog(DefaultDialogs.DIALOG_ID_ERROR, DIALOG_TITLE, dialogContent);
     }
+    $statusBarIndicator.on('click', statusIndicatorClickHandler);
 
     function fatalErrorHandler(message) {
         currentMessage = message;
