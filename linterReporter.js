@@ -18,6 +18,7 @@ define(function (require, exports, module) {
         KeyBindingManager = brackets.getModule("command/KeyBindingManager"),
         _                 = brackets.getModule("thirdparty/lodash");
     
+    var INLINE_WIDGET_LINT_TEMPLATE = require("text!templates/inlineWidgetLint.html");
 
     var msgId = 1;
     var pending, lastRequest;
@@ -216,21 +217,10 @@ define(function (require, exports, module) {
         var activeEditor = EditorManager.getActiveEditor();
         var inlineWidget = mark.inlineWidget;
 
-        var $errorHtml = $('<div class="interactive-linter-line-widget"></div>');
+        var messages = [].concat(mark.errors, mark.warnings);
 
-        var messages = [].concat(mark.errors, mark.warnings),
-            messageContent = "";
+        var $errorHtml = $(Mustache.render(INLINE_WIDGET_LINT_TEMPLATE, {messages: messages}));
 
-        // Message in line widget messages
-        _.forEach(messages, function(message) {
-            messageContent += "<div class='interactive-linter-line-{0} interactive-linter-line-{1}'>{2}".format(message.type, message.code, message.reason);
-            if (message.href) {
-                messageContent += " - <a href='{0}' target='interactivelinter'>Details</a>".format(message.href);
-            }
-            messageContent += "</div>";
-        });
-
-        $errorHtml.empty().append($(messageContent));
         inlineWidget.$htmlContent.append($errorHtml);
         activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height() + 20);
     };
