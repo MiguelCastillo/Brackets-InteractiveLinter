@@ -21,33 +21,31 @@ define(function(require, exports, module){
         var worker = new Worker(workerFile);
 
         // Process worker thread messages
-        worker.onmessage = function onmessage (evt) {
+        worker.onmessage = function onmessage(evt) {
             var data = evt.data;
 
-            switch (data.type) {
-                case "debug":
-                    console.log(data);
-                    return;
+            if (data.type === "debug") {
+                console.log(data);
+                return;
             }
 
-            if ( lastRequest && lastRequest.state() === "pending" ) {
+            if (lastRequest && lastRequest.state() === "pending") {
                 lastRequest.resolve(data);
             }
         };
 
 
-        worker.onerror = function onerror (evt) {
+        worker.onerror = function onerror(evt) {
             console.log("error", evt);
         };
 
 
-        function postMessage( data ) {
+        function postMessage(data) {
             pending = msgId;
             if ( lastRequest && lastRequest.state() === "pending" ) {
                 return spromise.resolved();
             }
 
-            //var timer = new Timer(true);
             lastRequest = spromise.defer();
             data.msgId  = msgId;
             worker.postMessage(data);
@@ -55,14 +53,13 @@ define(function(require, exports, module){
 
             return lastRequest.then(function(response) {
                 // If there is data pending, then send it
-                if ( pending !== response.msgId ) {
+                if (pending !== response.msgId) {
                     console.log("send queued message");
                     data.msgId = msgId;
                     msgId++;
                     worker.postMessage(data);
                 }
 
-                //console.log(timer.elapsed(), response.msgId);
                 return response.data;
             });
         }
@@ -70,7 +67,7 @@ define(function(require, exports, module){
 
         function loadPlugins(plugins) {
             var plugin;
-            for ( var iplugin in plugins ) {
+            for (var iplugin in plugins) {
                 plugin = plugins[iplugin];
 
                 // Add a lint interface that will be just posting a message to the worker thread
@@ -81,8 +78,8 @@ define(function(require, exports, module){
 
 
         // Api for plugin linters
-        function api( plugin ) {
-            function lint( text, settings ) {
+        function api(plugin) {
+            function lint(text, settings) {
                 return postMessage({
                     type: "lint",
                     data: {
@@ -124,7 +121,7 @@ define(function(require, exports, module){
         // var regex = /function[ ]?\w*\([\w,]*\)\{(?:\S[\s]?){150,}\}/gm;
         // var regex = /(?:\S[\s]?){250,}[\n]$/gm;
         var regex = /(?:.){500,}/gm;
-        return text.replace(regex, function() {return "";});
+        return text.replace(regex, "");
     }
 
 

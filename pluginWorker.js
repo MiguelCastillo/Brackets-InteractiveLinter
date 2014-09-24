@@ -32,7 +32,7 @@ function PluginLoader( settings ) {
             _result = {},
             plugin = null;
 
-        for ( var iPlugin in _plugins ) {
+        for (var iPlugin in _plugins) {
             plugin = _plugins[iPlugin];
             plugin.name = plugin.name || data.packages[iPlugin];
             _self.byName[plugin.name] = plugin;
@@ -45,7 +45,11 @@ function PluginLoader( settings ) {
             };
         }
 
-        postMessage({ type: "ready", data: _result, msgId: settings.msgId });
+        postMessage({
+            type: "ready",
+            data: _result,
+            msgId: settings.msgId
+        });
     });
 }
 
@@ -68,6 +72,9 @@ PluginLoader.prototype.lint = function(data) {
 };
 
 
+/**
+ * Only used for debugging purposes.
+ */
 var console = {
     log: function(message) {
         postMessage({
