@@ -10,8 +10,6 @@ define(function (require, exports, module) {
 
     var spromise = require("libs/js/spromise");
 
-    require('string');
-    
     var CommandManager    = brackets.getModule("command/CommandManager"),
         EditorManager     = brackets.getModule("editor/EditorManager"),
         InlineWidget      = brackets.getModule("editor/InlineWidget").InlineWidget,
