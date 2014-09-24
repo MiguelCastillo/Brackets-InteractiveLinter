@@ -8,8 +8,7 @@
 define(function (require /*, exports, module*/) {
     'use strict';
 
-    var CodeInspection = brackets.getModule("language/CodeInspection"),
-        CodeMirror     = brackets.getModule("thirdparty/CodeMirror2/lib/codemirror"),
+    var CodeMirror     = brackets.getModule("thirdparty/CodeMirror2/lib/codemirror"),
         linterSettings = require("linterSettings"),
         linterReporter = require("linterReporter"),
         languages      = {},
@@ -93,15 +92,6 @@ define(function (require /*, exports, module*/) {
         function register( linter ) {
             languages[linter.language] = linter;
             linters[linter.name] = linter;
-
-            //
-            // Make sure we override the default linters because doing double processing
-            // is extremely expensive
-            //
-            /*CodeInspection.register(linter.language, {
-                name: linter.language,
-                scanFile: $.noop
-            });*/
         }
 
         function registerKeyBindings() {
