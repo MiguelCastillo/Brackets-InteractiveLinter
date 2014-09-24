@@ -17,7 +17,6 @@ define(function (require, exports, module) {
         ExtensionUtils   = brackets.getModule("utils/ExtensionUtils");
 
     // Lets make sure we have proper string polyfills needed by interactive linters
-    require("string");
     require("errorIndicator");
     require("linterSettings");
 
