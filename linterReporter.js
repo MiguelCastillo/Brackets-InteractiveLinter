@@ -224,7 +224,7 @@ define(function (require, exports, module) {
     };
 
     /**
-    * Checks messages to figure out if JSHint report a fatal failue.
+    * Checks messages to figure out if JSHint report a fatal failure.
     */
     Reporter.prototype.checkFatal = function(messages) {
         // If the last message created by jshint is null, that means
