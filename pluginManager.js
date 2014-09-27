@@ -25,11 +25,11 @@ define(function(require, exports, module) {
     }
 
 
-    function getPluginsMeta (path) {
+    function getPluginsMeta(path) {
         var result = spromise.defer();
 
         FileSystem.getDirectoryForPath(path).getContents(function(err, entries) {
-            if ( err ) {
+            if (err) {
                 result.reject(err);
             }
 

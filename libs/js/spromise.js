@@ -440,14 +440,14 @@ define("lib/js/almond", function(){});
  */
 
 
-define( 'src/async',[],function() {
+define('src/async',[],function() {
   var _self = this;
 
   var nextTick;
-  if ( _self.setImmediate ) {
+  if (_self.setImmediate) {
     nextTick = _self.setImmediate;
   }
-  else if ( _self.process && typeof _self.process.nextTick === "function" ) {
+  else if (_self.process && typeof _self.process.nextTick === "function") {
     nextTick = _self.process.nextTick;
   }
   else {
@@ -491,7 +491,7 @@ define('src/promise',[
    * Small Promise
    */
   function Promise(resolver, options) {
-    if ( this instanceof Promise === false ) {
+    if (this instanceof Promise === false) {
       return new Promise(resolver, options);
     }
 
@@ -563,7 +563,7 @@ define('src/promise',[
     };
 
     // Interface to allow to post pone calling the resolver as long as its not needed
-    if ( typeof(resolver) === "function" ) {
+    if (typeof(resolver) === "function") {
       resolver.call(target, target.resolve, target.reject);
     }
   }
@@ -635,7 +635,7 @@ define('src/promise',[
 
     // If resolved, then lets try to execute the queue
     else if (_state === state || states.always === state) {
-      if ( sync ) {
+      if (sync) {
         cb.apply(_self.context, _self.value);
       }
       else {
@@ -647,7 +647,7 @@ define('src/promise',[
 
     // Do proper notify events
     else if (states.notify === state) {
-      if ( sync ) {
+      if (sync) {
         cb.call(_self.context, _self.state, _self.value);
       }
       else {
@@ -672,12 +672,12 @@ define('src/promise',[
     if (this.queue) {
       var queue = this.queue,
         length = queue.length,
-        i = 0,
+        i,
         item;
 
       this.queue = null;
 
-      for ( ; i < length; i++ ) {
+      for (i = 0 ; i < length; i++) {
         item = queue[i];
         this.enqueue(item.state, item.cb, sync);
       }
@@ -696,7 +696,7 @@ define('src/promise',[
     }
 
     resolution = new Resolution(new Promise());
-    this.enqueue( states.notify, resolution.notify(onResolved, onRejected) );
+    this.enqueue(states.notify, resolution.notify(onResolved, onRejected));
     return resolution.promise;
   };
 
@@ -731,7 +731,7 @@ define('src/promise',[
     return function resolve() {
       try {
         // Handler can only be called once!
-        if ( !_self.resolved ) {
+        if (!_self.resolved) {
           _self.resolved = true;
           _self.context  = this;
           _self.finalize(state, arguments);
@@ -811,14 +811,14 @@ define('src/when',[
   /**
   * Interface to allow multiple promises to be synchronized
   */
-  function When( ) {
+  function When() {
     // The input is the queue of items that need to be resolved.
     var queue    = Array.prototype.slice.call(arguments),
         promise  = Promise.defer(),
         context  = this,
         i, item, remaining, queueLength;
 
-    if ( !queue.length ) {
+    if (!queue.length) {
       return promise.resolve(null);
     }
 
@@ -827,17 +827,17 @@ define('src/when',[
     // the dependent promises.  If they are all done, then resolve the when promise
     //
     function checkPending() {
-      if ( remaining ) {
+      if (remaining) {
         remaining--;
       }
 
-      if ( !remaining ) {
+      if (!remaining) {
         promise.resolve.apply(context, queue);
       }
     }
 
     // Wrap the resolution to keep track of the proper index in the closure
-    function resolve( index ) {
+    function resolve(index) {
       return function() {
         // We will replace the item in the queue with result to make
         // it easy to send all the data into the resolve interface.
@@ -852,10 +852,10 @@ define('src/when',[
 
     function processQueue() {
       queueLength = remaining = queue.length;
-      for ( i = 0; i < queueLength; i++ ) {
+      for (i = 0; i < queueLength; i++) {
         item = queue[i];
 
-        if ( item && typeof item.then === "function" ) {
+        if (item && typeof item.then === "function") {
           item.then(resolve(i), reject);
         }
         else {

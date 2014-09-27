@@ -5,7 +5,7 @@
  */
 
 
-define(function (require, exports, module) {
+define(function (require/*, exports, module*/) {
     'use strict';
 
     var Dialogs         = brackets.getModule("widgets/Dialogs"),
@@ -16,31 +16,31 @@ define(function (require, exports, module) {
         currentLinter   = {};
 
 
-    function getParentPath( path ) {
-        var result = stripTrailingSlashes( path );
+    function getParentPath(path) {
+        var result = stripTrailingSlashes(path);
         return result.substr(0, result.lastIndexOf("/") + 1);
     }
 
 
-    function findFile( fileName, filePath, traverse ) {
+    function findFile(fileName, filePath, traverse) {
         var deferred = spromise.defer();
 
-        function find( filePath ) {
-            if ( !filePath ) {
+        function find(filePath) {
+            if (!filePath) {
                 return deferred.reject(false);
             }
 
             try {
-                var file = FileSystem.getFileForPath (filePath + "/" + fileName);
-                file.exists(function( err, exists ) {
-                    if ( exists ) {
+                var file = FileSystem.getFileForPath(filePath + "/" + fileName);
+                file.exists(function(err, exists) {
+                    if (exists) {
                         deferred.resolve(file);
                     }
-                    else if ( err || !traverse || filePath.indexOf( currentProject.fullPath ) === -1 ) {
+                    else if (err || !traverse || filePath.indexOf(currentProject.fullPath) === -1) {
                         deferred.reject(false);
                     }
                     else {
-                        find( getParentPath(filePath) );
+                        find(getParentPath(filePath));
                     }
                 });
             }
@@ -49,16 +49,16 @@ define(function (require, exports, module) {
             }
         }
 
-        find( filePath );
+        find(filePath);
         return deferred.promise;
     }
 
 
-    function readFile( file ) {
+    function readFile(file) {
         var deferred = spromise.defer();
 
-        file.read(function( err, content /*, stat*/ ) {
-            if ( err ) {
+        file.read(function(err, content /*, stat*/) {
+            if (err) {
                 deferred.reject(err);
                 return;
             }
@@ -70,7 +70,7 @@ define(function (require, exports, module) {
     }
 
 
-    function setSettings( settings ) {
+    function setSettings(settings) {
         var deferred = spromise.defer();
         settings = stripComments(settings);
 
@@ -78,8 +78,8 @@ define(function (require, exports, module) {
             settings = JSON.parse(settings);
             deferred.resolve(settings);
         }
-        catch( ex ) {
-            if ( !settings ) {
+        catch(ex) {
+            if (!settings) {
                 deferred.resolve();
                 return;
             }
@@ -88,7 +88,8 @@ define(function (require, exports, module) {
                 "interactiveLinterErr",
                 "Interactive Linter Error",
                 "Error processing linter settings<br>" +
-                ex.toString());
+                ex.toString()
+            );
 
             deferred.reject("Error processing linter settings");
         }
@@ -98,13 +99,13 @@ define(function (require, exports, module) {
 
 
     FileSystem.on("change", function(evt, file) {
-        if ( currentLinter.file && currentLinter.fileObject && file && file.fullPath === currentLinter.fileObject.fullPath ) {
+        if (currentLinter.file && currentLinter.fileObject && file && file.fullPath === currentLinter.fileObject.fullPath) {
             loadFile().done(currentLinter.manager.lint);
         }
     });
 
 
-    function loadFile( ) {
+    function loadFile() {
         var traverse = currentLinter.path.indexOf(currentProject.fullPath) !== -1;
 
         return findFile(currentLinter.file, currentLinter.path, traverse)
@@ -120,12 +121,12 @@ define(function (require, exports, module) {
 
 
     function loadSettings(file, path, manager) {
-        if ( !file ) {
+        if (!file) {
             return spromise.resolved();
         }
 
         // Cache so that we are not loading up the same file when navigating in the same directory...
-        if ( path === currentLinter.path ) {
+        if (path === currentLinter.path) {
             return spromise.resolved(currentLinter.settings);
         }
 
@@ -142,7 +143,7 @@ define(function (require, exports, module) {
     /**
     * Make sure we only have forward slashes and we dont have any duplicate slashes
     */
-    function normalizePath( path ) {
+    function normalizePath(path) {
         return path.replace(/\/+|\\+/g, "/");
     }
 
@@ -158,9 +159,9 @@ define(function (require, exports, module) {
     /**
      * Strips all commments from a json string.
      */
-    function stripComments( text ) {
+    function stripComments(text) {
         // Regex from requirejs.  Thanks James!
-        return  (text || '').replace(/(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg, '');
+        return  (text || "").replace(/(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg, '');
     }
 
 

@@ -17,6 +17,7 @@
         "$": true,
         "Mustache": true,
         "clearTimeout": true,
-        "setTimeout": true
+        "setTimeout": true,
+        "Worker": true
     }
 }

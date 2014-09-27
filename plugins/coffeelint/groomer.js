@@ -7,16 +7,16 @@ define(function(require, exports, module) {
         message.type   = message.level;
         message.reason = message.message;
 
-        if ( message.context ) {
+        if (message.context) {
             message.reason += " - " + message.context;
         }
 
-        if ( message.type === "warn" ) {
+        if (message.type === "warn") {
             message.type += "ing";
         }
 
-        if ( !message.code ) {
-            if ( message.type === "error" ) {
+        if (!message.code) {
+            if (message.type === "error") {
                 message.code = "E000";
             }
             else {

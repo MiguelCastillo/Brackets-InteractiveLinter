@@ -24,7 +24,7 @@
     var sources = Array.prototype.slice.call(arguments),
         target  = sources.shift();
 
-    for ( var source in sources ) {
+    for (var source in sources) {
       source = sources[source];
 
       // Copy properties

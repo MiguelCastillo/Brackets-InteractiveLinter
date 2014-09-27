@@ -15,13 +15,13 @@ define(function(require /*, exports, module*/) {
     // JSHINT will insert a fake window object...  This completely throws off coffeelint
     // because coffeelint blindly checks to see if window is defined and then it assumes
     // that it is a valid window object...
-    if ( window ) {
+    if (window) {
         window.addEventListener = window.addEventListener || function(){};
     }
 
     var coffeelint;
     require(["coffeelint/libs/coffee-script"], function(coffeescript){
-        if ( window ) {
+        if (window) {
             window.CoffeeScript = coffeescript;
         }
 
@@ -44,7 +44,7 @@ define(function(require /*, exports, module*/) {
 
         try {
             result = coffeelint.lint(text, settings);
-            for ( var iresult in result ) {
+            for (var iresult in result) {
                 result[iresult].token = groomer.groom(result[iresult], settings);
             }
         }

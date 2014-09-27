@@ -3,11 +3,10 @@
 define(function() {
     'use strict';
 
-    function successCallback ( fileEntry ) {
-            console.log(fileEntry);
+    function successCallback (fileEntry) {
+        console.log(fileEntry);
     }
 
-        successCallback(null);
-
+    successCallback(null);
 });
 

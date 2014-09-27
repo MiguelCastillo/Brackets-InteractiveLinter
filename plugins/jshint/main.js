@@ -21,22 +21,22 @@ define(function(require /*, exports, module*/) {
         defaultSettings = JSON.parse(require("text!jshint/default.json")),
         settings        = JSON.parse(require("text!jshint/settings.json"));
 
-    function lint( text, settings ) {
+    function lint(text, settings) {
         var i, length;
 
         settings = utils.mixin(defaultSettings, settings);
 
         // Get document as a string to be passed into JSHint
-        if ( !JSHINT(text, settings, settings.globals) ) {
+        if (!JSHINT(text, settings, settings.globals)) {
             var errors = JSHINT.errors.slice(0);
 
             // If JSHINT.errors is false, then JSHint has some errors it needs to report
-            for ( i = 0, length = errors.length; i < length; i++ ) {
+            for (i = 0, length = errors.length; i < length; i++) {
 
                 // If an error is empty, it should be the last error in the array which
                 // means that the max number of errors was exceeded or there was a fatal
                 // error while linting the file
-                if ( errors[i] ) {
+                if (errors[i]) {
                     errors[i].token = groomer.groom(errors[i], settings);
                 }
             }

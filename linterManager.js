@@ -21,8 +21,8 @@ define(function (require /*, exports, module*/) {
             _mode     = "",
             _fullPath = "";
 
-        function lint( ) {
-            if ( !_cm || !languages[_mode] ) {
+        function lint() {
+            if (!_cm || !languages[_mode]) {
                 return;
             }
 
@@ -71,7 +71,7 @@ define(function (require /*, exports, module*/) {
 
                 gutters = _cm.getOption("gutters").slice(0);
                 index = gutters.indexOf("interactive-linter-gutter");
-                if ( index !== -1 ) {
+                if (index !== -1) {
                     gutters.splice(index, 1);
                     _cm.setOption("gutters", gutters);
                 }
@@ -83,7 +83,7 @@ define(function (require /*, exports, module*/) {
                 _cm.on('gutterClick', gutterClick);
 
                 gutters = _cm.getOption("gutters").slice(0);
-                if ( gutters.indexOf("interactive-linter-gutter") === -1 ) {
+                if (gutters.indexOf("interactive-linter-gutter") === -1) {
                     gutters.unshift("interactive-linter-gutter");
                     cm.setOption("gutters", gutters);
                 }
@@ -91,7 +91,7 @@ define(function (require /*, exports, module*/) {
         }
 
 
-        function register( linter ) {
+        function register(linter) {
             languages[linter.language] = linter;
             linters[linter.name] = linter;
         }
