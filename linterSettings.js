@@ -100,7 +100,7 @@ define(function (require/*, exports, module*/) {
 
     FileSystem.on("change", function(evt, file) {
         if (currentLinter.file && currentLinter.fileObject && file && file.fullPath === currentLinter.fileObject.fullPath) {
-            loadFile().done(currentLinter.manager.lint);
+            loadFile().done(currentLinter.linter.lint);
         }
     });
 
@@ -120,7 +120,7 @@ define(function (require/*, exports, module*/) {
     }
 
 
-    function loadSettings(file, path, manager) {
+    function loadSettings(file, path, linter) {
         if (!file) {
             return spromise.resolved();
         }
@@ -133,7 +133,7 @@ define(function (require/*, exports, module*/) {
         currentLinter = {
             path: normalizePath(path),
             file: file,
-            manager: manager
+            linter: linter
         };
 
         return loadFile();
