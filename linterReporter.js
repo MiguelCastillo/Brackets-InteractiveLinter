@@ -46,15 +46,15 @@ define(function (require, exports, module) {
     Reporter.prototype.report = function(cm, messages) {
         var _self = this;
         pending = msgId;
-        if ( lastRequest && lastRequest.state() === "pending" ) {
+        if (lastRequest && lastRequest.state() === "pending") {
             return this;
         }
 
-        lastRequest = runReport( _self, pending, cm, messages ).done(function( doneId ) {
+        lastRequest = runReport(_self, pending, cm, messages).done(function(doneId) {
             lastRequest = null;
-            if ( pending !== doneId ) {
-                console.log( "run pending", pending );
-                _self.report( cm, messages );
+            if (pending !== doneId) {
+                console.log("run pending", pending);
+                _self.report(cm, messages);
             }
         });
 
@@ -84,7 +84,7 @@ define(function (require, exports, module) {
         // lineMarks are the underlines in the places the errors are reported for
         //
 
-        if( !_self.marks[token.start.line] ) {
+        if (!_self.marks[token.start.line]) {
             mark = {
                 warnings: [],
                 errors: [],
@@ -102,13 +102,13 @@ define(function (require, exports, module) {
         mark = _self.marks[token.start.line];
 
         // Increment errors/warnings count
-        if ( mark[message.type + "s"] ) {
+        if (mark[message.type + "s"]) {
             mark[message.type + "s"].push(message);
         }
 
         // If we have errors in this line, then we will add a class to the gutter to
         // highlight this fact.  Furthermore, I make sure I add this class only once...
-        if ( message.type === "error" && mark.errors.length === 1 ) {
+        if (message.type === "error" && mark.errors.length === 1) {
             mark.gutterMark.element.addClass('interactive-linter-gutter-errors');
         }
     };
@@ -135,14 +135,14 @@ define(function (require, exports, module) {
     Reporter.prototype.clearMarks = function() {
         var _self = this;
 
-        if (!_self.cm ){
+        if (!_self.cm) {
             return;
         }
 
         _self.cm.clearGutter("interactive-linter-gutter");
 
-        _.forEach( _self.marks, function(mark ) {
-            _.forEach( mark.lineMarks.slice(0), function(textMark) {
+        _.forEach(_self.marks, function(mark) {
+            _.forEach(mark.lineMarks.slice(0), function(textMark) {
                 textMark.line.clear();
             });
 
@@ -183,7 +183,8 @@ define(function (require, exports, module) {
 
         if (foundWidget) {
             this.hideLineDetails(foundWidget);
-        } else {
+        }
+        else {
             this.showLineDetails(line);
         }
     };
@@ -224,7 +225,7 @@ define(function (require, exports, module) {
     };
 
     /**
-    * Checks messages to figure out if JSHint report a fatal failue.
+    * Checks messages to figure out if JSHint report a fatal failure.
     */
     Reporter.prototype.checkFatal = function(messages) {
         // If the last message created by jshint is null, that means
@@ -242,7 +243,7 @@ define(function (require, exports, module) {
         $(linterReporter).triggerHandler("fatalError", null);
     };
 
-    function runReport( _self, reportId, cm, messages ) {
+    function runReport(_self, reportId, cm, messages) {
         var deferred = spromise.defer();
 
         setTimeout(function() {
@@ -260,7 +261,7 @@ define(function (require, exports, module) {
                             return;
                         }
 
-                        if ( message.token ) {
+                        if (message.token) {
                             _self.addGutterMarks(message, message.token);
                             _self.addLineMarks(message, message.token);
                         }

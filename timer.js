@@ -36,7 +36,7 @@ define([
 
 
   timer.prototype.elapsed = function(unit) {
-    if ( isNaN(unit) === true ) {
+    if (isNaN(unit) === true) {
       unit = timer.units.secs;
     }
 

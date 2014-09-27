@@ -72,7 +72,7 @@ define(function (require, exports, module) {
 
             case "W040": {
                 index = evidence.search(/[\s;.]/);
-                if ( index !== -1 ) {
+                if (index !== -1) {
                     evidence = evidence.substr(0, index);
                 }
                 break;
@@ -92,7 +92,7 @@ define(function (require, exports, module) {
 
                 // Find the first valid charater
                 while (/[\w]/.test(message.evidence[end]) === false) {
-                    if( end <= 0) {
+                    if (end <= 0) {
                         break;
                     }
 
@@ -103,7 +103,7 @@ define(function (require, exports, module) {
                 // token range.
                 start = end;
                 while (/[\s]/.test(message.evidence[start]) === false) {
-                    if( start <= 0) {
+                    if (start <= 0) {
                         break;
                     }
 
@@ -122,14 +122,14 @@ define(function (require, exports, module) {
 
             case "W055": {
                 index = evidence.search(/[(\s;]/);
-                if ( index !== -1 ) {
+                if (index !== -1) {
                     evidence = evidence.substr(0, index);
                 }
                 break;
             }
 
             case "W086": {
-                if ( settings.laxcasebreak ) {
+                if (settings.laxcasebreak) {
                     return false;
                 }
                 break;
@@ -149,7 +149,7 @@ define(function (require, exports, module) {
             */
 
             default: {
-                if ( message.a ) {
+                if (message.a) {
                     start = message.evidence.lastIndexOf(message.a, message.character);
                     message.character = start + 1;
                     evidence = message.a;
@@ -208,7 +208,7 @@ define(function (require, exports, module) {
         // Get the handler for the code type
         var helperFunction = message.code[0].toLowerCase();
 
-        if ( helper[helperFunction] ) {
+        if (helper[helperFunction]) {
             // Do special handling for the message if a handler exists
             helper[helperFunction](message, token);
         }

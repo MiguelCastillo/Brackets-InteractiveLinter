@@ -1,4 +1,4 @@
-function successCallback ( fileEntry ) {
+function successCallback (fileEntry) {
     console.log(fileEntry);
 }
 

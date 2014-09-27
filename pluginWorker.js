@@ -8,7 +8,7 @@
 importScripts("libs/js/require.js");
 
 
-function PluginLoader( settings ) {
+function PluginLoader(settings) {
     "use strict";
 
     var _self = this;
@@ -32,7 +32,7 @@ function PluginLoader( settings ) {
             _result = {},
             plugin = null;
 
-        for ( var iPlugin in _plugins ) {
+        for (var iPlugin in _plugins) {
             plugin = _plugins[iPlugin];
             plugin.name = plugin.name || data.packages[iPlugin];
             _self.byName[plugin.name] = plugin;
@@ -45,7 +45,11 @@ function PluginLoader( settings ) {
             };
         }
 
-        postMessage({ type: "ready", data: _result, msgId: settings.msgId });
+        postMessage({
+            type: "ready",
+            data: _result,
+            msgId: settings.msgId
+        });
     });
 }
 
@@ -68,6 +72,9 @@ PluginLoader.prototype.lint = function(data) {
 };
 
 
+/**
+ * Only used for debugging purposes.
+ */
 var console = {
     log: function(message) {
         postMessage({
@@ -82,7 +89,7 @@ onmessage = function(evt) {
     var data = evt.data || {};
     var method = PluginLoader.instance && PluginLoader.instance[data.type];
 
-    if ( typeof method === 'function' ) {
+    if (typeof method === 'function') {
         return method.apply(PluginLoader.instance, [data || {}]);
     }
 

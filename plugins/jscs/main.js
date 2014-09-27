@@ -4,7 +4,7 @@
  * Licensed under MIT
  */
 
-define(function (require /*, exports, module*/ ) {
+define(function (require /*, exports, module*/) {
 
 	var JscsStringChecker = require("plugins/jscs/libs/jscs-browser.js"),
 		utils = require("libs/utils"),

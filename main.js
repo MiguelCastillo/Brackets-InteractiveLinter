@@ -25,7 +25,7 @@ define(function (require, exports, module) {
 
     ExtensionUtils.loadStyleSheet(module, "style.css");
 
-    function setDocument(event, current, previous) {
+    function setDocument(event, current/*, previous*/) {
         if (current) {
             linterManager.setDocument(current._codeMirror, current.document.file.parentPath);
             linterManager.lint();
@@ -36,8 +36,8 @@ define(function (require, exports, module) {
 
     AppInit.appReady(function(){
         pluginManager().done(function(plugins) {
-            for ( var iPlugin in plugins ) {
-                linterManager.register( plugins[iPlugin] );
+            for (var iPlugin in plugins) {
+                linterManager.register(plugins[iPlugin]);
             }
 
             $(EditorManager).on("activeEditorChange.interactive-linter", setDocument);
