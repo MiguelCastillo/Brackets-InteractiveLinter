@@ -25,16 +25,16 @@ define(function(require, exports, module) {
     }
 
 
-    function getPluginsMeta (path) {
+    function getPluginsMeta(path) {
         var result = spromise.defer();
 
         FileSystem.getDirectoryForPath(path).getContents(function(err, entries) {
-            if ( err ) {
+            if (err) {
                 result.reject(err);
             }
 
-            var i, entry, directories = [];
-            for (i = 0; i < entries.length; i++) {
+            var entry, directories = [];
+            for (var i = 0; i < entries.length; i++) {
                 entry = entries[i];
                 if (entry.isDirectory) {
                     directories.push(entry.name);

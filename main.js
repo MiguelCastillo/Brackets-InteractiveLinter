@@ -25,7 +25,7 @@ define(function (require, exports, module) {
 
     ExtensionUtils.loadStyleSheet(module, "style.css");
 
-    function setDocument(event, current, previous) {
+    function setDocument(event, current/*, previous*/) {
         if (current) {
             linterManager.setDocument(current._codeMirror, current.document.file.parentPath);
             linterManager.lint();
