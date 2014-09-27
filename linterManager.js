@@ -8,6 +8,7 @@
 define(function (require /*, exports, module*/) {
     "use strict";
 
+    var _ = brackets.getModule("thirdparty/lodash");
     var linterSettings = require("linterSettings"),
         linterReporter = require("linterReporter"),
         languages      = {},
@@ -17,22 +18,11 @@ define(function (require /*, exports, module*/) {
      * Interface that will be used for running linters
      */
     function Linter(reporter, linterPlugin, cm, fullPath) {
-        var _self  = this;
-        var _timer = this._timer;
-
-        if (_timer) {
-            clearTimeout(_timer);
-        }
-
-        _self._timer = setTimeout(function () {
-            _self._timer = null;
-
-            linterSettings.loadSettings(linterPlugin.settingsFile, fullPath, _self).always(function(settings) {
-                linterPlugin.lint(cm.getDoc().getValue(), settings).done(function(result) {
-                    reporter.report(cm, result);
-                });
+        linterSettings.loadSettings(linterPlugin.settingsFile, fullPath, this).always(function(settings) {
+            linterPlugin.lint(cm.getDoc().getValue(), settings).done(function(result) {
+                reporter.report(cm, result);
             });
-        }, 1000);
+        });
     }
 
 
@@ -64,7 +54,7 @@ define(function (require /*, exports, module*/) {
             if (!linter) {
                 linter = {};
                 linter.reporter    = linterReporter();
-                linter.lint        = Linter.bind(linter, linter.reporter, languages[mode], cm, fullpath);
+                linter.lint        = _.debounce(Linter.bind(linter, linter.reporter, languages[mode], cm, fullpath), 1000);
                 linter.gutterClick = gutterClick.bind(undefined, linter);
                 linter.unregister  = unregisterDocument.bind(undefined, linter, cm);
                 cm.__linter = linter;
