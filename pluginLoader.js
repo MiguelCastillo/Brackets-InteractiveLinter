@@ -47,6 +47,8 @@ define(function(require, exports, module){
             }
 
             lastRequest = spromise.defer();
+
+            //var timer = new Timer(true);
             data.msgId  = msgId;
             worker.postMessage(data);
             msgId++;
@@ -60,6 +62,7 @@ define(function(require, exports, module){
                     worker.postMessage(data);
                 }
 
+                //console.log(timer.elapsed(), response.msgId);
                 return response.data;
             });
         }
