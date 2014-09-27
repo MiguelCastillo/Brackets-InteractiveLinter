@@ -71,7 +71,7 @@
 }
 
 .interactive-linter-status-bar-error-indicator.pulse {
-    -webkit-animation: pulse 2s linear infinite;
+    -webkit-animation: pulse 2s linear;
 }
 
 @-webkit-keyframes pulse {
