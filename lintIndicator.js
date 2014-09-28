@@ -7,6 +7,7 @@ define(function (require/*, exports, module*/) {
         DefaultDialogs   = brackets.getModule("widgets/DefaultDialogs"),
         Dialogs          = brackets.getModule("widgets/Dialogs"),
         CodeInspection   = brackets.getModule("language/CodeInspection"),
+        MainViewManager  = brackets.getModule("view/MainViewManager"),
         _                = brackets.getModule("thirdparty/lodash");
 
     var linterReporter = require("linterReporter");
@@ -38,9 +39,9 @@ define(function (require/*, exports, module*/) {
         StatusBar.addIndicator(INDICATOR_ID, $statusBarIndicator, true, INDICATOR_CLASSES);
         CodeInspection.toggleEnabled(false, true);
 
-        setTimeout(function () { // Hides the Brackets inspection status icon.
+        $(MainViewManager).one("currentFileChange", function () {
             $('#status-inspection').hide();
-        }, 1000);
+        });
 
         setStatusClass(INDICATOR_STATUS.DISABLED);
     });
