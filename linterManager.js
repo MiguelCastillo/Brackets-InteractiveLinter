@@ -39,7 +39,11 @@ define(function (require /*, exports, module*/) {
 
 
     /**
-     * We will only handle one document at a time
+     * Interface to register documents that need an instance of the appropriate linter.
+     *
+     * @param {CodeMirror} cm Is the CodeMirror instance to enable interactive linting on.
+     * @param {string} fullpath Is the path to the document being registered.  This is to
+     *  load the most suitable settings file.
      */
     function registerDocument(cm, fullpath) {
         var gutters, linter;
