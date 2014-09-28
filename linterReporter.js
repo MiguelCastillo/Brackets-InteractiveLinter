@@ -219,7 +219,7 @@ define(function (require, exports, module) {
 
 
     /**
-     * Determines is there is a fatal error in the linting report
+     * Determines if there is a fatal error in the linting report
      */
     Reporter.prototype.checkFatal = function(messages) {
         // If the last message created by jshint is null, that means
