@@ -11,14 +11,12 @@ define(function (require, exports, module) {
     // Reference for jshint errors/warnings
     // http://jslinterrors.com
 
-
     var EditorManager     = brackets.getModule("editor/EditorManager"),
         AppInit           = brackets.getModule("utils/AppInit"),
         KeyBindingManager = brackets.getModule("command/KeyBindingManager"),
         CommandManager    = brackets.getModule("command/CommandManager"),
         ExtensionUtils    = brackets.getModule("utils/ExtensionUtils");
 
-    // Lets make sure we have proper string polyfills needed by interactive linters
     require("errorIndicator");
     require("linterSettings");
 
@@ -26,15 +24,12 @@ define(function (require, exports, module) {
         pluginManager = require("pluginManager"),
         currentLinter;
 
-    ExtensionUtils.loadStyleSheet(module, "style.css");
-
-    // Let's bind the key
     var CMD_SHOW_LINE_DETAILS = "MiguelCastillo.interactive-linter.showLineDetails";
     var SHORTCUT_KEY = "Ctrl-Shift-E";
-    KeyBindingManager.addBinding(CMD_SHOW_LINE_DETAILS, SHORTCUT_KEY);
+
+    ExtensionUtils.loadStyleSheet(module, "style.css");
 
 
-    
     function handleToggleLineDetails() {
         currentLinter.reporter.toggleLineDetails();
     }
@@ -68,6 +63,9 @@ define(function (require, exports, module) {
     }
 
 
+    KeyBindingManager.addBinding(CMD_SHOW_LINE_DETAILS, SHORTCUT_KEY);
+    CommandManager.register("Show Line Details", CMD_SHOW_LINE_DETAILS , handleToggleLineDetails);
+
     AppInit.appReady(function(){
         pluginManager().done(function(plugins) {
             for (var iPlugin in plugins) {
@@ -76,7 +74,6 @@ define(function (require, exports, module) {
 
             $(EditorManager).on("activeEditorChange.interactive-linter", setDocument);
             setDocument(null, EditorManager.getActiveEditor());
-            CommandManager.register("Show Line Details", CMD_SHOW_LINE_DETAILS , handleToggleLineDetails);
         });
     });
 });
