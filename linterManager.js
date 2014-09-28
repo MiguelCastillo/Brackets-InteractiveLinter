@@ -67,8 +67,7 @@ define(function (require /*, exports, module*/) {
             cm.on("gutterClick", linter.gutterClick);
             gutters = cm.getOption("gutters").slice(0);
 
-            // Check if a gutter for interactive linter does not already exit...
-            // If it does not, then add one.
+            // If a gutter for interactive linter does not exist, add one.
             if (gutters.indexOf("interactive-linter-gutter") === -1) {
                 gutters.unshift("interactive-linter-gutter");
                 cm.setOption("gutters", gutters);
