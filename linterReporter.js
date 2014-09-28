@@ -103,7 +103,7 @@ define(function (require, exports, module) {
 
 
     /**
-     * Routine to add the underlines in the source
+     * Routine to underline problems in documents
      */
     Reporter.prototype.addLineMarks = function (message, token) {
         var _self = this,
@@ -168,7 +168,7 @@ define(function (require, exports, module) {
 
     Reporter.prototype.toggleLineDetails = function (line) {
         var activeEditor = EditorManager.getActiveEditor();
-        var cursorPos    = line !== 'undefined' ? {line: line, ch: 0} : activeEditor.getCursorPos();
+        var cursorPos    = line !== undefined ? {line: line, ch: 0} : activeEditor.getCursorPos();
         var foundWidget  = this.getWidgetForLine(cursorPos.line);
 
         if (foundWidget) {
@@ -219,7 +219,7 @@ define(function (require, exports, module) {
 
 
     /**
-     * Checks messages to figure out if JSHint report a fatal failure.
+     * Determines is there is a fatal error in the linting report
      */
     Reporter.prototype.checkFatal = function(messages) {
         // If the last message created by jshint is null, that means
