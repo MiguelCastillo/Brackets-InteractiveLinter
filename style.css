@@ -61,24 +61,24 @@
     border: 1px solid #fbeed5;
 }
 
-/*icon image from http://findicons.com/icon/184668/light_bulb*/
-.interactive-linter-status-bar-error-indicator {
-    background: url(img/light_bulb.png), transparent;
+.interactive-linter-lint-indicator {
     background-position: center;
-    background-size: 20px;
+    background-size: 15px;
     background-repeat: no-repeat;
-    color: #f74687;
 }
 
-.interactive-linter-status-bar-error-indicator.pulse {
-    -webkit-animation: pulse 2s linear;
+.interactive-linter-lint-indicator.error {
+    background-image: url(file:///opt/brackets/dev/src/styles/images/topcoat-error-15.svg);
 }
 
-@-webkit-keyframes pulse {
-    0% {
-        background-color: transparent;
-    }
-    50% {
-        background-color: #ffb0cd;
-    }
+.interactive-linter-lint-indicator.warning {
+    background-image: url(file:///opt/brackets/dev/src/styles/images/topcoat-warning-15.svg);
+}
+
+.interactive-linter-lint-indicator.okay {
+    background-image: url(file:///opt/brackets/dev/src/styles/images/topcoat-okay-15.svg);
+}
+
+.interactive-linter-lint-indicator.inactive {
+    background-image: url(file:///opt/brackets/dev/src/styles/images/topcoat-inactive-15.svg);
 }
