@@ -68,17 +68,17 @@
 }
 
 .interactive-linter-lint-indicator.error {
-    background-image: url(file:///opt/brackets/dev/src/styles/images/topcoat-error-15.svg);
+    background-image: url(img/topcoat-error-15.svg);
 }
 
 .interactive-linter-lint-indicator.warning {
-    background-image: url(file:///opt/brackets/dev/src/styles/images/topcoat-warning-15.svg);
+    background-image: url(img/topcoat-warning-15.svg);
 }
 
 .interactive-linter-lint-indicator.okay {
-    background-image: url(file:///opt/brackets/dev/src/styles/images/topcoat-okay-15.svg);
+    background-image: url(img/topcoat-okay-15.svg);
 }
 
 .interactive-linter-lint-indicator.inactive {
-    background-image: url(file:///opt/brackets/dev/src/styles/images/topcoat-inactive-15.svg);
+    background-image: url(img/topcoat-inactive-15.svg);
 }
