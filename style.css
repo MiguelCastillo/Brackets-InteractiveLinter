@@ -67,6 +67,19 @@
     background-repeat: no-repeat;
 }
 
+.interactive-linter-lint-indicator.pulse {
+    -webkit-animation: pulse 2s linear;
+}
+
+@-webkit-keyframes pulse {
+    0% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: #ffb0cd;
+    }
+}
+
 .interactive-linter-lint-indicator.error {
     background-image: url(img/topcoat-error-15.svg);
 }

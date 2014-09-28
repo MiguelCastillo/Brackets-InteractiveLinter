@@ -8,6 +8,7 @@ define(function (require/*, exports, module*/) {
         Dialogs          = brackets.getModule("widgets/Dialogs"),
         CodeInspection   = brackets.getModule("language/CodeInspection"),
         MainViewManager  = brackets.getModule("view/MainViewManager"),
+        AnimationUtils   = brackets.getModule("utils/AnimationUtils"),
         _                = brackets.getModule("thirdparty/lodash");
 
     var linterReporter = require("linterReporter");
@@ -78,10 +79,7 @@ define(function (require/*, exports, module*/) {
             setStatusClass(INDICATOR_STATUS.ERROR);
             $statusBarIndicator.attr('title', INDICATOR_TOOLTIPS.ERROR);
 
-            $statusBarIndicator.addClass('pulse');
-            setTimeout(function () {
-                $statusBarIndicator.removeClass('pulse');
-            }, 1000);
+            AnimationUtils.animateUsingClass($statusBarIndicator, 'pulse', 2000);
 
             dialogContent = Mustache.render(DIALOG_TEMPLATE, {
                 line: message.line,
