@@ -12,6 +12,7 @@ define(function (require, exports, module) {
     // http://jslinterrors.com
 
     var EditorManager     = brackets.getModule("editor/EditorManager"),
+        CodeInspection    = brackets.getModule("language/CodeInspection"),
         AppInit           = brackets.getModule("utils/AppInit"),
         KeyBindingManager = brackets.getModule("command/KeyBindingManager"),
         CommandManager    = brackets.getModule("command/CommandManager"),
@@ -62,11 +63,23 @@ define(function (require, exports, module) {
         }
     }
 
+    function removeBracketsLinter() {
+        /**
+         * Removes the default Brackets JSLint linter
+         */
+        CodeInspection.register("javascript", {
+            name: "interactive-linter-remove-jslint",
+            scanFile: $.noop
+        });
+    }
+
 
     KeyBindingManager.addBinding(CMD_SHOW_LINE_DETAILS, SHORTCUT_KEY);
     CommandManager.register("Show Line Details", CMD_SHOW_LINE_DETAILS , handleToggleLineDetails);
 
     AppInit.appReady(function(){
+        removeBracketsLinter();
+
         pluginManager().done(function(plugins) {
             for (var iPlugin in plugins) {
                 linterManager.registerLinter(plugins[iPlugin]);
