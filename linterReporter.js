@@ -10,10 +10,8 @@ define(function (require, exports, module) {
 
     var spromise = require("libs/js/spromise");
 
-    var CommandManager    = brackets.getModule("command/CommandManager"),
-        EditorManager     = brackets.getModule("editor/EditorManager"),
+    var EditorManager     = brackets.getModule("editor/EditorManager"),
         InlineWidget      = brackets.getModule("editor/InlineWidget").InlineWidget,
-        KeyBindingManager = brackets.getModule("command/KeyBindingManager"),
         _                 = brackets.getModule("thirdparty/lodash");
     
     var INLINE_WIDGET_LINT_TEMPLATE = require("text!templates/inlineWidgetLint.html");
@@ -21,28 +19,18 @@ define(function (require, exports, module) {
     var msgId = 1;
     var pending, lastRequest;
 
-
     function Reporter() {
-        var _self = this;
-        _self.marks = {};
+        this.marks = {};
     }
-    
-    Reporter.prototype.registerKeyBinding = function () {
-        var _self = this;
-        var CMD_SHOW_LINE_DETAILS = "MiguelCastillo.interactive-linter.showLineDetails";
-        CommandManager.register("Show Line Details", CMD_SHOW_LINE_DETAILS, function () {
-            _self.toggleLineDetails();
-        });
-        KeyBindingManager.addBinding(CMD_SHOW_LINE_DETAILS, "Ctrl-Shift-E");
-    };
+
 
     /**
-    * Routine that goes through all the jshint messages and adds all the gutter
-    * symbols and the underlines.
-    *
-    * @param messages {Array} jshint messages
-    * @param cm {CodeMirror} codemirror instance
-    */
+     * Routine that goes through all the jshint messages and adds all the gutter
+     * symbols and the underlines.
+     *
+     * @param messages {Array} jshint messages
+     * @param cm {CodeMirror} codemirror instance
+     */
     Reporter.prototype.report = function(cm, messages) {
         var _self = this;
         pending = msgId;
@@ -64,18 +52,18 @@ define(function (require, exports, module) {
 
 
     /**
-    * Add reporting information in code mirror's document
-    *
-    * Message requires:
-    * - type,
-    * - code,
-    * - raw,
-    * - reason,
-    * - href
-    *
-    * Token is a CodeMirror token that specifies start/end information for
-    * the string in CodeMirror's document
-    */
+     * Add reporting information in code mirror's document
+     *
+     * Message requires:
+     * - type,
+     * - code,
+     * - raw,
+     * - reason,
+     * - href
+     *
+     * Token is a CodeMirror token that specifies start/end information for
+     * the string in CodeMirror's document
+     */
     Reporter.prototype.addGutterMarks = function(message, token) {
         var _self = this, mark;
 
@@ -115,8 +103,8 @@ define(function (require, exports, module) {
 
 
     /**
-    * Routine to add the underlines in the source
-    */
+     * Routine to underline problems in documents
+     */
     Reporter.prototype.addLineMarks = function (message, token) {
         var _self = this,
             mark  = _self.marks[token.start.line];
@@ -130,8 +118,8 @@ define(function (require, exports, module) {
 
 
     /**
-    * Clears all warning/errors from codemirror's document
-    */
+     * Clears all warning/errors from codemirror's document
+     */
     Reporter.prototype.clearMarks = function() {
         var _self = this;
 
@@ -160,6 +148,7 @@ define(function (require, exports, module) {
         _self.marks = {};
     };
 
+
     Reporter.prototype.getWidgetForLine = function (line) {
         var activeEditor  = EditorManager.getActiveEditor();
         var inlineWidgets = activeEditor.getInlineWidgets();
@@ -176,10 +165,11 @@ define(function (require, exports, module) {
         return foundWidget;
     };
 
+
     Reporter.prototype.toggleLineDetails = function (line) {
         var activeEditor = EditorManager.getActiveEditor();
-        var cursorPos    = typeof line !== 'undefined' ? {line: line, ch: 0} : activeEditor.getCursorPos();
-        var foundWidget = this.getWidgetForLine(cursorPos.line);
+        var cursorPos    = line !== undefined ? {line: line, ch: 0} : activeEditor.getCursorPos();
+        var foundWidget  = this.getWidgetForLine(cursorPos.line);
 
         if (foundWidget) {
             this.hideLineDetails(foundWidget);
@@ -189,9 +179,11 @@ define(function (require, exports, module) {
         }
     };
 
+
     Reporter.prototype.hideLineDetails = function (widget) {
         EditorManager.getActiveEditor().removeInlineWidget(widget);
     };
+
 
     Reporter.prototype.showLineDetails = function(line) {
         var activeEditor = EditorManager.getActiveEditor();
@@ -212,6 +204,7 @@ define(function (require, exports, module) {
         this.updateLineDetails(mark);
     };
 
+
     Reporter.prototype.updateLineDetails = function (mark) {
         var activeEditor = EditorManager.getActiveEditor();
         var inlineWidget = mark.inlineWidget;
@@ -224,9 +217,10 @@ define(function (require, exports, module) {
         activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height() + 20);
     };
 
+
     /**
-    * Checks messages to figure out if JSHint report a fatal failure.
-    */
+     * Determines if there is a fatal error in the linting report
+     */
     Reporter.prototype.checkFatal = function(messages) {
         // If the last message created by jshint is null, that means
         // that we have encoutered a fatal error...
@@ -239,9 +233,11 @@ define(function (require, exports, module) {
         return false;
     };
 
+
     Reporter.prototype.clearFatalError = function() {
         $(linterReporter).triggerHandler("fatalError", null);
     };
+
 
     function runReport(_self, reportId, cm, messages) {
         var deferred = spromise.defer();
@@ -278,7 +274,7 @@ define(function (require, exports, module) {
     }
 
 
-    var linterReporter = (function () {
+    function linterReporter () {
         var _reporter = new Reporter();
 
         function report(cm, messages) {
@@ -289,10 +285,6 @@ define(function (require, exports, module) {
             _reporter.toggleLineDetails(line);
         }
 
-        function registerKeyBindings() {
-            _reporter.registerKeyBinding();
-        }
-
         function clearFatalError() {
             _reporter.clearFatalError();
         }
@@ -300,10 +292,9 @@ define(function (require, exports, module) {
         return {
             report: report,
             toggleLineDetails: toggleLineDetails,
-            registerKeyBindings: registerKeyBindings,
             clearFatalError: clearFatalError
         };
-    })();
+    }
 
 
     return linterReporter;
