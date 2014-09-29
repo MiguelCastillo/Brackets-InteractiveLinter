@@ -1,16 +1,16 @@
 define(function (require/*, exports, module*/) {
     'use strict';
 
-    var AppInit          = brackets.getModule("utils/AppInit"),
-        StatusBar        = brackets.getModule("widgets/StatusBar"),
-        StringUtils      = brackets.getModule("utils/StringUtils"),
+    var AnimationUtils   = brackets.getModule("utils/AnimationUtils"),
+        AppInit          = brackets.getModule("utils/AppInit"),
+        CodeInspection   = brackets.getModule("language/CodeInspection"),
+        CommandManager   = brackets.getModule("command/CommandManager"),
+        Commands         = brackets.getModule("command/Commands"),
         DefaultDialogs   = brackets.getModule("widgets/DefaultDialogs"),
         Dialogs          = brackets.getModule("widgets/Dialogs"),
-        CodeInspection   = brackets.getModule("language/CodeInspection"),
         MainViewManager  = brackets.getModule("view/MainViewManager"),
-        AnimationUtils   = brackets.getModule("utils/AnimationUtils"),
-        Commands         = brackets.getModule("command/Commands"),
-        CommandManager   = brackets.getModule("command/CommandManager"),
+        StatusBar        = brackets.getModule("widgets/StatusBar"),
+        StringUtils      = brackets.getModule("utils/StringUtils"),
         _                = brackets.getModule("thirdparty/lodash");
 
     var linterReporter = require("linterReporter");
