@@ -83,16 +83,6 @@ define(function (require /*, exports, module*/) {
         cm.off("gutterClick", linter.gutterClick);
     }
 
-    function removeBracketsLinter() {
-        /**
-         * Removes the default Brackets JSLint linter
-         */
-        CodeInspection.register("javascript", {
-            name: "interactive-linter-remove-jslint",
-            scanFile: $.noop
-        });
-    }
-
 
     function registerLinter(linter) {
         languages[linter.language] = linter;

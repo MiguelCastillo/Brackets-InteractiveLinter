@@ -62,14 +62,24 @@ define(function (require, exports, module) {
         }
     }
 
+    function removeBracketsLinter() {
+        /**
+         * Removes the default Brackets JSLint linter
+         */
+        CodeInspection.register("javascript", {
+            name: "interactive-linter-remove-jslint",
+            scanFile: $.noop
+        });
+    }
+
 
     KeyBindingManager.addBinding(CMD_SHOW_LINE_DETAILS, SHORTCUT_KEY);
     CommandManager.register("Show Line Details", CMD_SHOW_LINE_DETAILS , handleToggleLineDetails);
 
     AppInit.appReady(function(){
-        pluginManager().done(function(plugins) {
-            linterManager.removeBracketsLinter();
+        removeBracketsLinter();
 
+        pluginManager().done(function(plugins) {
             for (var iPlugin in plugins) {
                 linterManager.registerLinter(plugins[iPlugin]);
             }
