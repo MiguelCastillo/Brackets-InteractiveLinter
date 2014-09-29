@@ -12,6 +12,7 @@ define(function (require, exports, module) {
     // http://jslinterrors.com
 
     var EditorManager     = brackets.getModule("editor/EditorManager"),
+        CodeInspection    = brackets.getModule("language/CodeInspection"),
         AppInit           = brackets.getModule("utils/AppInit"),
         KeyBindingManager = brackets.getModule("command/KeyBindingManager"),
         CommandManager    = brackets.getModule("command/CommandManager"),

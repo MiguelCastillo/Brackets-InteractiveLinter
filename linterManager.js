@@ -8,8 +8,7 @@
 define(function (require /*, exports, module*/) {
     "use strict";
 
-    var CodeInspection = brackets.getModule("language/CodeInspection"),
-        _              = brackets.getModule("thirdparty/lodash");
+    var _ = brackets.getModule("thirdparty/lodash");
     var linterSettings = require("linterSettings"),
         linterReporter = require("linterReporter"),
         languages      = {},
@@ -92,7 +91,6 @@ define(function (require /*, exports, module*/) {
 
     return {
         registerDocument: registerDocument,
-        removeBracketsLinter: removeBracketsLinter,
         registerLinter: registerLinter
     };
 });
