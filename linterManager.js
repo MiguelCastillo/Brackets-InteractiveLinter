@@ -8,7 +8,8 @@
 define(function (require /*, exports, module*/) {
     "use strict";
 
-    var _ = brackets.getModule("thirdparty/lodash");
+    var CodeInspection = brackets.getModule("language/CodeInspection"),
+        _              = brackets.getModule("thirdparty/lodash");
     var linterSettings = require("linterSettings"),
         linterReporter = require("linterReporter"),
         languages      = {},
@@ -82,6 +83,16 @@ define(function (require /*, exports, module*/) {
         cm.off("gutterClick", linter.gutterClick);
     }
 
+    function removeBracketsLinter() {
+        /**
+         * Removes the default Brackets JSLint linter
+         */
+        CodeInspection.register("javascript", {
+            name: "interactive-linter-remove-jslint",
+            scanFile: $.noop
+        });
+    }
+
 
     function registerLinter(linter) {
         languages[linter.language] = linter;
@@ -91,6 +102,7 @@ define(function (require /*, exports, module*/) {
 
     return {
         registerDocument: registerDocument,
+        removeBracketsLinter: removeBracketsLinter,
         registerLinter: registerLinter
     };
 });

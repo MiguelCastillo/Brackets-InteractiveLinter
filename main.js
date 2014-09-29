@@ -68,6 +68,8 @@ define(function (require, exports, module) {
 
     AppInit.appReady(function(){
         pluginManager().done(function(plugins) {
+            linterManager.removeBracketsLinter();
+
             for (var iPlugin in plugins) {
                 linterManager.registerLinter(plugins[iPlugin]);
             }
