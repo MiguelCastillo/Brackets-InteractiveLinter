@@ -9,6 +9,8 @@ define(function (require/*, exports, module*/) {
         CodeInspection   = brackets.getModule("language/CodeInspection"),
         MainViewManager  = brackets.getModule("view/MainViewManager"),
         AnimationUtils   = brackets.getModule("utils/AnimationUtils"),
+        Commands         = brackets.getModule("command/Commands"),
+        CommandManager   = brackets.getModule("command/CommandManager"),
         _                = brackets.getModule("thirdparty/lodash");
 
     var linterReporter = require("linterReporter");
@@ -42,6 +44,8 @@ define(function (require/*, exports, module*/) {
 
         $(MainViewManager).one("currentFileChange", function () {
             $('#status-inspection').hide();
+            CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION).setChecked(false);
+            CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION).setEnabled(false);
         });
 
         setStatusClass(INDICATOR_STATUS.DISABLED);
