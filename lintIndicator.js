@@ -15,11 +15,8 @@ define(function (require/*, exports, module*/) {
 
     var linterReporter = require("linterReporter");
 
-    var INDICATOR_ID = "interactive-linter-lint-indicator";
-    var INDICATOR_CLASSES = "interactive-linter-lint-indicator";
-
-    var DIALOG_TITLE = "Interactive Linter: Fatal Linter Error";
-    var DIALOG_TEMPLATE = require("text!templates/errorDialog.html");
+    var dialogTemplate = require("text!templates/errorDialog.html");
+    var dialogContent;
 
     var INDICATOR_TOOLTIPS = {
         OK: "Interactive Linter found no problems in code.",
@@ -36,20 +33,6 @@ define(function (require/*, exports, module*/) {
     };
 
     var $statusBarIndicator = $('<div>&nbsp;</div>');
-    var dialogContent;
-
-    AppInit.appReady(function () {
-        StatusBar.addIndicator(INDICATOR_ID, $statusBarIndicator, true, INDICATOR_CLASSES);
-        CodeInspection.toggleEnabled(false, true);
-
-        $(MainViewManager).one("currentFileChange", function () {
-            $('#status-inspection').hide();
-            CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION).setChecked(false);
-            CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION).setEnabled(false);
-        });
-
-        setStatusClass(INDICATOR_STATUS.DISABLED);
-    });
 
     function removeStatusClasses() {
         _.forEach(INDICATOR_STATUS, function (statusClass) {
@@ -62,19 +45,9 @@ define(function (require/*, exports, module*/) {
         $statusBarIndicator.addClass(status);
     }
 
-    $(linterReporter).on("lintMessage", function (evt, messages) {
-        lintMessageHandler(messages);
-    });
-
-    $(linterReporter).on("fatalError", function (evt, message) {
-        fatalErrorHandler(message);
-    });
-
-    $statusBarIndicator.on('click', indicatorClickHandler);
-
     function indicatorClickHandler() {
         if ($statusBarIndicator.hasClass('error')) {
-            Dialogs.showModalDialog(DefaultDialogs.DIALOG_ID_ERROR, DIALOG_TITLE, dialogContent);
+            Dialogs.showModalDialog(DefaultDialogs.DIALOG_ID_ERROR, "Interactive Linter: Fatal Linter Error", dialogContent);
         }
     }
 
@@ -85,7 +58,7 @@ define(function (require/*, exports, module*/) {
 
             AnimationUtils.animateUsingClass($statusBarIndicator, 'pulse', 2000);
 
-            dialogContent = Mustache.render(DIALOG_TEMPLATE, {
+            dialogContent = Mustache.render(dialogTemplate, {
                 line: message.line,
                 character: message.character,
                 error: message.reason,
@@ -104,4 +77,27 @@ define(function (require/*, exports, module*/) {
             $statusBarIndicator.attr('title', StringUtils.format(INDICATOR_TOOLTIPS.WARNING, messages.length));
         }
     }
+
+    AppInit.appReady(function () {
+        StatusBar.addIndicator("interactive-linter-lint-indicator", $statusBarIndicator, true, "interactive-linter-lint-indicator");
+        CodeInspection.toggleEnabled(false, true);
+
+        $(MainViewManager).one("currentFileChange", function () {
+            $('#status-inspection').hide();
+            CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION).setChecked(false);
+            CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION).setEnabled(false);
+        });
+
+        setStatusClass(INDICATOR_STATUS.DISABLED);
+    });
+
+    $(linterReporter).on("lintMessage", function (evt, messages) {
+        lintMessageHandler(messages);
+    });
+
+    $(linterReporter).on("fatalError", function (evt, message) {
+        fatalErrorHandler(message);
+    });
+
+    $statusBarIndicator.on('click', indicatorClickHandler);
 });
