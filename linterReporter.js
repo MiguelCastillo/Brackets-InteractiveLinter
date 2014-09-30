@@ -247,6 +247,8 @@ define(function (require, exports, module) {
             cm.operation(function() {
                 _self.clearMarks();
 
+                $(linterReporter).triggerHandler("lintMessage", [messages]);
+
                 if (messages) {
                     _self.checkFatal(messages);
                     _self.cm       = cm;

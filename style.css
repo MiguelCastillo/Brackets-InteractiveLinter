@@ -61,19 +61,6 @@
     border: 1px solid #fbeed5;
 }
 
-/*icon image from http://findicons.com/icon/184668/light_bulb*/
-.interactive-linter-status-bar-error-indicator {
-    background: url(img/light_bulb.png), transparent;
-    background-position: center;
-    background-size: 20px;
-    background-repeat: no-repeat;
-    color: #f74687;
-}
-
-.interactive-linter-status-bar-error-indicator.pulse {
-    -webkit-animation: pulse 2s linear;
-}
-
 @-webkit-keyframes pulse {
     0% {
         background-color: transparent;
@@ -81,4 +68,28 @@
     50% {
         background-color: #ffb0cd;
     }
+}
+
+.interactive-linter-lint-indicator {
+    background-position: center;
+    background-size: 15px;
+    background-repeat: no-repeat;
+}
+
+.interactive-linter-lint-indicator[status=error] {
+    -webkit-animation: pulse 2s linear;
+    -webkit-animation-iteration-count: 3;
+    background-image: url(img/topcoat-error-15.svg);
+}
+
+.interactive-linter-lint-indicator[status=warning] {
+    background-image: url(img/topcoat-warning-15.svg);
+}
+
+.interactive-linter-lint-indicator[status=okay] {
+    background-image: url(img/topcoat-okay-15.svg);
+}
+
+.interactive-linter-lint-indicator[status=inactive] {
+    background-image: url(img/topcoat-inactive-15.svg);
 }
