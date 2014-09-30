@@ -12,7 +12,7 @@ define(function (require /*, exports, module*/) {
 		settings = JSON.parse(require("text!jscs/settings.json"));
 
 	function lint(text, settings) {
-		var i, length, error, jscs, errors, errList;
+		var i, length, jscs, errors, errList;
 
 		settings = utils.mixin({}, settings);
 		jscs = new JscsStringChecker();
