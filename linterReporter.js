@@ -235,7 +235,13 @@ define(function (require, exports, module) {
 
 
     Reporter.prototype.clearFatalError = function() {
-        $(linterReporter).triggerHandler("fatalError", null);
+        $(linterReporter).triggerHandler("fatalError", [null]);
+    };
+
+
+    Reporter.prototype.clearLinterMessages = function() {
+        this.clearFatalError();
+        $(linterReporter).triggerHandler("lintMessage", [null]);
     };
 
 
@@ -247,9 +253,8 @@ define(function (require, exports, module) {
             cm.operation(function() {
                 _self.clearMarks();
 
-                $(linterReporter).triggerHandler("lintMessage", [messages]);
-
                 if (messages) {
+                    $(linterReporter).triggerHandler("lintMessage", [messages]);
                     _self.checkFatal(messages);
                     _self.cm       = cm;
                     _self.messages = messages;
@@ -264,6 +269,9 @@ define(function (require, exports, module) {
                             _self.addLineMarks(message, message.token);
                         }
                     });
+                }
+                else {
+                    $(linterReporter).triggerHandler("lintMessage", [[]]);
                 }
 
                 deferred.resolve(reportId);
@@ -289,10 +297,15 @@ define(function (require, exports, module) {
             _reporter.clearFatalError();
         }
 
+        function clearLinterMessages() {
+            _reporter.clearLinterMessages();
+        }
+
         return {
             report: report,
             toggleLineDetails: toggleLineDetails,
-            clearFatalError: clearFatalError
+            clearFatalError: clearFatalError,
+            clearLinterMessages: clearLinterMessages
         };
     }
 

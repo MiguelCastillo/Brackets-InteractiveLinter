@@ -21,7 +21,7 @@ define(function (require/*, exports, module*/) {
         OK: "Interactive Linter found no problems in code.",
         WARNING: "Interactive Linter found {0} problem(s) in code.",
         ERROR: "Interactive Linter encountered a fatal error, click for more details.",
-        DISABLED: "Interactive Linter is disabled."
+        DISABLED: "Interactive Linter is disabled, or there are no linters for this file."
     };
 
     var INDICATOR_STATUS = {
@@ -56,7 +56,11 @@ define(function (require/*, exports, module*/) {
     }
 
     function lintMessageHandler(messages) {
-        if (messages === undefined || messages.length === 0) {
+        if (messages === null || messages === undefined) {
+            setStatus(INDICATOR_STATUS.DISABLED);
+            $statusBarIndicator.attr('title', INDICATOR_TOOLTIPS.DISABLED);
+        }
+        else if (messages.length === 0) {
             setStatus(INDICATOR_STATUS.OK);
             $statusBarIndicator.attr('title', INDICATOR_TOOLTIPS.OK);
         }

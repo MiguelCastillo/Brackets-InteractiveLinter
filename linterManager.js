@@ -49,6 +49,9 @@ define(function (require /*, exports, module*/) {
         var gutters, linter;
         var mode = cm && cm.getDoc().getMode();
 
+        var reporter = linterReporter();
+        reporter.clearLinterMessages();
+
         // Get the best poosible mode (document type) for the document
         mode = mode && (mode.helperType || mode.name);
 
@@ -57,7 +60,7 @@ define(function (require /*, exports, module*/) {
 
             if (!linter) {
                 linter = {};
-                linter.reporter    = linterReporter();
+                linter.reporter    = reporter;
                 linter.lint        = _.debounce(Linter.bind(linter, linter.reporter, languages[mode], cm, fullpath), 1000);
                 linter.gutterClick = gutterClick.bind(undefined, linter);
                 linter.unregister  = unregisterDocument.bind(undefined, linter, cm);
