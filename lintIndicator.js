@@ -1,8 +1,7 @@
 define(function (require/*, exports, module*/) {
     'use strict';
 
-    var AnimationUtils   = brackets.getModule("utils/AnimationUtils"),
-        AppInit          = brackets.getModule("utils/AppInit"),
+    var AppInit          = brackets.getModule("utils/AppInit"),
         CodeInspection   = brackets.getModule("language/CodeInspection"),
         CommandManager   = brackets.getModule("command/CommandManager"),
         Commands         = brackets.getModule("command/Commands"),
@@ -10,8 +9,7 @@ define(function (require/*, exports, module*/) {
         Dialogs          = brackets.getModule("widgets/Dialogs"),
         MainViewManager  = brackets.getModule("view/MainViewManager"),
         StatusBar        = brackets.getModule("widgets/StatusBar"),
-        StringUtils      = brackets.getModule("utils/StringUtils"),
-        _                = brackets.getModule("thirdparty/lodash");
+        StringUtils      = brackets.getModule("utils/StringUtils");
 
     var linterReporter = require("linterReporter"),
         dialogTemplate = require("text!templates/errorDialog.html");
@@ -47,8 +45,6 @@ define(function (require/*, exports, module*/) {
         if (message) {
             setStatus(INDICATOR_STATUS.ERROR);
             $statusBarIndicator.attr("title", INDICATOR_TOOLTIPS.ERROR);
-
-            AnimationUtils.animateUsingClass($statusBarIndicator, 'pulse', 2000);
 
             dialogContent = Mustache.render(dialogTemplate, {
                 line: message.line,

@@ -61,16 +61,6 @@
     border: 1px solid #fbeed5;
 }
 
-.interactive-linter-lint-indicator {
-    background-position: center;
-    background-size: 15px;
-    background-repeat: no-repeat;
-}
-
-.interactive-linter-lint-indicator.pulse {
-    -webkit-animation: pulse 2s linear;
-}
-
 @-webkit-keyframes pulse {
     0% {
         background-color: transparent;
@@ -80,7 +70,15 @@
     }
 }
 
+.interactive-linter-lint-indicator {
+    background-position: center;
+    background-size: 15px;
+    background-repeat: no-repeat;
+}
+
 .interactive-linter-lint-indicator[status=error] {
+    -webkit-animation: pulse 2s linear;
+    -webkit-animation-iteration-count: 3;
     background-image: url(img/topcoat-error-15.svg);
 }
 
