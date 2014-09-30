@@ -40,7 +40,7 @@ define(function(require /*, exports, module*/) {
         // Get document as a string to be passed into JSHint
         var result;
 
-        settings = utils.mixin(defaultSettings, settings);
+        settings = utils.mixin({}, defaultSettings, settings);
 
         try {
             result = coffeelint.lint(text, settings);

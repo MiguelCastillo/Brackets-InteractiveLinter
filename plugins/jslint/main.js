@@ -16,7 +16,7 @@ define(function(require /*, exports, module*/) {
     function lint(text, settings) {
         var i, length;
 
-        settings = utils.mixin(defaultSettings, settings);
+        settings = utils.mixin({}, defaultSettings, settings);
 
         if (!JSLINT(text, settings)) {
             var errors = JSLINT.errors.slice(0);

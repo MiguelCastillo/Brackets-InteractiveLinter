@@ -24,7 +24,7 @@ define(function(require /*, exports, module*/) {
     function lint(text, settings) {
         var i, length;
 
-        settings = utils.mixin(defaultSettings, settings);
+        settings = utils.mixin({}, defaultSettings, settings);
 
         // Get document as a string to be passed into JSHint
         if (!JSHINT(text, settings, settings.globals)) {
