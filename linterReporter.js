@@ -285,14 +285,9 @@ define(function (require, exports, module) {
             _reporter.toggleLineDetails(line);
         }
 
-        function clearFatalError() {
-            _reporter.clearFatalError();
-        }
-
         return {
             report: report,
-            toggleLineDetails: toggleLineDetails,
-            clearFatalError: clearFatalError
+            toggleLineDetails: toggleLineDetails
         };
     }
 

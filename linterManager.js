@@ -12,7 +12,8 @@ define(function (require /*, exports, module*/) {
     var linterSettings = require("linterSettings"),
         linterReporter = require("linterReporter"),
         languages      = {},
-        linters        = {};
+        linters        = {},
+        linterManager;
 
     /**
      * Interface that will be used for running linters
@@ -48,6 +49,8 @@ define(function (require /*, exports, module*/) {
     function registerDocument(cm, fullpath) {
         var gutters, linter;
         var mode = cm && cm.getDoc().getMode();
+
+        $(linterManager).triggerHandler("linterNotFound");
 
         // Get the best poosible mode (document type) for the document
         mode = mode && (mode.helperType || mode.name);
@@ -88,10 +91,11 @@ define(function (require /*, exports, module*/) {
         linters[linter.name] = linter;
     }
 
-
-    return {
+    linterManager = {
         registerDocument: registerDocument,
         registerLinter: registerLinter
     };
+
+    return linterManager;
 });
 
