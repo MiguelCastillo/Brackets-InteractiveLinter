@@ -52,9 +52,6 @@ define(function (require /*, exports, module*/) {
 
         $(linterManager).triggerHandler("linterNotFound");
 
-        var reporter = linterReporter();
-        reporter.clearFatalError();
-
         // Get the best poosible mode (document type) for the document
         mode = mode && (mode.helperType || mode.name);
 
@@ -63,7 +60,7 @@ define(function (require /*, exports, module*/) {
 
             if (!linter) {
                 linter = {};
-                linter.reporter    = reporter;
+                linter.reporter    = linterReporter();
                 linter.lint        = _.debounce(Linter.bind(linter, linter.reporter, languages[mode], cm, fullpath), 1000);
                 linter.gutterClick = gutterClick.bind(undefined, linter);
                 linter.unregister  = unregisterDocument.bind(undefined, linter, cm);

@@ -235,7 +235,7 @@ define(function (require, exports, module) {
 
 
     Reporter.prototype.clearFatalError = function() {
-        $(linterReporter).triggerHandler("fatalError", [null]);
+        $(linterReporter).triggerHandler("fatalError", null);
     };
 
 
@@ -285,14 +285,9 @@ define(function (require, exports, module) {
             _reporter.toggleLineDetails(line);
         }
 
-        function clearFatalError() {
-            _reporter.clearFatalError();
-        }
-
         return {
             report: report,
-            toggleLineDetails: toggleLineDetails,
-            clearFatalError: clearFatalError
+            toggleLineDetails: toggleLineDetails
         };
     }
 
