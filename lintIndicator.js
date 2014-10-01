@@ -56,17 +56,13 @@ define(function (require/*, exports, module*/) {
     }
 
     function lintMessageHandler(messages) {
-        if (messages === null || messages === undefined) {
-            setStatus(INDICATOR_STATUS.DISABLED);
-            $statusBarIndicator.attr('title', INDICATOR_TOOLTIPS.DISABLED);
-        }
-        else if (messages.length === 0) {
-            setStatus(INDICATOR_STATUS.OK);
-            $statusBarIndicator.attr('title', INDICATOR_TOOLTIPS.OK);
-        }
-        else if (messages.length > 0) {
+        if (messages) {
             setStatus(INDICATOR_STATUS.WARNING);
             $statusBarIndicator.attr('title', StringUtils.format(INDICATOR_TOOLTIPS.WARNING, messages.length));
+        }
+        else {
+            setStatus(INDICATOR_STATUS.OK);
+            $statusBarIndicator.attr('title', INDICATOR_TOOLTIPS.OK);
         }
     }
 
@@ -81,6 +77,12 @@ define(function (require/*, exports, module*/) {
             CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION).setChecked(false);
             CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION).setEnabled(false);
         });
+    });
+
+
+    $(linterReporter).on("lintUndetermined", function () {
+        setStatus(INDICATOR_STATUS.DISABLED);
+        $statusBarIndicator.attr('title', INDICATOR_TOOLTIPS.DISABLED);
     });
 
     $(linterReporter).on("lintMessage", function (evt, messages) {

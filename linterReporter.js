@@ -239,9 +239,8 @@ define(function (require, exports, module) {
     };
 
 
-    Reporter.prototype.clearLinterMessages = function() {
-        this.clearFatalError();
-        $(linterReporter).triggerHandler("lintMessage", [null]);
+    Reporter.prototype.setUndetermined = function() {
+        $(linterReporter).triggerHandler("lintUndetermined", [null]);
     };
 
 
@@ -253,8 +252,9 @@ define(function (require, exports, module) {
             cm.operation(function() {
                 _self.clearMarks();
 
+                $(linterReporter).triggerHandler("lintMessage", [messages]);
+
                 if (messages) {
-                    $(linterReporter).triggerHandler("lintMessage", [messages]);
                     _self.checkFatal(messages);
                     _self.cm       = cm;
                     _self.messages = messages;
@@ -269,9 +269,6 @@ define(function (require, exports, module) {
                             _self.addLineMarks(message, message.token);
                         }
                     });
-                }
-                else {
-                    $(linterReporter).triggerHandler("lintMessage", [[]]);
                 }
 
                 deferred.resolve(reportId);
@@ -297,15 +294,15 @@ define(function (require, exports, module) {
             _reporter.clearFatalError();
         }
 
-        function clearLinterMessages() {
-            _reporter.clearLinterMessages();
+        function setUndetermined() {
+            _reporter.setUndetermined();
         }
 
         return {
             report: report,
             toggleLineDetails: toggleLineDetails,
             clearFatalError: clearFatalError,
-            clearLinterMessages: clearLinterMessages
+            setUndetermined: setUndetermined
         };
     }
 

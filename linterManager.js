@@ -50,7 +50,8 @@ define(function (require /*, exports, module*/) {
         var mode = cm && cm.getDoc().getMode();
 
         var reporter = linterReporter();
-        reporter.clearLinterMessages();
+        reporter.setUndetermined();
+        reporter.clearFatalError();
 
         // Get the best poosible mode (document type) for the document
         mode = mode && (mode.helperType || mode.name);
