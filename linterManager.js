@@ -49,8 +49,9 @@ define(function (require /*, exports, module*/) {
         var gutters, linter;
         var mode = cm && cm.getDoc().getMode();
 
+        $(this).triggerHandler("linterNotFound");
+
         var reporter = linterReporter();
-        reporter.setUndetermined();
         reporter.clearFatalError();
 
         // Get the best poosible mode (document type) for the document

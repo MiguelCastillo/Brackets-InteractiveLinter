@@ -12,6 +12,7 @@ define(function (require/*, exports, module*/) {
         StringUtils      = brackets.getModule("utils/StringUtils");
 
     var linterReporter = require("linterReporter"),
+        linterManager  = require("linterManager"),
         dialogTemplate = require("text!templates/errorDialog.html");
 
     var $statusBarIndicator = $('<div>&nbsp;</div>');
@@ -80,7 +81,7 @@ define(function (require/*, exports, module*/) {
     });
 
 
-    $(linterReporter).on("lintUndetermined", function () {
+    $(linterManager).on("linterNotFound", function () {
         setStatus(INDICATOR_STATUS.DISABLED);
         $statusBarIndicator.attr('title', INDICATOR_TOOLTIPS.DISABLED);
     });

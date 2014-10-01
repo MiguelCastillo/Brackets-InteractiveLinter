@@ -239,11 +239,6 @@ define(function (require, exports, module) {
     };
 
 
-    Reporter.prototype.setUndetermined = function() {
-        $(linterReporter).triggerHandler("lintUndetermined", [null]);
-    };
-
-
     function runReport(_self, reportId, cm, messages) {
         var deferred = spromise.defer();
 
@@ -294,15 +289,10 @@ define(function (require, exports, module) {
             _reporter.clearFatalError();
         }
 
-        function setUndetermined() {
-            _reporter.setUndetermined();
-        }
-
         return {
             report: report,
             toggleLineDetails: toggleLineDetails,
-            clearFatalError: clearFatalError,
-            setUndetermined: setUndetermined
+            clearFatalError: clearFatalError
         };
     }
 
