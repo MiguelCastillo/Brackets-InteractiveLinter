@@ -21,11 +21,11 @@ define(function (require, exports, module) {
         return {
             text: message.text,
             start: {
-                line: message.loc.first_line,
+                line: (message.loc.first_line - 1),
                 ch: message.loc.first_column
             },
             end: {
-                line: message.loc.last_line,
+                line: (message.loc.last_line - 1),
                 ch: message.loc.last_column
             }
         };
