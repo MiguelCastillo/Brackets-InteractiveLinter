@@ -14,13 +14,15 @@ define(function(require, exports, module) {
 
 
     /**
-    * pluginManager is the processor for loading up plugins in the plugins directory in
-    * make sure they are smoothly running in a worker thread.
-    */
+     * pluginManager is the processor for loading up plugins in the plugins directory in
+     * make sure they are smoothly running in a worker thread.
+     */
     function pluginManager() {
+        var pluginDirectory = module.uri.substring(0, module.uri.lastIndexOf("/")) + "/plugins";
+
         // Build plugin list that the worker thread needs to load
-        return getPluginsMeta(module.uri.substring(0, module.uri.lastIndexOf("/")) + "/plugins").then(function(pluginsMeta) {
-            return pluginLoader(pluginManager, pluginsMeta);
+        return getPluginsMeta(pluginDirectory).then(function(pluginsMeta) {
+            return pluginLoader(pluginsMeta);
         });
     }
 

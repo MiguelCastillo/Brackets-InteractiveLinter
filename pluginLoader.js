@@ -8,10 +8,11 @@
 define(function(require, exports, module){
     "use strict";
 
-    var spromise = require("libs/js/spromise");
+    var spromise = require("libs/js/spromise"),
+        utils = require("libs/js/utils");
 
 
-    function pluginLoader(manager, pluginsMeta) {
+    function pluginLoader(pluginsMeta) {
         var msgId = 1,
             plugins, pending, lastRequest;
 
@@ -74,7 +75,7 @@ define(function(require, exports, module){
                 plugin = plugins[iplugin];
 
                 // Add a lint interface that will be just posting a message to the worker thread
-                $.extend(plugin, api(plugin));
+                utils.mixin(plugin, api(plugin));
             }
             return plugins;
         }
