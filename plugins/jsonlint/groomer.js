@@ -15,7 +15,7 @@ define(function (require, exports, module) {
      * @param message {Object} jshint message
      */
     function groom(message) {
-        message.reason = "Expected: " + message.expected.join(', ') + ". Instead saw: '" + message.text + "'";
+        message.reason = "Expected: " + message.expected.join(', ') + ". Instead saw: " + message.text + ".";
         message.type = "error";
 
         return {
