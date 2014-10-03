@@ -68,7 +68,7 @@ define(function (require/*, exports, module*/) {
     }
 
     AppInit.appReady(function () {
-        StatusBar.addIndicator("interactive-linter-lint-indicator", $statusBarIndicator, true, "interactive-linter-lint-indicator");
+        StatusBar.addIndicator("interactive-linter-lint-indicator", $statusBarIndicator, true, "interactive-linter-lint-indicator", "", "status-indent");
         setStatus(INDICATOR_STATUS.DISABLED);
 
         CodeInspection.toggleEnabled(false, true);
