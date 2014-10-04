@@ -214,6 +214,11 @@ define(function (require, exports, module) {
         var $errorHtml = $(Mustache.render(INLINE_WIDGET_LINT_TEMPLATE, {messages: messages}));
 
         inlineWidget.$htmlContent.append($errorHtml);
+
+        $errorHtml.on("mousedown", function (e) {
+            e.stopPropagation();
+        });
+
         activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height() + 20);
     };
 

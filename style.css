@@ -41,11 +41,26 @@
 
 .CodeMirror .interactive-linter-line-widget {
     margin: 10px 0;
+
+    /* Enable text selection */
+    cursor: auto;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    -o-user-select: text;
+    user-select: text;
 }
 
 .CodeMirror .interactive-linter-line-error, .CodeMirror .interactive-linter-line-warning {
     padding: 0 15px;
     margin-left: 40px;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    -o-user-select: text;
+    user-select: text;
 }
 
 /* twitter bootstrap alert colors */
