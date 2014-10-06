@@ -18,8 +18,8 @@ define(function (require, exports, module) {
         CommandManager    = brackets.getModule("command/CommandManager"),
         ExtensionUtils    = brackets.getModule("utils/ExtensionUtils");
 
-    require("lintPanel");
     require("lintIndicator");
+    require("lintPanel");
     require("linterSettings");
 
     var linterManager = require("linterManager"),

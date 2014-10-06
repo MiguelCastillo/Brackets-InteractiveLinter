@@ -67,10 +67,10 @@ define(function (require/*, exports, module*/) {
         }
     }
 
-    AppInit.appReady(function () {
-        StatusBar.addIndicator("interactive-linter-lint-indicator", $statusBarIndicator, true, "interactive-linter-lint-indicator");
-        setStatus(INDICATOR_STATUS.DISABLED);
+    StatusBar.addIndicator("interactive-linter-lint-indicator", $statusBarIndicator, true, "interactive-linter-lint-indicator");
+    setStatus(INDICATOR_STATUS.DISABLED);
 
+    AppInit.appReady(function () {
         CodeInspection.toggleEnabled(false, true);
 
         $(MainViewManager).one("currentFileChange", function () {

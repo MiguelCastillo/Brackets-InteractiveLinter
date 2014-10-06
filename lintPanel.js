@@ -13,13 +13,34 @@ define(function (require, exports, module) {
         singleError     = 'Interactive Linter: 1 Linter Problem',
         multipleErrors  = 'Interactive Linter: {0} Linter Problems',
         $problemsPanel,
-        $problemsPanelTable;
+        $problemsPanelTable,
+        _hasErrors = false;
+
+
+    function togglePanel() {
+        if (!_hasErrors) {
+            hidePanel();
+        } else {
+            Resizer.toggle($problemsPanel);
+        }
+    }
+
+
+    function showPanel() {
+        if (_hasErrors) {
+            Resizer.show($problemsPanel);
+        }
+    }
+
+
+    function hidePanel() {
+        Resizer.hide($problemsPanel);
+    }
 
 
     function createPanel() {
         var $panelHtml = $(Mustache.render(panelTemplate));
-        var Panel = WorkspaceManager.createBottomPanel("interactive-linter.linting.messages", $panelHtml, 100);
-        Panel.setVisible(true);
+        WorkspaceManager.createBottomPanel("interactive-linter.linting.messages", $panelHtml, 100);
 
         $problemsPanel = $("#interactive-linter-problems-panel");
         $problemsPanelTable = $problemsPanel.find(".table-container");
@@ -39,6 +60,14 @@ define(function (require, exports, module) {
                 MainViewManager.focusActivePane();
             }
         });
+
+        $problemsPanel.find(".close").on("click", function () {
+            hidePanel();
+        });
+
+        $("#interactive-linter-lint-indicator").on("click", function () {
+            togglePanel();
+        });
     }
 
 
@@ -46,23 +75,31 @@ define(function (require, exports, module) {
         var message;
         if (numProblems === 1) {
             message = singleError;
-        } else {
+        }
+        else {
             message = StringUtils.format(multipleErrors, numProblems);
         }
         $problemsPanel.find(".title").text(message);
     }
 
     function handleMessages(messages) {
-        var html = Mustache.render(resultsTemplate, {messages: messages});
+        if (messages) {
+            _hasErrors = true;
+            var html = Mustache.render(resultsTemplate, {messages: messages});
 
-        $problemsPanelTable
-            .empty()
-            .append($(html))
-            .scrollTop(0);
+            $problemsPanelTable
+                .empty()
+                .append($(html))
+                .scrollTop(0);
 
-        Resizer.show($problemsPanel);
+            showPanel();
 
-        updateTitle(messages.length);
+            updateTitle(messages.length);
+        }
+        else {
+            _hasErrors = false;
+            hidePanel();
+        }
     }
 
     createPanel();
@@ -72,6 +109,7 @@ define(function (require, exports, module) {
     });
 
     $(linterManager).on("linterNotFound", function () {
-        Resizer.hide($problemsPanel);
+        _hasErrors = false;
+        hidePanel();
     });
 });
