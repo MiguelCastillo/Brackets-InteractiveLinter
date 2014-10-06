@@ -10,24 +10,29 @@ define(function (require, exports, module) {
         linterReporter  = require("linterReporter"),
         panelTemplate   = require("text!templates/problemsPanel.html"),
         resultsTemplate = require("text!templates/problemsPanelTable.html"),
-        singleError     = 'Interactive Linter: 1 Linter Problem',
-        multipleErrors  = 'Interactive Linter: {0} Linter Problems',
         $problemsPanel,
         $problemsPanelTable,
-        _hasErrors = false;
+        collapsed = true,
+        hasErrors = false;
 
 
-    function togglePanel() {
-        if (!_hasErrors) {
+    function handleIndicatorClick() {
+        if (!hasErrors) {
             hidePanel();
         } else {
-            Resizer.toggle($problemsPanel);
+            if (Resizer.isVisible($problemsPanel)) {
+                collapsed = true;
+                hidePanel();
+            } else {
+                collapsed = false;
+                showPanel();
+            }
         }
     }
 
 
     function showPanel() {
-        if (_hasErrors) {
+        if (hasErrors) {
             Resizer.show($problemsPanel);
         }
     }
@@ -62,11 +67,12 @@ define(function (require, exports, module) {
         });
 
         $problemsPanel.find(".close").on("click", function () {
+            collapsed = true;
             hidePanel();
         });
 
         $("#interactive-linter-lint-indicator").on("click", function () {
-            togglePanel();
+            handleIndicatorClick();
         });
     }
 
@@ -74,17 +80,17 @@ define(function (require, exports, module) {
     function updateTitle(numProblems) {
         var message;
         if (numProblems === 1) {
-            message = singleError;
+            message = 'Interactive Linter: 1 Linter Problem';
         }
         else {
-            message = StringUtils.format(multipleErrors, numProblems);
+            message = StringUtils.format('Interactive Linter: {0} Linter Problems', numProblems);
         }
         $problemsPanel.find(".title").text(message);
     }
 
     function handleMessages(messages) {
         if (messages) {
-            _hasErrors = true;
+            hasErrors = true;
             var html = Mustache.render(resultsTemplate, {messages: messages});
 
             $problemsPanelTable
@@ -92,12 +98,14 @@ define(function (require, exports, module) {
                 .append($(html))
                 .scrollTop(0);
 
-            showPanel();
+            if (!collapsed) {
+                showPanel();
+            }
 
             updateTitle(messages.length);
         }
         else {
-            _hasErrors = false;
+            hasErrors = false;
             hidePanel();
         }
     }
@@ -109,7 +117,7 @@ define(function (require, exports, module) {
     });
 
     $(linterManager).on("linterNotFound", function () {
-        _hasErrors = false;
+        hasErrors = false;
         hidePanel();
     });
 });
