@@ -50,15 +50,14 @@ define(function (require, exports, module) {
         $problemsPanel = $("#interactive-linter-problems-panel");
         $problemsPanelTable = $problemsPanel.find(".table-container");
 
-        $problemsPanelTable.on("click", "tr", function (e) {
-            var $target = $(e.currentTarget);
+        $problemsPanelTable.on("click", "tr", function () {
+            var $target = $(this);
             // Grab the required position data
-            var lineTd    = $target.find(".line-number");
-            var line      = parseInt(lineTd.text(), 10) - 1; // Convert from friendly line to actual line number
+            var line      = $target.data("line") - 1; // Convert from friendly line to actual line number
 
             // if there is no line number available, don't do anything
             if (!isNaN(line)) {
-                var character = lineTd.data("character") - 1; // Convert from friendly character to actual character
+                var character = $target.data("character") - 1; // Convert from friendly character to actual character
 
                 var editor = EditorManager.getCurrentFullEditor();
                 editor.setCursorPos(line, character, true);
@@ -66,13 +65,9 @@ define(function (require, exports, module) {
             }
         });
 
-        $problemsPanel.find(".close").on("click", function () {
+        $problemsPanel.on("click", ".close", function () {
             collapsed = true;
             hidePanel();
-        });
-
-        $("#interactive-linter-lint-indicator").on("click", function () {
-            handleIndicatorClick();
         });
     }
 
@@ -110,8 +105,6 @@ define(function (require, exports, module) {
         }
     }
 
-    createPanel();
-
     $(linterReporter).on("lintMessage", function (evt, messages) {
         handleMessages(messages);
     });
@@ -119,5 +112,11 @@ define(function (require, exports, module) {
     $(linterManager).on("linterNotFound", function () {
         hasErrors = false;
         hidePanel();
+    });
+
+    createPanel();
+
+    $(document).on("click", "#interactive-linter-lint-indicator", function () {
+        handleIndicatorClick();
     });
 });

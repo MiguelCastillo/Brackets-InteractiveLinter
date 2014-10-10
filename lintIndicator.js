@@ -67,9 +67,10 @@ define(function (require/*, exports, module*/) {
         }
     }
 
+    StatusBar.addIndicator("interactive-linter-lint-indicator", $statusBarIndicator, true, "interactive-linter-lint-indicator", "", "status-indent");
+    setStatus(INDICATOR_STATUS.DISABLED);
+
     AppInit.appReady(function () {
-        StatusBar.addIndicator("interactive-linter-lint-indicator", $statusBarIndicator, true, "interactive-linter-lint-indicator", "", "status-indent");
-        setStatus(INDICATOR_STATUS.DISABLED);
         CodeInspection.toggleEnabled(false, true);
 
         $(MainViewManager).one("currentFileChange", function () {

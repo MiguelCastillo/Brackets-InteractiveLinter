@@ -1,8 +1,8 @@
 <table class="bottom-panel-table table table-striped table-condensed row-highlight">
     <tbody>
         {{#messages}}
-        <tr>
-            <td class="line-number" data-character="{{character}}">{{line}}</td>
+        <tr data-line="{{line}}" data-character="{{character}}">
+            <td class="line-number">{{line}}</td>
             <td class="line-text">{{reason}} ({{code}})</td>
             <td class="line-snippet">{{evidence}}</td>
         </tr>
