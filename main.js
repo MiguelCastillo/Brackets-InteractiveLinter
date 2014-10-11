@@ -15,6 +15,7 @@ define(function (require, exports, module) {
         CodeInspection    = brackets.getModule("language/CodeInspection"),
         AppInit           = brackets.getModule("utils/AppInit"),
         KeyBindingManager = brackets.getModule("command/KeyBindingManager"),
+        Commands          = brackets.getModule("command/Commands"),
         CommandManager    = brackets.getModule("command/CommandManager"),
         ExtensionUtils    = brackets.getModule("utils/ExtensionUtils");
 
@@ -24,7 +25,8 @@ define(function (require, exports, module) {
 
     var linterManager = require("linterManager"),
         pluginManager = require("pluginManager"),
-        currentLinter;
+        currentLinter,
+        bracketsLinterEnabled = true;
 
     var CMD_SHOW_LINE_DETAILS = "MiguelCastillo.interactive-linter.showLineDetails";
     var SHORTCUT_KEY = "Ctrl-Shift-E";
@@ -39,6 +41,31 @@ define(function (require, exports, module) {
 
     function handleDocumentChange() {
         currentLinter.lint();
+    }
+
+
+    function disableBracketsIndicator() {
+        CodeInspection.toggleEnabled(false, true);
+
+        var command = CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION);
+        bracketsLinterEnabled = command.getChecked();
+        command.setChecked(false);
+        command.setEnabled(false);
+
+        $("#status-inspection").hide();
+        $("#interactive-linter-lint-indicator").show();
+    }
+
+
+    function enableBracketsIndicator() {
+        CodeInspection.toggleEnabled(true, true);
+
+        var command = CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION);
+        command.setChecked(bracketsLinterEnabled);
+        command.setEnabled(true);
+
+        $("#status-inspection").show();
+        $("#interactive-linter-lint-indicator").hide();
     }
 
 
@@ -61,6 +88,9 @@ define(function (require, exports, module) {
         if (currentLinter) {
             $(currentEditor).on("editorChange", handleDocumentChange);
             currentLinter.lint();
+            setTimeout(disableBracketsIndicator);
+        } else {
+            setTimeout(enableBracketsIndicator);
         }
     }
 
