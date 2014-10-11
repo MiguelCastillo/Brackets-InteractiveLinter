@@ -69,8 +69,8 @@ Links
 Contributors
 ===================
 
-* Miguel Castillo - @manchagnu
-* Mark Simulacrum - @MarkSimulacrum 
+* Miguel Castillo - <a href="https://twitter.com/manchagnu">@manchagnu</a>
+* Mark Simulacrum - <a href="https://twitter.com/MarkSimulacrum">@MarkSimulacrum</a>
 
 
 Contact me
