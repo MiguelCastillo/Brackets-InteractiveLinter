@@ -66,6 +66,12 @@ Links
  - Brackets Github: <https://github.com/adobe/brackets>
 
 
+Contributors
+===================
+Miguel Castillo - @manchagnu
+Mark Simulacrum - @MarkSimulacrum 
+
+
 Contact me
 ===================
 
