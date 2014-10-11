@@ -68,8 +68,9 @@ Links
 
 Contributors
 ===================
-Miguel Castillo - @manchagnu
-Mark Simulacrum - @MarkSimulacrum 
+
+* Miguel Castillo - @manchagnu
+* Mark Simulacrum - @MarkSimulacrum 
 
 
 Contact me
