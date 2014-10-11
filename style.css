@@ -93,3 +93,22 @@
 .interactive-linter-lint-indicator[status=inactive] {
     background-image: url(img/topcoat-inactive-15.svg);
 }
+
+#interactive-linter-problems-panel {
+    -webkit-user-select: text;  // allow selecting error messages for easy web searching
+}
+
+#interactive-linter-problems-panel .line {
+    text-align: right;  // make line number line up with editor line numbers
+}
+
+#interactive-linter-problems-panel .line-text {
+    white-space: nowrap;
+    width: auto;
+}
+
+#interactive-linter-problems-panel .line-snippet {
+    white-space: nowrap;
+    width: 100%;
+    padding-left: 10px;
+}

@@ -1,0 +1,11 @@
+<table class="bottom-panel-table table table-striped table-condensed row-highlight">
+    <tbody>
+        {{#messages}}
+        <tr data-line="{{line}}" data-character="{{character}}">
+            <td class="line-number">{{line}}</td>
+            <td class="line-text">{{reason}}</td>
+            <td class="line-snippet">{{evidence}}</td>
+        </tr>
+        {{/messages}}
+    </tbody>
+</table>

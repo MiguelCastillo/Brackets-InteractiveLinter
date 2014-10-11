@@ -19,6 +19,7 @@ define(function (require, exports, module) {
         ExtensionUtils    = brackets.getModule("utils/ExtensionUtils");
 
     require("lintIndicator");
+    require("lintPanel");
     require("linterSettings");
 
     var linterManager = require("linterManager"),
