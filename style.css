@@ -104,11 +104,11 @@
 }
 
 #interactive-linter-problems-panel {
-    -webkit-user-select: text;  // allow selecting error messages for easy web searching
+    -webkit-user-select: text;  /* allow selecting error messages for easy web searching */
 }
 
 #interactive-linter-problems-panel .line {
-    text-align: right;  // make line number line up with editor line numbers
+    text-align: right;  /* make line number line up with editor line numbers */
 }
 
 #interactive-linter-problems-panel .line-text {
