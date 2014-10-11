@@ -78,6 +78,8 @@
 }
 
 #interactive-linter-lint-indicator {
+    display: none; /* Hide lint indicator by default, so as not to show before show/hide code is run */
+    width: 13px; /* Same width as default indicator */
     background-position: center;
     background-size: 15px;
     background-repeat: no-repeat;
