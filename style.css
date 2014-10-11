@@ -41,6 +41,13 @@
 
 .CodeMirror .interactive-linter-line-widget {
     margin: 10px 0;
+
+    /*Allow cursor to display area as text*/
+    cursor: auto;
+
+    /* Enable text selection */
+    -webkit-user-select: text;
+    user-select: text;
 }
 
 .CodeMirror .interactive-linter-line-error, .CodeMirror .interactive-linter-line-warning {
