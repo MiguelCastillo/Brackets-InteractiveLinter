@@ -11,6 +11,8 @@ Features
 * Configure the linter settings file that gets loaded. Maybe you want to load `jshintrc.json` instead of `.jshintrc`
 * Configuration files hot reload. So if you adjust you beloved `.jshintrc`, Interactive Linter will automatically reload it.
 * Skips blocks of minified code to avoid cluttering your reports. (Minified code is determined by amount of characters per-line)
+* Provides panel with a table of all errors and warning for easy navigation.
+* Status indicator when your code is "happy", or when there are warnings and errors.
 
 
 JSHint/JSLint
