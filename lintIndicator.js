@@ -1,13 +1,8 @@
 define(function (require/*, exports, module*/) {
     'use strict';
 
-    var AppInit          = brackets.getModule("utils/AppInit"),
-        CodeInspection   = brackets.getModule("language/CodeInspection"),
-        CommandManager   = brackets.getModule("command/CommandManager"),
-        Commands         = brackets.getModule("command/Commands"),
-        DefaultDialogs   = brackets.getModule("widgets/DefaultDialogs"),
+    var DefaultDialogs   = brackets.getModule("widgets/DefaultDialogs"),
         Dialogs          = brackets.getModule("widgets/Dialogs"),
-        MainViewManager  = brackets.getModule("view/MainViewManager"),
         StatusBar        = brackets.getModule("widgets/StatusBar"),
         StringUtils      = brackets.getModule("utils/StringUtils");
 
@@ -67,19 +62,9 @@ define(function (require/*, exports, module*/) {
         }
     }
 
-    StatusBar.addIndicator("interactive-linter-lint-indicator", $statusBarIndicator, true, "interactive-linter-lint-indicator", "", "status-indent");
+
+    StatusBar.addIndicator("interactive-linter-lint-indicator", $statusBarIndicator, true, "", "", "status-indent");
     setStatus(INDICATOR_STATUS.DISABLED);
-
-    AppInit.appReady(function () {
-        CodeInspection.toggleEnabled(false, true);
-
-        $(MainViewManager).one("currentFileChange", function () {
-            $('#status-inspection').hide();
-            CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION).setChecked(false);
-            CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION).setEnabled(false);
-        });
-    });
-
 
     $(linterManager).on("linterNotFound", function () {
         setStatus(INDICATOR_STATUS.DISABLED);
