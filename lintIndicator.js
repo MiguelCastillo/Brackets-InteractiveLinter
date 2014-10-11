@@ -67,17 +67,21 @@ define(function (require/*, exports, module*/) {
         }
     }
 
-    StatusBar.addIndicator("interactive-linter-lint-indicator", $statusBarIndicator, true, "interactive-linter-lint-indicator", "", "status-indent");
+
+    function hideBracketsIndicator() {
+        CodeInspection.toggleEnabled(false, true);
+        $('#status-inspection').hide();
+
+        var command = CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION);
+        command.setChecked(false);
+        command.setEnabled(false);
+    }
+
+    StatusBar.addIndicator("interactive-linter-lint-indicator", $statusBarIndicator, true, "", "", "status-indent");
     setStatus(INDICATOR_STATUS.DISABLED);
 
-    AppInit.appReady(function () {
-        CodeInspection.toggleEnabled(false, true);
-
-        $(MainViewManager).one("currentFileChange", function () {
-            $('#status-inspection').hide();
-            CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION).setChecked(false);
-            CommandManager.get(Commands.VIEW_TOGGLE_INSPECTION).setEnabled(false);
-        });
+    $(MainViewManager).on("currentFileChange", function () {
+        setTimeout(hideBracketsIndicator);
     });
 
 
