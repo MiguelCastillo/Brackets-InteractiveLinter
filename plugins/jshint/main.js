@@ -37,6 +37,7 @@ define(function(require /*, exports, module*/) {
                 // means that the max number of errors was exceeded or there was a fatal
                 // error while linting the file
                 if (errors[i]) {
+                    delete errors[i].scope; // Some errors have scope, which breaks workers (cannot clone objects)
                     errors[i].token = groomer.groom(errors[i], settings);
                 }
             }
