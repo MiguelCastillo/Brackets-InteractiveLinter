@@ -35,7 +35,9 @@ define(function (require, exports, module) {
 
 
     function handleToggleLineDetails() {
-        currentLinter.reporter.toggleLineDetails();
+        if (currentLinter) {
+            currentLinter.reporter.toggleLineDetails();
+        }
     }
 
 
