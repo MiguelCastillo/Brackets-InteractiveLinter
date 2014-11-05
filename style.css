@@ -58,7 +58,6 @@
     padding: 0 30px;
 }
 
-/* twitter bootstrap alert colors */
 .CodeMirror .interactive-linter-line-error {
     background-image: url(img/topcoat-error-15.svg);
 }
