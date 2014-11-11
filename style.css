@@ -40,7 +40,8 @@
 }
 
 .CodeMirror .interactive-linter-line-widget {
-    margin: 10px 0;
+    margin-top: 10px;
+    margin-left: 50px;
 
     /*Allow cursor to display area as text*/
     cursor: auto;
@@ -51,21 +52,18 @@
 }
 
 .CodeMirror .interactive-linter-line-error, .CodeMirror .interactive-linter-line-warning {
-    padding: 0 15px;
-    margin-left: 40px;
+    background-position: left;
+    background-size: 15px;
+    background-repeat: no-repeat;
+    padding: 0 30px;
 }
 
-/* twitter bootstrap alert colors */
 .CodeMirror .interactive-linter-line-error {
-    color: #b94a48;
-    background-color: #f2dede;
-    border-color: #eed3d7;
+    background-image: url(img/topcoat-error-15.svg);
 }
 
 .CodeMirror .interactive-linter-line-warning {
-    color: #c09853;
-    background-color: #fcf8e3;
-    border: 1px solid #fbeed5;
+    background-image: url(img/topcoat-warning-15.svg);
 }
 
 @-webkit-keyframes pulse {
