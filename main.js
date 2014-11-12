@@ -24,18 +24,19 @@ define(function (require, exports, module) {
     require("linterSettings");
 
     var linterManager = require("linterManager"),
-        pluginManager = require("pluginManager"),
         currentLinter,
         bracketsLinterEnabled = true;
 
     var CMD_SHOW_LINE_DETAILS = "MiguelCastillo.interactive-linter.showLineDetails";
     var SHORTCUT_KEY = "Ctrl-Shift-E";
 
-    ExtensionUtils.loadStyleSheet(module, "style.css");
+    ExtensionUtils.loadStyleSheet(module, "style.less");
 
 
     function handleToggleLineDetails() {
-        currentLinter.reporter.toggleLineDetails();
+        if (currentLinter) {
+            currentLinter.reporter.toggleLineDetails();
+        }
     }
 
 
@@ -94,30 +95,12 @@ define(function (require, exports, module) {
         }
     }
 
-    function removeBracketsLinter() {
-        /**
-         * Removes the default Brackets JSLint linter
-         */
-        CodeInspection.register("javascript", {
-            name: "interactive-linter-remove-jslint",
-            scanFile: $.noop
-        });
-    }
-
 
     KeyBindingManager.addBinding(CMD_SHOW_LINE_DETAILS, SHORTCUT_KEY);
     CommandManager.register("Show Line Details", CMD_SHOW_LINE_DETAILS , handleToggleLineDetails);
 
     AppInit.appReady(function(){
-        removeBracketsLinter();
-
-        pluginManager().done(function(plugins) {
-            for (var iPlugin in plugins) {
-                linterManager.registerLinter(plugins[iPlugin]);
-            }
-
-            $(EditorManager).on("activeEditorChange.interactive-linter", setDocument);
-            setDocument(null, EditorManager.getActiveEditor());
-        });
+        $(EditorManager).on("activeEditorChange.interactive-linter", setDocument);
+        setDocument(null, EditorManager.getActiveEditor());
     });
 });

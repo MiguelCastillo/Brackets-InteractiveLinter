@@ -11,13 +11,12 @@ define(function (require, exports, module) {
     var spromise = require("libs/js/spromise");
 
     var EditorManager     = brackets.getModule("editor/EditorManager"),
+        CodeInspection    = brackets.getModule("language/CodeInspection"),
         InlineWidget      = brackets.getModule("editor/InlineWidget").InlineWidget,
         _                 = brackets.getModule("thirdparty/lodash");
-    
-    var INLINE_WIDGET_LINT_TEMPLATE = require("text!templates/inlineWidgetLint.html");
 
-    var msgId = 1;
-    var pending, lastRequest;
+    var inlineWidgetLintTemplate = require("text!templates/inlineWidgetLint.html");
+
 
     function Reporter() {
         this.marks = {};
@@ -25,31 +24,32 @@ define(function (require, exports, module) {
 
 
     /**
-     * Routine that goes through all the jshint messages and adds all the gutter
+     * Routine that goes through all the linter messages and adds all the gutter
      * symbols and the underlines.
      *
-     * @param messages {Array} jshint messages
+<<<<<<< HEAD
+     * @param result {?Array.<{provider:Object, result: ?{errors:!Array, aborted:boolean}}>} linter result
+=======
+     * @param messages {Array} linter messages
+>>>>>>> master
      * @param cm {CodeMirror} codemirror instance
      */
-    Reporter.prototype.report = function(cm, messages) {
+    Reporter.prototype.report = function(cm, result) {
         var _self = this;
-        pending = msgId;
-        if (lastRequest && lastRequest.state() === "pending") {
-            return this;
+
+        this.lastResult = result;
+
+        if (this.lastRequest && this.lastRequest.state() === "pending") {
+            return;
         }
 
-        lastRequest = runReport(_self, pending, cm, messages).done(function(doneId) {
-            lastRequest = null;
-            if (pending !== doneId) {
-                console.log("run pending", pending);
-                _self.report(cm, messages);
+        this.lastRequest = this._runReport(cm, result).always(function () {
+            _self.lastRequest = null;
+            if (_self.lastResult !== result) {
+                _self.report(cm, _self.lastResult);
             }
         });
-
-        msgId++;
-        return this;
     };
-
 
     /**
      * Add reporting information in code mirror's document
@@ -64,54 +64,38 @@ define(function (require, exports, module) {
      * Token is a CodeMirror token that specifies start/end information for
      * the string in CodeMirror's document
      */
-    Reporter.prototype.addGutterMarks = function(message, token) {
-        var _self = this, mark;
+    Reporter.prototype.addGutterMarks = function(message) {
+        var mark = this.marks[message.pos.line];
 
-        //
         // gutterMark is the placehoder for the lightbulb
         // lineMarks are the underlines in the places the errors are reported for
-        //
 
-        if (!_self.marks[token.start.line]) {
+        if (!mark) {
             mark = {
-                warnings: [],
                 errors: [],
-                lineMarks:[],
+                lineMarks: [],
                 gutterMark: {
                     element: $("<div class='interactive-linter-gutter-messages' title='Click for details'>&nbsp;</div>")
                 }
             };
 
-            _self.marks[token.start.line] = mark;
-            mark.gutterMark.line = _self.cm.setGutterMarker(token.start.line, "interactive-linter-gutter", mark.gutterMark.element[0]);
+            this.marks[message.pos.line] = mark;
+            mark.gutterMark.line = this.cm.setGutterMarker(message.pos.line, "interactive-linter-gutter", mark.gutterMark.element[0]);
         }
 
-        // Add marks to the line that is reporting messages
-        mark = _self.marks[token.start.line];
-
-        // Increment errors/warnings count
-        if (mark[message.type + "s"]) {
-            mark[message.type + "s"].push(message);
-        }
-
-        // If we have errors in this line, then we will add a class to the gutter to
-        // highlight this fact.  Furthermore, I make sure I add this class only once...
-        if (message.type === "error" && mark.errors.length === 1) {
-            mark.gutterMark.element.addClass('interactive-linter-gutter-errors');
-        }
+        mark.errors.push(message);
     };
 
 
     /**
      * Routine to underline problems in documents
      */
-    Reporter.prototype.addLineMarks = function (message, token) {
-        var _self = this,
-            mark  = _self.marks[token.start.line];
+    Reporter.prototype.addLineMarks = function (message) {
+        var mark  = this.marks[message.pos.line];
 
         // Add line marks
         mark.lineMarks.push({
-            line: _self.cm.markText(token.start, token.end, {className: "interactive-linter-" + message.type}),
+            line: this.cm.markText(message.pos, message.endpos, {className: "interactive-linter-text-mark"}),
             message: message
         });
     };
@@ -120,17 +104,17 @@ define(function (require, exports, module) {
     /**
      * Clears all warning/errors from codemirror's document
      */
-    Reporter.prototype.clearMarks = function() {
+    Reporter.prototype.clearMarks = function () {
         var _self = this;
 
-        if (!_self.cm) {
+        if (!this.cm) {
             return;
         }
 
-        _self.cm.clearGutter("interactive-linter-gutter");
+        this.cm.clearGutter("interactive-linter-gutter");
 
-        _.forEach(_self.marks, function(mark) {
-            _.forEach(mark.lineMarks.slice(0), function(textMark) {
+        _.forEach(this.marks, function (mark) {
+            _.forEach(mark.lineMarks, function (textMark) {
                 textMark.line.clear();
             });
 
@@ -145,34 +129,27 @@ define(function (require, exports, module) {
             delete mark.gutterMarks;
         });
 
-        _self.marks = {};
+        this.marks = {};
     };
 
 
     Reporter.prototype.getWidgetForLine = function (line) {
         var activeEditor  = EditorManager.getActiveEditor();
         var inlineWidgets = activeEditor.getInlineWidgets();
-        var foundWidget;
 
-        if (inlineWidgets.length > 0) {
-            foundWidget = _.find(inlineWidgets, function (widget) {
-                if (widget.hasOwnProperty('interactiveLinterLineNumber') && widget.interactiveLinterLineNumber === line) {
-                    return true;
-                }
-            });
-
-        }
-        return foundWidget;
+        return _.find(inlineWidgets, function (widget) {
+            return widget.interactiveLinterLineNumber === line;
+        });
     };
 
 
     Reporter.prototype.toggleLineDetails = function (line) {
         var activeEditor = EditorManager.getActiveEditor();
         var cursorPos    = line !== undefined ? {line: line, ch: 0} : activeEditor.getCursorPos();
-        var foundWidget  = this.getWidgetForLine(cursorPos.line);
+        var lineWidget   = this.getWidgetForLine(cursorPos.line);
 
-        if (foundWidget) {
-            this.hideLineDetails(foundWidget);
+        if (lineWidget) {
+            this.hideLineDetails(lineWidget);
         }
         else {
             this.showLineDetails(line);
@@ -185,9 +162,9 @@ define(function (require, exports, module) {
     };
 
 
-    Reporter.prototype.showLineDetails = function(line) {
+    Reporter.prototype.showLineDetails = function (line) {
         var activeEditor = EditorManager.getActiveEditor();
-        var cursorPos = typeof line !== 'undefined' ? {line: line, ch: 0} : activeEditor.getCursorPos();
+        var cursorPos = line !== undefined ? {line: line, ch: 0} : activeEditor.getCursorPos();
 
         var mark = this.marks[cursorPos.line];
 
@@ -209,9 +186,28 @@ define(function (require, exports, module) {
         var activeEditor = EditorManager.getActiveEditor();
         var inlineWidget = mark.inlineWidget;
 
-        var messages = [].concat(mark.errors, mark.warnings);
+        var messages = mark.errors;;
 
-        var $errorHtml = $(Mustache.render(INLINE_WIDGET_LINT_TEMPLATE, {messages: messages}));
+        var results = [];
+        _.forEach(messages, function (message) {
+            if (message) {
+                var key = message.providerName;
+                var keyIndex = _.findKey(results, { providerName: key });
+
+                if (keyIndex) {
+                    results[keyIndex].result.errors.push(message);
+                } else {
+                    results.push({
+                        providerName: key,
+                        result: {
+                            errors: [message]
+                        }
+                    });
+                }
+            }
+        });
+
+        var $errorHtml = $(Mustache.render(inlineWidgetLintTemplate, {results: results}));
 
         inlineWidget.$htmlContent.append($errorHtml);
 
@@ -219,64 +215,146 @@ define(function (require, exports, module) {
             e.stopPropagation();
         });
 
+        $errorHtml.on("click", ".inspector-title", function (e) {
+            var $title = $(e.target);
+            $title.toggleClass("open");
+            $title.toggleClass("closed");
+
+            var $inspectorProblems = $title.parent().find(".inspector-problems");
+            $inspectorProblems.toggle($title.hasClass("open"));
+
+            activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height() + 20);
+        });
+
         activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height() + 20);
+    };
+
+
+    Reporter.prototype.messageLoop = function (result, callback) {
+       _.forEach(result, function (providerObject) {
+            if (!providerObject || !providerObject.result) {
+                return;
+            }
+
+            _.forEach(providerObject.result.errors, function (message) {
+                return callback(providerObject.provider, message);
+            });
+        });
     };
 
 
     /**
      * Determines if there is a fatal error in the linting report
      */
-    Reporter.prototype.checkFatal = function(messages) {
-        // If the last message created by jshint is null, that means
-        // that we have encoutered a fatal error...
-        if (messages.length > 2 && !messages[messages.length - 1]) {
-            $(linterReporter).triggerHandler("fatalError", messages[messages.length - 2]);
-            return true;
+    Reporter.prototype.checkFatal = function (result) {
+        var abortedProvider;
+
+        _.forEach(result, function (providerObject) {
+            if (providerObject.result && providerObject.result.aborted) {
+                abortedProvider = providerObject;
+
+                /**
+                 * Makes the first aborted provider the one we report the fatal error for, not the last.
+                 * LoDash forEach stops iterating when an explicit false is returned.
+                 */
+                return false;
+            }
+        });
+
+        if (abortedProvider) {
+            var messages = abortedProvider.result.errors;
+            if (messages.length > 2 && !messages[messages.length - 1]) {
+                $(linterReporter).triggerHandler("fatalError", messages[messages.length - 2]);
+                return true;
+            }
+
         }
 
-        this.clearFatalError();
+        $(linterReporter).triggerHandler("fatalError", null); // Clears a fatal error
         return false;
     };
 
 
-    Reporter.prototype.clearFatalError = function() {
-        $(linterReporter).triggerHandler("fatalError", null);
+    Reporter.prototype.groomResult = function (result) {
+        var currentDoc = EditorManager.getActiveEditor().document;
+
+        result = _.filter(result, function (resultObject) {
+            return resultObject.result != null && resultObject.result.errors.length !== 0;
+        });
+
+
+        // Augment error objects with additional fields needed by Mustache template
+        this.messageLoop(result, function (provider, message) {
+            // some inspectors don't always provide a line number or report a negative line number
+            var messageLine = currentDoc.getLine(message.pos.line);
+            if (!isNaN(message.pos.line) && (message.pos.line + 1) > 0 && message.codeSnippet !== undefined) {
+                message.friendlyLine = message.pos.line + 1;
+                message.codeSnippet = messageLine.substr(0, Math.min(175, messageLine.length));  // limit snippet width
+            }
+
+            var token = this.cm.getTokenAt({
+                line: message.pos.line,
+                ch: message.pos.ch + 1
+            });
+            var index = token ? token.end : -1;
+
+            if (index < message.pos.ch) {
+                index = messageLine.length;
+            }
+
+            if (index === message.pos.ch && message.pos.ch > 0) {
+                message.pos.ch--;
+            }
+
+            message.endpos = {
+                line: message.pos.line,
+                ch: index
+            };
+
+
+            message.providerName = provider.name;
+            message.cssType = _.findKey(CodeInspection.Type, function (type) {
+                return type === message.type;
+            }).toLowerCase();
+        }.bind(this));
+
+        return result;
     };
 
 
-    function runReport(_self, reportId, cm, messages) {
+    Reporter.prototype._runReport = function (cm, result) {
+        var _self = this;
         var deferred = spromise.defer();
 
-        setTimeout(function() {
-            // Run as operation for best performance
+
+        // Run as operation for best performance
+        setTimeout(function () {
             cm.operation(function() {
                 _self.clearMarks();
 
-                $(linterReporter).triggerHandler("lintMessage", [messages]);
+                if (result) {
 
-                if (messages) {
-                    _self.checkFatal(messages);
                     _self.cm       = cm;
-                    _self.messages = messages;
+                    result         = _self.groomResult(result);
+                    _self.result   = result;
+                    _self.checkFatal(result);
 
-                    _.forEach(messages, function (message) {
-                        if (!message) {
-                            return;
-                        }
-
-                        if (message.token) {
-                            _self.addGutterMarks(message, message.token);
-                            _self.addLineMarks(message, message.token);
+                    _self.messageLoop(result, function (providerObject, message) {
+                        if (message) {
+                            _self.addGutterMarks(message);
+                            _self.addLineMarks(message);
                         }
                     });
                 }
 
-                deferred.resolve(reportId);
+                $(linterReporter).triggerHandler("lintMessage", [result]);
+
+                deferred.resolve();
             });
         }, 0);
 
         return deferred.promise;
-    }
+    };
 
 
     function linterReporter () {

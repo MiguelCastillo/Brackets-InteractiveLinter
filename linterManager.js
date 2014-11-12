@@ -8,21 +8,20 @@
 define(function (require /*, exports, module*/) {
     "use strict";
 
-    var _ = brackets.getModule("thirdparty/lodash");
-    var linterSettings = require("linterSettings"),
-        linterReporter = require("linterReporter"),
-        languages      = {},
-        linters        = {},
+    var EditorManager  = brackets.getModule("editor/EditorManager"),
+        CodeInspection = brackets.getModule("language/CodeInspection"),
+        _              = brackets.getModule("thirdparty/lodash");
+
+    var linterReporter = require("linterReporter"),
         linterManager;
 
     /**
      * Interface that will be used for running linters
      */
-    function Linter(reporter, linterPlugin, cm, fullPath) {
-        linterSettings.loadSettings(linterPlugin.settingsFile, fullPath, this).always(function(settings) {
-            linterPlugin.lint(cm.getDoc().getValue(), settings).done(function(result) {
-                reporter.report(cm, result);
-            });
+    function Linter(reporter, cm) {
+        var currentFile = EditorManager.getActiveEditor().document.file;
+        CodeInspection.inspectFile(currentFile).done(function (result) {
+            reporter.report(cm, result);
         });
     }
 
@@ -43,10 +42,8 @@ define(function (require /*, exports, module*/) {
      * Interface to register documents that need an instance of the appropriate linter.
      *
      * @param {CodeMirror} cm Is the CodeMirror instance to enable interactive linting on.
-     * @param {string} fullpath Is the path to the document being registered.  This is to
-     *  load the most suitable settings file.
      */
-    function registerDocument(cm, fullpath) {
+    function registerDocument(cm) {
         var gutters, linter;
         var mode = cm && cm.getDoc().getMode();
 
@@ -55,13 +52,13 @@ define(function (require /*, exports, module*/) {
         // Get the best poosible mode (document type) for the document
         mode = mode && (mode.helperType || mode.name);
 
-        if (cm && languages[mode]) {
+        if (cm) {
             linter = cm.__linter;
 
             if (!linter) {
                 linter = {};
                 linter.reporter    = linterReporter();
-                linter.lint        = _.debounce(Linter.bind(linter, linter.reporter, languages[mode], cm, fullpath), 1000);
+                linter.lint        = _.debounce(Linter.bind(linter, linter.reporter, cm), 1000);
                 linter.gutterClick = gutterClick.bind(undefined, linter);
                 linter.unregister  = unregisterDocument.bind(undefined, linter, cm);
                 cm.__linter = linter;
@@ -86,16 +83,9 @@ define(function (require /*, exports, module*/) {
     }
 
 
-    function registerLinter(linter) {
-        languages[linter.language] = linter;
-        linters[linter.name] = linter;
-    }
-
     linterManager = {
-        registerDocument: registerDocument,
-        registerLinter: registerLinter
+        registerDocument: registerDocument
     };
 
     return linterManager;
 });
-

@@ -1,9 +1,11 @@
 define(function (require, exports, module) {
+
     var EditorManager    = brackets.getModule("editor/EditorManager"),
         MainViewManager  = brackets.getModule("view/MainViewManager"),
         WorkspaceManager = brackets.getModule("view/WorkspaceManager"),
         Resizer          = brackets.getModule("utils/Resizer"),
-        StringUtils      = brackets.getModule("utils/StringUtils");
+        StringUtils      = brackets.getModule("utils/StringUtils"),
+        _                = brackets.getModule("thirdparty/lodash");
 
 
     var linterManager   = require("linterManager"),
@@ -47,13 +49,13 @@ define(function (require, exports, module) {
         var $panelHtml = $(Mustache.render(panelTemplate));
         WorkspaceManager.createBottomPanel("interactive-linter.linting.messages", $panelHtml, 100);
 
-        $problemsPanel = $("#interactive-linter-problems-panel");
+        $problemsPanel = $("#problems-panel");
         $problemsPanelTable = $problemsPanel.find(".table-container");
 
         $problemsPanelTable.on("click", "tr", function () {
             var $target = $(this);
             // Grab the required position data
-            var line      = $target.data("line") - 1; // Convert from friendly line to actual line number
+            var line = parseInt($target.data("line"), 10) - 1; // Convert from friendly line to actual line number
 
             // if there is no line number available, don't do anything
             if (!isNaN(line)) {
@@ -83,21 +85,30 @@ define(function (require, exports, module) {
         $problemsPanel.find(".title").text(message);
     }
 
-    function handleMessages(messages) {
-        if (messages) {
+
+    function handleMessages(results) {
+        if (results) {
             hasErrors = true;
-            var html = Mustache.render(resultsTemplate, {messages: messages});
+            var html = Mustache.render(resultsTemplate, {results: results});
 
             $problemsPanelTable
-                .empty()
-                .append($(html))
+                .html(html)
                 .scrollTop(0);
 
             if (!collapsed) {
                 showPanel();
             }
 
-            updateTitle(messages.length);
+            var errorAmount = _.reduce(results, function (accumulator, value) {
+                if (value.result) {
+                    return accumulator + value.result.errors.length;
+                }
+                else {
+                    return accumulator;
+                }
+            }, 0);
+
+            updateTitle(errorAmount);
         }
         else {
             hasErrors = false;
@@ -105,8 +116,9 @@ define(function (require, exports, module) {
         }
     }
 
-    $(linterReporter).on("lintMessage", function (evt, messages) {
-        handleMessages(messages);
+
+    $(linterReporter).on("lintMessage", function (evt, results) {
+        handleMessages(results);
     });
 
     $(linterManager).on("linterNotFound", function () {

@@ -1,0 +1,93 @@
+.interactive-linter-gutter {
+    width: 23px;
+}
+
+/*icon image from http://findicons.com/icon/184668/light_bulb*/
+.interactive-linter-gutter-messages {
+    background-image: url(img/light_bulb.png);
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    margin-left: 7px;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.interactive-linter-gutter-errors {
+    background-color: red;
+    border-color: #f2dede;
+    border-radius: 10px;
+}
+
+.arrow-opener() {
+    &::before {
+        padding-right: 10px;
+    }
+
+    &.open::before {
+        content: "\25bd";
+    }
+
+    &.closed::before {
+        content: "\25b6";
+    }
+}
+
+.interactive-linter-line-widget {
+    margin-top: 10px;
+    margin-left: 50px;
+
+    cursor: auto; // Allow cursor to display area as text
+
+    /* Enable text selection */
+    -webkit-user-select: text;
+    user-select: text;
+
+    .inspector-title {
+        .arrow-opener();
+    }
+
+    .inspector-problems {
+        margin-left: 20px;
+    }
+}
+
+.interactive-linter-text-mark {
+    border-bottom: 2px dotted red;
+}
+
+@-webkit-keyframes pulse {
+    0% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: #ffb0cd;
+    }
+}
+
+#interactive-linter-lint-indicator {
+    display: none; // Hide lint indicator by default, so as not to show before show/hide code is run
+    width: 13px; // Same width as default indicator
+    background-position: center;
+    background-size: 15px;
+    background-repeat: no-repeat;
+
+    &[status="error"] {
+        -webkit-animation: pulse 2s linear;
+        -webkit-animation-iteration-count: 3;
+        background-image: url(img/topcoat-error-15.svg);
+    }
+
+    &[status="warning"] {
+        background-image: url(img/topcoat-warning-15.svg);
+    }
+
+    &[status="okay"] {
+        background-image: url(img/topcoat-okay-15.svg);
+    }
+
+    &[status="inactive"] {
+        background-image: url(img/topcoat-inactive-15.svg);
+    }
+}
