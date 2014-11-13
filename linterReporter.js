@@ -27,11 +27,7 @@ define(function (require, exports, module) {
      * Routine that goes through all the linter messages and adds all the gutter
      * symbols and the underlines.
      *
-<<<<<<< HEAD
      * @param result {?Array.<{provider:Object, result: ?{errors:!Array, aborted:boolean}}>} linter result
-=======
-     * @param messages {Array} linter messages
->>>>>>> master
      * @param cm {CodeMirror} codemirror instance
      */
     Reporter.prototype.report = function(cm, result) {
