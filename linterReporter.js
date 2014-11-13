@@ -283,7 +283,7 @@ define(function (require, exports, module) {
         this.messageLoop(result, function (provider, message) {
             // some inspectors don't always provide a line number or report a negative line number
             var messageLine = currentDoc.getLine(message.pos.line);
-            if (!isNaN(message.pos.line) && (message.pos.line + 1) > 0 && message.codeSnippet !== undefined) {
+            if (!isNaN(message.pos.line) && (message.pos.line + 1) > 0 && messageLine !== undefined) {
                 message.friendlyLine = message.pos.line + 1;
                 message.codeSnippet = messageLine.substr(0, Math.min(175, messageLine.length));  // limit snippet width
             }
