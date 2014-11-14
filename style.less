@@ -25,24 +25,27 @@
         padding-right: 10px;
     }
 
-    &.open::before {
+    &.open::before, &.expanded::before {
         content: "\25bd";
     }
 
-    &.closed::before {
+    &.closed::before, &:not(.expanded)::before {
         content: "\25b6";
     }
+}
+
+.user-select(@type: none) {
+    /* Enable text selection */
+    -webkit-user-select: @type;
+    user-select: @type;
 }
 
 .interactive-linter-line-widget {
     margin-top: 10px;
     margin-left: 50px;
 
-    cursor: auto; // Allow cursor to display area as text
-
-    /* Enable text selection */
-    -webkit-user-select: text;
-    user-select: text;
+    cursor: auto;
+    .user-select(text);
 
     .inspector-title {
         .arrow-opener();
@@ -55,6 +58,32 @@
 
 .interactive-linter-text-mark {
     border-bottom: 2px dotted red;
+}
+
+#interactive-linter-problems-panel {
+    cursor: auto;
+    .user-select(text);
+
+    .provider-name {
+        .arrow-opener();
+    }
+
+    .line {
+        text-align: right;
+    }
+
+    .line-text {
+        width: auto;
+    }
+
+    .line-snippet {
+        white-space: nowrap;
+        padding-left: 10px;
+    }
+
+    .inspector-section > td {
+        padding-left: 5px;
+    }
 }
 
 @-webkit-keyframes pulse {

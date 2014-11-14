@@ -47,25 +47,39 @@ define(function (require, exports, module) {
 
     function createPanel() {
         var $panelHtml = $(Mustache.render(panelTemplate));
-        WorkspaceManager.createBottomPanel("interactive-linter.linting.messages", $panelHtml, 100);
+        var panel = WorkspaceManager.createBottomPanel("interactive-linter.linting.messages", $panelHtml, 100);
+        $problemsPanel = panel.$panel;
+        var $selectedRow;
+        $problemsPanelTable = $problemsPanel.find(".table-container")
+            .on("click", "tr", function (e) {
+                if ($selectedRow) {
+                    $selectedRow.removeClass("selected");
+                }
 
-        $problemsPanel = $("#problems-panel");
-        $problemsPanelTable = $problemsPanel.find(".table-container");
+                $selectedRow = $(e.currentTarget);
+                $selectedRow.addClass("selected");
 
-        $problemsPanelTable.on("click", "tr", function () {
-            var $target = $(this);
-            // Grab the required position data
-            var line = parseInt($target.data("line"), 10) - 1; // Convert from friendly line to actual line number
+                // This is a inspector title row, expand/collapse on click
+                if ($selectedRow.hasClass("inspector-section")) {
+                    // Clicking the inspector title section header collapses/expands result rows
+                    $selectedRow.nextUntil(".inspector-section").toggle();
 
-            // if there is no line number available, don't do anything
-            if (!isNaN(line)) {
-                var character = $target.data("character") - 1; // Convert from friendly character to actual character
+                    $(".provider-name", $selectedRow).toggleClass("expanded");
+                } else {
+                    // This is a problem marker row, show the result on click
+                    // Grab the required position data
+                    var lineTd    = $selectedRow.find(".line-number");
+                    var line      = parseInt(lineTd.text(), 10) - 1;  // convert friendlyLine back to pos.line
+                    // if there is no line number available, don't do anything
+                    if (!isNaN(line)) {
+                        var character = lineTd.data("character");
 
-                var editor = EditorManager.getCurrentFullEditor();
-                editor.setCursorPos(line, character, true);
-                MainViewManager.focusActivePane();
-            }
-        });
+                        var editor = EditorManager.getCurrentFullEditor();
+                        editor.setCursorPos(line, character, true);
+                        MainViewManager.focusActivePane();
+                    }
+                }
+            });
 
         $problemsPanel.on("click", ".close", function () {
             collapsed = true;
