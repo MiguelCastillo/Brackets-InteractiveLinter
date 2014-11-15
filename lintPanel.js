@@ -17,6 +17,17 @@ define(function (require, exports, module) {
         collapsed = true,
         hasErrors = false;
 
+    function showPanel() {
+        if (hasErrors) {
+            Resizer.show($problemsPanel);
+        }
+    }
+
+
+    function hidePanel() {
+        Resizer.hide($problemsPanel);
+    }
+
 
     function handleIndicatorClick() {
         if (!hasErrors) {
@@ -30,18 +41,6 @@ define(function (require, exports, module) {
                 showPanel();
             }
         }
-    }
-
-
-    function showPanel() {
-        if (hasErrors) {
-            Resizer.show($problemsPanel);
-        }
-    }
-
-
-    function hidePanel() {
-        Resizer.hide($problemsPanel);
     }
 
 
@@ -91,10 +90,10 @@ define(function (require, exports, module) {
     function updateTitle(numProblems) {
         var message;
         if (numProblems === 1) {
-            message = 'Interactive Linter: 1 Linter Problem';
+            message = "Interactive Linter: 1 Linter Problem";
         }
         else {
-            message = StringUtils.format('Interactive Linter: {0} Linter Problems', numProblems);
+            message = StringUtils.format("Interactive Linter: {0} Linter Problems", numProblems);
         }
         $problemsPanel.find(".title").text(message);
     }
