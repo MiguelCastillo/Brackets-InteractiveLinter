@@ -6,7 +6,7 @@
 
 
 define(function (require, exports, module) {
-    'use strict';
+    "use strict";
 
     var spromise = require("libs/js/spromise");
 
@@ -15,7 +15,8 @@ define(function (require, exports, module) {
         InlineWidget      = brackets.getModule("editor/InlineWidget").InlineWidget,
         _                 = brackets.getModule("thirdparty/lodash");
 
-    var inlineWidgetLintTemplate = require("text!templates/inlineWidgetLint.html");
+    var inlineWidgetLintTemplate = require("text!templates/inlineWidgetLint.html"),
+        linterReporter;
 
 
     function Reporter() {
@@ -182,7 +183,7 @@ define(function (require, exports, module) {
         var activeEditor = EditorManager.getActiveEditor();
         var inlineWidget = mark.inlineWidget;
 
-        var messages = mark.errors;;
+        var messages = mark.errors;
 
         var results = [];
         _.forEach(messages, function (message) {
@@ -275,7 +276,7 @@ define(function (require, exports, module) {
         var currentDoc = EditorManager.getActiveEditor().document;
 
         result = _.filter(result, function (resultObject) {
-            return resultObject.result != null && resultObject.result.errors.length !== 0;
+            return resultObject.result && resultObject.result.errors.length !== 0;
         });
 
 
@@ -353,7 +354,7 @@ define(function (require, exports, module) {
     };
 
 
-    function linterReporter () {
+    linterReporter = function () {
         var _reporter = new Reporter();
 
         function report(cm, messages) {
@@ -368,7 +369,7 @@ define(function (require, exports, module) {
             report: report,
             toggleLineDetails: toggleLineDetails
         };
-    }
+    };
 
 
     return linterReporter;

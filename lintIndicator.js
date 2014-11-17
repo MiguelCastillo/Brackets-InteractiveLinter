@@ -1,5 +1,5 @@
 define(function (require/*, exports, module*/) {
-    'use strict';
+    "use strict";
 
     var DefaultDialogs   = brackets.getModule("widgets/DefaultDialogs"),
         Dialogs          = brackets.getModule("widgets/Dialogs"),
@@ -10,7 +10,7 @@ define(function (require/*, exports, module*/) {
         linterManager  = require("linterManager"),
         dialogTemplate = require("text!templates/errorDialog.html");
 
-    var $statusBarIndicator = $('<div>&nbsp;</div>');
+    var $statusBarIndicator = $("<div>&nbsp;</div>");
     var dialogContent;
 
     var INDICATOR_TOOLTIPS = {
@@ -21,10 +21,10 @@ define(function (require/*, exports, module*/) {
     };
 
     var INDICATOR_STATUS = {
-        OK: 'okay',
-        WARNING: 'warning',
-        ERROR: 'error',
-        DISABLED: 'inactive'
+        OK: "okay",
+        WARNING: "warning",
+        ERROR: "error",
+        DISABLED: "inactive"
     };
 
     function setStatus(status) {
@@ -54,11 +54,11 @@ define(function (require/*, exports, module*/) {
     function lintMessageHandler(messages) {
         if (messages) {
             setStatus(INDICATOR_STATUS.WARNING);
-            $statusBarIndicator.attr('title', StringUtils.format(INDICATOR_TOOLTIPS.WARNING, messages.length));
+            $statusBarIndicator.attr("title", StringUtils.format(INDICATOR_TOOLTIPS.WARNING, messages.length));
         }
         else {
             setStatus(INDICATOR_STATUS.OK);
-            $statusBarIndicator.attr('title', INDICATOR_TOOLTIPS.OK);
+            $statusBarIndicator.attr("title", INDICATOR_TOOLTIPS.OK);
         }
     }
 
@@ -68,7 +68,7 @@ define(function (require/*, exports, module*/) {
 
     $(linterManager).on("linterNotFound", function () {
         setStatus(INDICATOR_STATUS.DISABLED);
-        $statusBarIndicator.attr('title', INDICATOR_TOOLTIPS.DISABLED);
+        $statusBarIndicator.attr("title", INDICATOR_TOOLTIPS.DISABLED);
     });
 
     $(linterReporter).on("lintMessage", function (evt, messages) {
@@ -79,5 +79,5 @@ define(function (require/*, exports, module*/) {
         fatalErrorHandler(message);
     });
 
-    $statusBarIndicator.on('click', indicatorClickHandler);
+    $statusBarIndicator.on("click", indicatorClickHandler);
 });

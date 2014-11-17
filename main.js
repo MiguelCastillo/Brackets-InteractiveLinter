@@ -6,7 +6,7 @@
 
 
 define(function (require, exports, module) {
-    'use strict';
+    "use strict";
 
     // Reference for jshint errors/warnings
     // http://jslinterrors.com
@@ -21,7 +21,6 @@ define(function (require, exports, module) {
 
     require("lintIndicator");
     require("lintPanel");
-    require("linterSettings");
 
     var linterManager = require("linterManager"),
         currentLinter,

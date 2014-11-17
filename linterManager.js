@@ -38,6 +38,11 @@ define(function (require /*, exports, module*/) {
     }
 
 
+        function unregisterDocument(linter, cm) {
+        cm.off("gutterClick", linter.gutterClick);
+    }
+
+
     /**
      * Interface to register documents that need an instance of the appropriate linter.
      *
@@ -75,11 +80,6 @@ define(function (require /*, exports, module*/) {
 
             return linter;
         }
-    }
-
-
-    function unregisterDocument(linter, cm) {
-        cm.off("gutterClick", linter.gutterClick);
     }
 
 

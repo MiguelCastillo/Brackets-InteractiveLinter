@@ -1,0 +1,19 @@
+{
+    "env": {
+        "browser": true
+    },
+    "globals": {
+        "brackets": true,
+        "importScripts": true,
+        "postMessage": true,
+        "onmessage": true,
+        "requirejs": true,
+        "require": true,
+        "define": true,
+        "$": true,
+        "Mustache": true
+    },
+    "rules": {
+        "no-underscore-dangle": 0
+    }
+}
