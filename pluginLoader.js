@@ -23,7 +23,6 @@ define(function(require, exports, module){
         });
 
 
-
         // Api for plugin linters
         function api(plugin) {
             var _lint = plugin.lint;
@@ -57,7 +56,6 @@ define(function(require, exports, module){
 
 
     function workerThreadPluginLoader(pluginsMeta) {
-        embeddedPluginLoader(pluginsMeta);
         var currentRequest, lastMessage;
         var pendingRequest = spromise.defer();
         var worker = new Worker(module.uri.substring(0, module.uri.lastIndexOf("/")) + "/pluginWorker.js");

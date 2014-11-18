@@ -19,7 +19,7 @@ define(function(require, exports, module) {
      * make sure they are smoothly running in a worker thread.
      */
     function pluginManager() {
-        return getPluginsMeta(pluginDirectory).then(pluginLoader.embeddedPluginLoader);
+        return getPluginsMeta(pluginDirectory).then(pluginLoader.workerThreadPluginLoader);
     }
 
 

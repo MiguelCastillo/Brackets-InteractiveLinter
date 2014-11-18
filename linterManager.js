@@ -65,7 +65,6 @@ define(function (require /*, exports, module*/) {
      * Show line details
      */
     function gutterClick(linter, cm, lineIndex, gutterId) {
-        console.log("click", lineIndex, gutterId);
         if (gutterId !== "interactive-linter-gutter") {
             return;
         }
