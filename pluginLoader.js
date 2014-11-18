@@ -29,7 +29,7 @@ define(function(require, exports, module){
             var _lint = plugin.lint;
 
             function lint(text, settings) {
-                return spromise.resolved(_lint(text, settings));
+                return spromise.resolve(_lint(text, settings));
             }
 
             return {
