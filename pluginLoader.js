@@ -9,17 +9,59 @@ define(function(require, exports, module){
     "use strict";
 
     var spromise = require("libs/js/spromise"),
-        utils = require("libs/js/utils");
+        utils    = require("libs/js/utils");
 
 
-    function pluginLoader(pluginsMeta) {
-        var msgId = 1,
-            plugins, pending, lastRequest;
+    function embeddedPluginLoader(pluginsMeta) {
+        var requirePlugin = requirejs.config({
+            "paths": {
+                "text": "../libs/js/text",
+                "libs": "../libs/js"
+            },
+            "baseUrl": pluginsMeta.path,
+            "packages": pluginsMeta.directories
+        });
 
-        var workerFile = module.uri.substring(0, module.uri.lastIndexOf("/")) + "/pluginWorker.js";
 
-        // Instantiate the worker thread for the linter
-        var worker = new Worker(workerFile);
+
+        // Api for plugin linters
+        function api(plugin) {
+            var _lint = plugin.lint;
+
+            function lint(text, settings) {
+                return spromise.resolved(_lint(text, settings));
+            }
+
+            return {
+                lint: lint
+            };
+        }
+
+
+        return spromise(function(resolve) {
+            requirePlugin(pluginsMeta.directories, function() {
+                var plugins = {};
+
+                Array.prototype.slice.call(arguments).forEach(function(plugin, index) {
+                    plugin.name = pluginsMeta.directories[index];
+                    plugins[plugin.name] = plugin;
+
+                    // Add a lint interface that will be just posting a message to the worker thread
+                    utils.mixin(plugin, api(plugin));
+                });
+
+                resolve(plugins);
+           });
+        });
+    }
+
+
+    function workerThreadPluginLoader(pluginsMeta) {
+        embeddedPluginLoader(pluginsMeta);
+        var currentRequest, lastMessage;
+        var pendingRequest = spromise.defer();
+        var worker = new Worker(module.uri.substring(0, module.uri.lastIndexOf("/")) + "/pluginWorker.js");
+
 
         // Process worker thread messages
         worker.onmessage = function onmessage(evt) {
@@ -30,8 +72,8 @@ define(function(require, exports, module){
                 return;
             }
 
-            if (lastRequest && lastRequest.state() === "pending") {
-                lastRequest.resolve(data);
+            if (currentRequest.state() === "pending") {
+                currentRequest.resolve(data);
             }
         };
 
@@ -41,31 +83,33 @@ define(function(require, exports, module){
         };
 
 
-        function postMessage(data) {
-            pending = msgId;
-            if (lastRequest && lastRequest.state() === "pending") {
-                return spromise.resolved();
+        function postMessage(message) {
+            lastMessage = message;
+
+            if (currentRequest && currentRequest.state() === "pending") {
+                pendingRequest.resolve(); // Skip whatever is pending and queue another request
+                return (pendingRequest = spromise.defer()).then(resolveRequest.bind(null, message));
+            }
+            else {
+                worker.postMessage(message);
+                return (currentRequest = spromise.defer()).then(resolveRequest.bind(null, message));
+            }
+        }
+
+
+        function resolveRequest(message, response) {
+            if (!response) {
+                return;
             }
 
-            lastRequest = spromise.defer();
+            // If there is data pending, then send it
+            if (message !== lastMessage) {
+                console.log("send queued message");
+                currentRequest = pendingRequest;
+                worker.postMessage(message);
+            }
 
-            //var timer = new Timer(true);
-            data.msgId  = msgId;
-            worker.postMessage(data);
-            msgId++;
-
-            return lastRequest.then(function(response) {
-                // If there is data pending, then send it
-                if (pending !== response.msgId) {
-                    console.log("send queued message");
-                    data.msgId = msgId;
-                    msgId++;
-                    worker.postMessage(data);
-                }
-
-                //console.log(timer.elapsed(), response.msgId);
-                return response.data;
-            });
+            return response.data;
         }
 
 
@@ -77,6 +121,7 @@ define(function(require, exports, module){
                 // Add a lint interface that will be just posting a message to the worker thread
                 utils.mixin(plugin, api(plugin));
             }
+
             return plugins;
         }
 
@@ -111,10 +156,7 @@ define(function(require, exports, module){
                 "packages": pluginsMeta.directories
             }
         })
-        .then(function(response) {
-            plugins = loadPlugins(response);
-            return plugins;
-        });
+        .then(loadPlugins);
     }
 
 
@@ -129,6 +171,8 @@ define(function(require, exports, module){
     }
 
 
-    return pluginLoader;
-
+    return {
+        workerThreadPluginLoader: workerThreadPluginLoader,
+        embeddedPluginLoader: embeddedPluginLoader
+    };
 });
