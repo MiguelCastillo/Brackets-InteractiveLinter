@@ -122,12 +122,12 @@ define(function (require/*, exports, module*/) {
 
     function loadSettings(file, path, linter) {
         if (!file) {
-            return spromise.resolved();
+            return spromise.resolve();
         }
 
         // Cache so that we are not loading up the same file when navigating in the same directory...
         if (path === currentLinter.path) {
-            return spromise.resolved(currentLinter.settings);
+            return spromise.resolve(currentLinter.settings);
         }
 
         currentLinter = {

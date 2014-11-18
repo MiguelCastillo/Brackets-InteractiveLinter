@@ -44,7 +44,7 @@ define(function(require, exports, module){
         function postMessage(data) {
             pending = msgId;
             if (lastRequest && lastRequest.state() === "pending") {
-                return spromise.resolved();
+                return spromise.resolve();
             }
 
             lastRequest = spromise.defer();
