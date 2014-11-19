@@ -4,53 +4,49 @@ define(function (require, exports, module) {
     var EditorManager    = brackets.getModule("editor/EditorManager"),
         MainViewManager  = brackets.getModule("view/MainViewManager"),
         WorkspaceManager = brackets.getModule("view/WorkspaceManager"),
-        Resizer          = brackets.getModule("utils/Resizer"),
-        StringUtils      = brackets.getModule("utils/StringUtils"),
-        _                = brackets.getModule("thirdparty/lodash");
-
+        StringUtils      = brackets.getModule("utils/StringUtils");
 
     var linterManager   = require("linterManager"),
         linterReporter  = require("linterReporter"),
+        linterHelper    = require("linterHelper"),
         panelTemplate   = require("text!templates/problemsPanel.html"),
         resultsTemplate = require("text!templates/problemsPanelTable.html"),
-        $problemsPanel,
+        problemsPanel,
         $problemsPanelTable,
-        collapsed = true,
-        hasErrors = false;
+        collapsed = true;
 
     function showPanel() {
-        if (hasErrors) {
-            Resizer.show($problemsPanel);
+        if (linterHelper.hasProblems()) {
+            problemsPanel.show();
         }
     }
 
 
     function hidePanel() {
-        Resizer.hide($problemsPanel);
+        problemsPanel.hide();
     }
 
 
     function handleIndicatorClick() {
-        if (!hasErrors) {
-            hidePanel();
-        } else {
-            if (Resizer.isVisible($problemsPanel)) {
+        if (linterHelper.hasProblems()) {
+            if (problemsPanel.isVisible()) {
                 collapsed = true;
                 hidePanel();
             } else {
                 collapsed = false;
                 showPanel();
             }
+        } else {
+            hidePanel();
         }
     }
 
 
     function createPanel() {
         var $panelHtml = $(Mustache.render(panelTemplate));
-        var panel = WorkspaceManager.createBottomPanel("interactive-linter.linting.messages", $panelHtml, 100);
-        $problemsPanel = panel.$panel;
+        problemsPanel = WorkspaceManager.createBottomPanel("interactive-linter.linting.messages", $panelHtml, 100);
         var $selectedRow;
-        $problemsPanelTable = $problemsPanel.find(".table-container")
+        $problemsPanelTable = problemsPanel.$panel.find(".table-container")
             .on("click", "tr", function (e) {
                 if ($selectedRow) {
                     $selectedRow.removeClass("selected");
@@ -81,29 +77,30 @@ define(function (require, exports, module) {
                 }
             });
 
-        $problemsPanel.on("click", ".close", function () {
+        problemsPanel.$panel.on("click", ".close", function () {
             collapsed = true;
             hidePanel();
         });
     }
 
 
-    function updateTitle(numProblems) {
-        var message;
-        if (numProblems === 1) {
+    function updateTitle() {
+        var numberOfProblems = linterHelper.getAmountOfProblems(),
+            message;
+
+        if (numberOfProblems === 1) {
             message = "Interactive Linter: 1 Linter Problem";
         }
         else {
-            message = StringUtils.format("Interactive Linter: {0} Linter Problems", numProblems);
+            message = StringUtils.format("Interactive Linter: {0} Linter Problems", numberOfProblems);
         }
-        $problemsPanel.find(".title").text(message);
+        problemsPanel.$panel.find(".title").text(message);
     }
 
 
     function handleMessages(results) {
-        if (results) {
-            hasErrors = true;
-            var html = Mustache.render(resultsTemplate, {results: results});
+        if (results && results.length > 0) {
+            var html = Mustache.render(resultsTemplate, { results: results });
 
             $problemsPanelTable
                 .html(html)
@@ -113,19 +110,9 @@ define(function (require, exports, module) {
                 showPanel();
             }
 
-            var errorAmount = _.reduce(results, function (accumulator, value) {
-                if (value.result) {
-                    return accumulator + value.result.errors.length;
-                }
-                else {
-                    return accumulator;
-                }
-            }, 0);
-
-            updateTitle(errorAmount);
+            updateTitle();
         }
         else {
-            hasErrors = false;
             hidePanel();
         }
     }
@@ -136,7 +123,6 @@ define(function (require, exports, module) {
     });
 
     $(linterManager).on("linterNotFound", function () {
-        hasErrors = false;
         hidePanel();
     });
 

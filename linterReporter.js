@@ -264,7 +264,6 @@ define(function (require, exports, module) {
                 $(linterReporter).triggerHandler("fatalError", messages[messages.length - 2]);
                 return true;
             }
-
         }
 
         $(linterReporter).triggerHandler("fatalError", null); // Clears a fatal error

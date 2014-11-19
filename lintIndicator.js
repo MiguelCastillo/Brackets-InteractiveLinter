@@ -8,39 +8,42 @@ define(function (require/*, exports, module*/) {
 
     var linterReporter = require("linterReporter"),
         linterManager  = require("linterManager"),
+        linterHelper   = require("linterHelper"),
         dialogTemplate = require("text!templates/errorDialog.html");
 
     var $statusBarIndicator = $("<div>&nbsp;</div>");
     var dialogContent;
 
     var INDICATOR_TOOLTIPS = {
-        OK: "Interactive Linter found no problems in code.",
-        WARNING: "Interactive Linter found {0} problem(s) in code.",
-        ERROR: "Interactive Linter encountered a fatal error, click for more details.",
-        DISABLED: "Interactive Linter is disabled, or there are no linters for this file."
+        NO_ERRORS: "Interactive Linter: No problems found",
+        SINGLE_ERROR: "Interactive Linter: 1 problem found.",
+        MULTIPLE_ERRORS: "Interactive Linter: {0} problems found.",
+        LINT_DISABLED: "Interactive Linter: Linting is disabled."
     };
 
-    var INDICATOR_STATUS = {
-        OK: "okay",
-        WARNING: "warning",
-        ERROR: "error",
-        DISABLED: "inactive"
-    };
+    function updateStatus() {
+        $statusBarIndicator.attr("status", linterHelper.getCurrentStatus());
 
-    function setStatus(status) {
-        $statusBarIndicator.attr("status", status);
+        var numberOfProblems = linterHelper.getAmountOfProblems();
+
+        if (numberOfProblems === 0) {
+            $statusBarIndicator.attr("title", INDICATOR_TOOLTIPS.NO_ERRORS);
+        } else if (numberOfProblems === 1) {
+            $statusBarIndicator.attr("title", INDICATOR_TOOLTIPS.SINGLE_ERROR);
+        } else {
+            $statusBarIndicator.attr("title", StringUtils.format(INDICATOR_TOOLTIPS.MULTIPLE_ERRORS, numberOfProblems));
+        }
     }
 
     function indicatorClickHandler() {
-        if ($statusBarIndicator.attr("status") === INDICATOR_STATUS.ERROR) {
+        if (dialogContent) {
             Dialogs.showModalDialog(DefaultDialogs.DIALOG_ID_ERROR, "Interactive Linter: Fatal Linter Error", dialogContent);
         }
     }
 
     function fatalErrorHandler(message) {
         if (message) {
-            setStatus(INDICATOR_STATUS.ERROR);
-            $statusBarIndicator.attr("title", INDICATOR_TOOLTIPS.ERROR);
+            updateStatus();
 
             dialogContent = Mustache.render(dialogTemplate, {
                 line: message.line,
@@ -48,27 +51,21 @@ define(function (require/*, exports, module*/) {
                 error: message.reason,
                 href: message.href
             });
+        } else {
+            dialogContent = null;
         }
     }
 
-    function lintMessageHandler(messages) {
-        if (messages) {
-            setStatus(INDICATOR_STATUS.WARNING);
-            $statusBarIndicator.attr("title", StringUtils.format(INDICATOR_TOOLTIPS.WARNING, messages.length));
-        }
-        else {
-            setStatus(INDICATOR_STATUS.OK);
-            $statusBarIndicator.attr("title", INDICATOR_TOOLTIPS.OK);
-        }
+    function lintMessageHandler() {
+        updateStatus();
     }
 
 
     StatusBar.addIndicator("interactive-linter-lint-indicator", $statusBarIndicator, true, "", "", "status-indent");
-    setStatus(INDICATOR_STATUS.DISABLED);
+    updateStatus();
 
     $(linterManager).on("linterNotFound", function () {
-        setStatus(INDICATOR_STATUS.DISABLED);
-        $statusBarIndicator.attr("title", INDICATOR_TOOLTIPS.DISABLED);
+        updateStatus();
     });
 
     $(linterReporter).on("lintMessage", function (evt, messages) {
