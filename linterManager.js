@@ -38,7 +38,7 @@ define(function (require /*, exports, module*/) {
     }
 
 
-        function unregisterDocument(linter, cm) {
+    function unregisterDocument(linter, cm) {
         cm.off("gutterClick", linter.gutterClick);
     }
 
