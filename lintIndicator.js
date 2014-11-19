@@ -11,8 +11,9 @@ define(function (require/*, exports, module*/) {
         linterHelper   = require("linterHelper"),
         dialogTemplate = require("text!templates/errorDialog.html");
 
-    var $statusBarIndicator = $("<div>&nbsp;</div>");
-    var dialogContent;
+    var $statusBarIndicator = $("<div>&nbsp;</div>"),
+        lintIndicator = {}, // Initialize to an empty object so that jQuery can successfully event-handle
+        dialogContent;
 
     var INDICATOR_TOOLTIPS = {
         NO_ERRORS: "Interactive Linter: No problems found",
@@ -36,6 +37,8 @@ define(function (require/*, exports, module*/) {
     }
 
     function indicatorClickHandler() {
+        $(lintIndicator).triggerHandler("indicatorClicked");
+
         if (dialogContent) {
             Dialogs.showModalDialog(DefaultDialogs.DIALOG_ID_ERROR, "Interactive Linter: Fatal Linter Error", dialogContent);
         }
@@ -77,4 +80,6 @@ define(function (require/*, exports, module*/) {
     });
 
     $statusBarIndicator.on("click", indicatorClickHandler);
+
+    return lintIndicator;
 });

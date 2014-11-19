@@ -9,6 +9,7 @@ define(function (require, exports, module) {
     var linterManager   = require("linterManager"),
         linterReporter  = require("linterReporter"),
         linterHelper    = require("linterHelper"),
+        lintIndicator   = require("lintIndicator"),
         panelTemplate   = require("text!templates/problemsPanel.html"),
         resultsTemplate = require("text!templates/problemsPanelTable.html"),
         problemsPanel,
@@ -128,7 +129,7 @@ define(function (require, exports, module) {
 
     createPanel();
 
-    $(document).on("click", "#interactive-linter-lint-indicator", function () {
+    $(lintIndicator).on("indicatorClicked", function () {
         handleIndicatorClick();
     });
 });
