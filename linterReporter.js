@@ -186,7 +186,7 @@ define(function (require, exports, module) {
         var messages = mark.errors;
 
         var results = [];
-        _.forEach(messages, function (message) {
+        _.forEach(messages, function (message) { // Allows Mustache to iterate over the messages, grouped by provider.
             if (message) {
                 var key = message.providerName;
                 var keyIndex = _.findKey(results, { providerName: key });
@@ -214,11 +214,10 @@ define(function (require, exports, module) {
 
         $errorHtml.on("click", ".inspector-title", function (e) {
             var $title = $(e.target);
-            $title.toggleClass("open");
-            $title.toggleClass("closed");
+            $title.toggleClass("expanded");
 
             var $inspectorProblems = $title.parent().find(".inspector-problems");
-            $inspectorProblems.toggle($title.hasClass("open"));
+            $inspectorProblems.toggle($title.hasClass("expanded"));
 
             activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height() + 20);
         });

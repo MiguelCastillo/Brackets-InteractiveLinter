@@ -25,12 +25,12 @@
         padding-right: 10px;
     }
 
-    &.open::before, &.expanded::before {
-        content: "\25bd";
+    &:not(.expanded)::before {
+        content: "\25b6";
     }
 
-    &.closed::before, &:not(.expanded)::before {
-        content: "\25b6";
+    &.expanded::before {
+        content: "\25bd";
     }
 }
 
