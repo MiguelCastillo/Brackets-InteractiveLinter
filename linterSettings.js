@@ -6,7 +6,7 @@
 
 
 define(function (require/*, exports, module*/) {
-    'use strict';
+    "use strict";
 
     var Dialogs         = brackets.getModule("widgets/Dialogs"),
         ProjectManager  = brackets.getModule("project/ProjectManager"),

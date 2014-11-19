@@ -6,7 +6,7 @@
 
 
 define(function(require, exports, module) {
-    'use strict';
+    "use strict";
 
     var FileSystem   = brackets.getModule("filesystem/FileSystem");
     var pluginLoader = require("pluginLoader");
