@@ -1,5 +1,7 @@
-### Plugins folder to testing/developing plugins and keepting them from sneaking into git
-plugins.dev
+plugins/dev/*
+plugins/disabled/*
+!plugins/dev/README.md
+!plugins/disabled/README.md
 
 #################
 ## NodeJs

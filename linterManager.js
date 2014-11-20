@@ -38,13 +38,19 @@ define(function (require /*, exports, module*/) {
     /**
      * Create instance of linter to process CodeMirror documents
      */
-    Linter.factory = function(cm, fullPath) {
+    Linter.factory = function(cm, file) {
         var mode = cm && cm.getDoc().getMode();
+
         // Get the best poosible mode (document type) for the document
         mode = mode && (mode.helperType || mode.name);
 
+        // A bit of hackery to figure out if we can process the document as typescript
+        if (/.ts|.typescript$/.test(file.name) && mode === "javascript" && languages[mode]) {
+            mode = "typescript";
+        }
+
         if (languages[mode]) {
-            return new Linter(cm, mode, fullPath);
+            return new Linter(cm, mode, file.parentPath);
         }
     };
 
@@ -77,17 +83,17 @@ define(function (require /*, exports, module*/) {
      * Interface to register documents that need an instance of the appropriate linter.
      *
      * @param {CodeMirror} cm Is the CodeMirror instance to enable interactive linting on.
-     * @param {string} fullpath Is the path to the document being registered.  This is to
+     * @param {File} file - Is the file for the document being registered.  This is to
      *  load the most suitable settings file.
      *
      * @returns {Linter} Instance of linter to process the cm document
      */
-    function registerDocument(cm, fullPath) {
+    function registerDocument(cm, file) {
         if (!cm) {
             throw new TypeError("Must provide a valid instance of CodeMirror");
         }
 
-        var linter = cm.__linter || (cm.__linter = Linter.factory(cm, fullPath));
+        var linter = cm.__linter || (cm.__linter = Linter.factory(cm, file));
 
         if (!linter) {
             $(linterManager).triggerHandler("linterNotFound");

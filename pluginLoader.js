@@ -8,20 +8,25 @@
 define(function(require, exports, module){
     "use strict";
 
+    var requireUID = 1;
     var spromise = require("libs/js/spromise"),
         utils    = require("libs/js/utils");
 
 
     function embeddedPluginLoader(pluginsMeta) {
+        if (!pluginsMeta.directories.length) {
+            return spromise.resolve();
+        }
+
         var requirePlugin = requirejs.config({
+            "context": "interactive-linter-plugins-" + (requireUID++),
             "paths": {
-                "text": "../libs/js/text",
-                "libs": "../libs/js"
+                "text": "../../libs/js/text",
+                "libs": "../../libs/js"
             },
             "baseUrl": pluginsMeta.path,
             "packages": pluginsMeta.directories
         });
-
 
         // Api for plugin linters
         function api(plugin) {
@@ -35,7 +40,6 @@ define(function(require, exports, module){
                 lint: lint
             };
         }
-
 
         return spromise(function(resolve) {
             requirePlugin(pluginsMeta.directories, function() {
@@ -56,9 +60,13 @@ define(function(require, exports, module){
 
 
     function workerThreadPluginLoader(pluginsMeta) {
+        if (!pluginsMeta.directories.length) {
+            return spromise.resolve();
+        }
+
         var currentRequest, lastMessage;
         var pendingRequest = spromise.defer();
-        var worker = new Worker(module.uri.substring(0, module.uri.lastIndexOf("/")) + "/pluginWorker.js");
+        var worker         = new Worker(module.uri.substring(0, module.uri.lastIndexOf("/")) + "/pluginWorker.js");
 
 
         // Process worker thread messages
@@ -84,7 +92,7 @@ define(function(require, exports, module){
         function postMessage(message) {
             lastMessage = message;
 
-            if (currentRequest && currentRequest.state() === "pending") {
+            if (currentRequest && currentRequest.isPending()) {
                 pendingRequest.resolve(); // Skip whatever is pending and queue another request
                 return (pendingRequest = spromise.defer()).then(resolveRequest.bind(null, message));
             }

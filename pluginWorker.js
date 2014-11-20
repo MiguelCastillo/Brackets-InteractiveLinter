@@ -16,8 +16,8 @@ function PluginLoader(settings) {
 
     var pluginRequire = requirejs.config({
         "paths": {
-            "text": "../libs/js/text",
-            "libs": "../libs/js"
+            "text": "../../libs/js/text",
+            "libs": "../../libs/js"
         },
         "baseUrl": data.baseUrl,
         "packages": data.packages
