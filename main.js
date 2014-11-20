@@ -6,7 +6,7 @@
 
 
 define(function (require, exports, module) {
-    'use strict';
+    "use strict";
 
     // Reference for jshint errors/warnings
     // http://jslinterrors.com
