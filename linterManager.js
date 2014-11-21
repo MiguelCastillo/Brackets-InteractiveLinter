@@ -90,7 +90,7 @@ define(function (require /*, exports, module*/) {
      */
     function registerDocument(cm, file) {
         if (!cm) {
-            throw new TypeError("Must provide a valid instance of CodeMirror");
+            throw new TypeError("Must provide an instance of CodeMirror");
         }
 
         var linter = cm.__linter || (cm.__linter = Linter.factory(cm, file));

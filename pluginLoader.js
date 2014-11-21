@@ -9,8 +9,9 @@ define(function(require, exports, module){
     "use strict";
 
     var requireUID = 1;
-    var spromise = require("libs/js/spromise"),
-        utils    = require("libs/js/utils");
+
+    var _        = brackets.getModule("thirdparty/lodash"),
+        spromise = require("libs/js/spromise");
 
 
     function embeddedPluginLoader(pluginsMeta) {
@@ -45,12 +46,12 @@ define(function(require, exports, module){
             requirePlugin(pluginsMeta.directories, function() {
                 var plugins = {};
 
-                Array.prototype.slice.call(arguments).forEach(function(plugin, index) {
+                _.toArray(arguments).forEach(function(plugin, index) {
                     plugin.name = pluginsMeta.directories[index];
                     plugins[plugin.name] = plugin;
 
                     // Add a lint interface that will be just posting a message to the worker thread
-                    utils.mixin(plugin, api(plugin));
+                    _.merge(plugin, api(plugin));
                 });
 
                 resolve(plugins);
@@ -85,7 +86,7 @@ define(function(require, exports, module){
 
 
         worker.onerror = function onerror(evt) {
-            console.log("error", evt);
+            console.error("error", evt);
         };
 
 
@@ -125,7 +126,7 @@ define(function(require, exports, module){
                 plugin = plugins[iplugin];
 
                 // Add a lint interface that will be just posting a message to the worker thread
-                utils.mixin(plugin, api(plugin));
+                _.merge(plugin, api(plugin));
             }
 
             return plugins;
