@@ -6,7 +6,7 @@
 
 
 define(function(require, exports, module) {
-    'use strict';
+    "use strict";
 
     var _               = brackets.getModule("thirdparty/lodash"),
         FileSystem      = brackets.getModule("filesystem/FileSystem"),

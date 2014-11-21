@@ -25,7 +25,7 @@
 /*jslint plusplus: true, nomen: true, regexp: true, maxerr: 50 */
 
 define(function (require, exports, module) {
-    'use strict';
+    "use strict";
 
     /**
     * Used for reporting errors.  The name is shorter to more directly match

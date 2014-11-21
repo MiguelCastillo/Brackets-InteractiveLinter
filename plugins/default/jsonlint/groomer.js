@@ -6,7 +6,7 @@
 
 
 define(function (require, exports, module) {
-    'use strict';
+    "use strict";
 
     /**
      * Breaks up the message from jshint into something that can be used

@@ -1,5 +1,5 @@
 define(function (require/*, exports, module*/) {
-    'use strict';
+    "use strict";
 
     var DefaultDialogs   = brackets.getModule("widgets/DefaultDialogs"),
         Dialogs          = brackets.getModule("widgets/Dialogs"),
