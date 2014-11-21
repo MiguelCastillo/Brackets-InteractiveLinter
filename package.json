@@ -4,6 +4,7 @@
     "description": "Interactive Linter brings realtime JSHint/JSLint/CoffeeLint reports into Brackets as you work on your code",
     "version": "0.6.0",
     "author": "Miguel Castillo <manchagnu@gmail.com>",
+    "contributors": ["Mark Simulacrum <mark.simulacrum@gmail.com>"],
     "homepage": "https://github.com/MiguelCastillo/Brackets-Interactive-Linter",
     "repository": {
         "type": "git",
