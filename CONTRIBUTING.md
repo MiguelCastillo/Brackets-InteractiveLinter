@@ -8,13 +8,13 @@ problem, actual vs. expected results, and your OS and Brackets version number.
 When filing a new bug, please include:
 
 - Descriptive title
-- Steps to trigger the problem that are specific, and repeatable
-- What happens when you follow the steps, and what you expected to happen instead
+- Steps to reproduce the problem
+- Describe current and expected behavior
 - Include the exact text of any error messages if applicable (or upload screenshots)
 - Brackets version (or if you're pulling directly from Git, your current commit SHA - use git rev-parse HEAD)
 - Interactive Linter Version (see Extension Manager)
 - OS, and OS version
-- Extensions? (Other than Interactive Linter)
+- List of other installed extensions
 - Any errors logged in Debug > Show Developer Tools - Console view
 
 ### Guidelines for code contributions
