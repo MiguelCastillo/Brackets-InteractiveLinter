@@ -8,9 +8,11 @@
 define(function(require, exports, module) {
     "use strict";
 
-    var FileSystem   = brackets.getModule("filesystem/FileSystem");
-    var pluginLoader = require("pluginLoader");
-    var spromise     = require("libs/js/spromise");
+    var _               = brackets.getModule("thirdparty/lodash"),
+        FileSystem      = brackets.getModule("filesystem/FileSystem"),
+        pluginLoader    = require("pluginLoader"),
+        spromise        = require("libs/js/spromise"),
+        pluginDirectory = module.uri.substring(0, module.uri.lastIndexOf("/"));
 
 
     /**
@@ -18,38 +20,37 @@ define(function(require, exports, module) {
      * make sure they are smoothly running in a worker thread.
      */
     function pluginManager() {
-        var pluginDirectory = module.uri.substring(0, module.uri.lastIndexOf("/")) + "/plugins";
+        return spromise.all([getPluginsMeta(pluginDirectory  + "/plugins/default"), getPluginsMeta(pluginDirectory  + "/plugins/dev")])
+            .then(loadPlugins)
+            .then(pluginsLoaded);
+    }
 
-        // Build plugin list that the worker thread needs to load
-        return getPluginsMeta(pluginDirectory).then(function(pluginsMeta) {
-            return pluginLoader(pluginsMeta);
+
+    function loadPlugins(plugins) {
+        plugins = _.filter(plugins, function(plugin) {
+            return plugin.directories.length !== 0;
         });
+
+        return spromise.all(plugins.map(function(plugin) {
+            return pluginLoader.workerThreadPluginLoader(plugin);
+        }));
+    }
+
+
+    function pluginsLoaded(plugins) {
+        return _.extend.apply(_, plugins);
     }
 
 
     function getPluginsMeta(path) {
-        var result = spromise.defer();
-
-        FileSystem.getDirectoryForPath(path).getContents(function(err, entries) {
-            if (err) {
-                result.reject(err);
-            }
-
-            var i, entry, directories = [];
-            for (i = 0; i < entries.length; i++) {
-                entry = entries[i];
-                if (entry.isDirectory) {
-                    directories.push(entry.name);
-                }
-            }
-
-            result.resolve({
-                directories: directories,
-                path: path
+        return spromise(function(resolve) {
+            FileSystem.getDirectoryForPath(path).getContents(function(err, entries) {
+                resolve({
+                    directories: _.filter(entries, 'isDirectory').map(function(dir) {return dir.name;}),
+                    path: path
+                });
             });
         });
-
-        return result.promise;
     }
 
 

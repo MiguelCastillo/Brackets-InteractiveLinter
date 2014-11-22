@@ -16,8 +16,8 @@ function PluginLoader(settings) {
 
     var pluginRequire = requirejs.config({
         "paths": {
-            "text": "../libs/js/text",
-            "libs": "../libs/js"
+            "text": "../../libs/js/text",
+            "libs": "../../libs/js"
         },
         "baseUrl": data.baseUrl,
         "packages": data.packages
@@ -47,8 +47,7 @@ function PluginLoader(settings) {
 
         postMessage({
             type: "ready",
-            data: _result,
-            msgId: settings.msgId
+            data: _result
         });
     });
 }
@@ -56,7 +55,6 @@ function PluginLoader(settings) {
 
 PluginLoader.prototype.lint = function(data) {
     var _self = this;
-    var msgId = data.msgId;
 
     // Lint!
     data = data.data;
@@ -64,7 +62,6 @@ PluginLoader.prototype.lint = function(data) {
 
     postMessage({
         "type": "lint",
-        "msgId": msgId,
         "data": {
             result: lintResult
         }

@@ -30,32 +30,6 @@ define(function(require /*, exports, module*/) {
         });
     });
 
-    var utils           = require("libs/utils"),
-        groomer         = require("coffeelint/groomer"),
-        defaultSettings = JSON.parse(require("text!coffeelint/default.json")),
-        settings        = JSON.parse(require("text!coffeelint/settings.json"));
+    return {};
 
-
-    function lint(text, settings) {
-        // Get document as a string to be passed into JSHint
-        var result;
-
-        settings = utils.mixin({}, defaultSettings, settings);
-
-        try {
-            result = coffeelint.lint(text, settings);
-            for (var iresult in result) {
-                result[iresult].token = groomer.groom(result[iresult], settings);
-            }
-        }
-        catch(ex) {
-            console.log("ex");
-        }
-
-        return result;
-    }
-
-    return utils.mixin(settings, {
-        lint: lint
-    });
 });

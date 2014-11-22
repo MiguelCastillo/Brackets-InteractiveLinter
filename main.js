@@ -83,7 +83,7 @@ define(function (require, exports, module) {
         }
 
         if (currentEditor) {
-            currentLinter = linterManager.registerDocument(currentEditor._codeMirror, currentEditor.document.file.parentPath);
+            currentLinter = linterManager.registerDocument(currentEditor._codeMirror, currentEditor.document.file);
         }
 
         // If a linter was successfully created, then we are safe to bind event handlers for editor changes.
