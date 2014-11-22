@@ -1,1 +1,1 @@
-Use this folder to place any plugins you don't want Interactive Linter to load.  Anything in this directory will be ignored by git.
+Place plugins that you don't want Interactive Linter to load in this directory. Anything in this directory will be ignored by git.
