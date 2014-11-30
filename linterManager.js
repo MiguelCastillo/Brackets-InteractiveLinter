@@ -13,16 +13,17 @@ define(function (require /*, exports, module*/) {
         _              = brackets.getModule("thirdparty/lodash");
 
     var linterReporter = require("linterReporter"),
-        languages      = {},
         linterManager  = {};
 
 
-    function Linter(cm, mode, fullPath) {
+    /**
+     * Represents a linter, with its reporter, codemirror, lint methods.
+     * @param {Object} cm CodeMirror instance
+     */
+    function Linter(cm) {
         this.cm            = cm;
-        this.mode          = mode;
         this.reporter      = linterReporter();
-        this.lint          = _.debounce(Linter.lint.bind(null, this, languages[mode], fullPath), 1000);
-        this.onClickGutter = gutterClick.bind(null, this);
+        this.lint          = _.debounce(Linter.lint.bind(null, this), 1000);
     }
 
 
@@ -37,27 +38,7 @@ define(function (require /*, exports, module*/) {
 
 
     /**
-     * Create instance of linter to process CodeMirror documents
-     */
-    Linter.factory = function(cm, file) {
-        var mode = cm && cm.getDoc().getMode();
-
-        // Get the best poosible mode (document type) for the document
-        mode = mode && (mode.helperType || mode.name);
-
-        // A bit of hackery to figure out if we can process the document as typescript
-        if (/.ts|.typescript$/.test(file.name) && mode === "javascript" && languages[mode]) {
-            mode = "typescript";
-        }
-
-        if (languages[mode]) {
-            return new Linter(cm, mode, file.parentPath);
-        }
-    };
-
-
-    /**
-     * Interface that will be used for running linters
+     * Interface to run linters
      */
     Linter.lint = function(linter) {
         var currentFile = EditorManager.getActiveEditor().document.file;
@@ -69,36 +50,34 @@ define(function (require /*, exports, module*/) {
 
     /**
      * Show line details
+     * @param {Object}   cm        CodeMirror instance
+     *                             @param {Number}   lineIndex The line number of the line for which the gutter was clicked.
+     * @param {[[Type]]} gutterId  [[Description]]
      */
-    function gutterClick(linter, cm, lineIndex, gutterId) {
+    Linter.onGutterClick = function (cm, lineIndex, gutterId) {
         if (gutterId !== "interactive-linter-gutter") {
             return;
         }
 
-        linter.reporter.toggleLineDetails(lineIndex);
-    }
+        this.reporter.toggleLineDetails(lineIndex);
+    };
 
 
     /**
      * Interface to register documents that need an instance of the appropriate linter.
      *
      * @param {CodeMirror} cm Is the CodeMirror instance to enable interactive linting on.
-     * @param {File} file - Is the file for the document being registered.  This is to
-     *  load the most suitable settings file.
      *
      * @returns {Linter} Instance of linter to process the cm document
      */
-    function registerDocument(cm, file) {
+    function registerDocument(cm) {
         if (!cm) {
             throw new TypeError("Must provide an instance of CodeMirror");
         }
 
-        var linter = cm.__linter || (cm.__linter = Linter.factory(cm, file));
+        var linter = cm.__linter || (cm.__linter = new Linter(cm));
 
-        if (!linter) {
-            $(linterManager).triggerHandler("linterNotFound");
-            return;
-        }
+        $(linterManager).triggerHandler("linterNotFound"); // TODO: Check if there are linters in CodeInspection
 
         var gutters = cm.getOption("gutters").slice(0);
 
