@@ -28,12 +28,12 @@ define(function (require /*, exports, module*/) {
 
 
     Linter.prototype.register = function() {
-        this.cm.on("gutterClick", this.onClickGutter);
+        this.cm.on("gutterClick", this.onGutterClick.bind(this));
     };
 
 
     Linter.prototype.unregister = function() {
-        this.cm.off("gutterClick", this.onClickGutter);
+        this.cm.off("gutterClick", this.onGutterClick.bind(this));
     };
 
 
@@ -49,12 +49,12 @@ define(function (require /*, exports, module*/) {
 
 
     /**
-     * Show line details
-     * @param {Object}   cm        CodeMirror instance
-     *                             @param {Number}   lineIndex The line number of the line for which the gutter was clicked.
-     * @param {[[Type]]} gutterId  [[Description]]
+     * Show line details when clicking on the interactive linter gutter.
+     * @param {Object} cm        CodeMirror instance
+     * @param {Number} lineIndex The line number of the line for which the gutter was clicked.
+     * @param {String} gutterId  The ID of the gutter
      */
-    Linter.onGutterClick = function (cm, lineIndex, gutterId) {
+    Linter.prototype.onGutterClick = function onGutterClickHandler(cm, lineIndex, gutterId) {
         if (gutterId !== "interactive-linter-gutter") {
             return;
         }
