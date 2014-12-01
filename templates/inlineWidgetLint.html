@@ -1,11 +1,11 @@
 <div class="interactive-linter-line-widget">
     {{#results}}
         <div class="inspector-section">
-            <div class="inspector-title expanded">{{providerName}} ({{result.errors.length}})</div>
+            <div class="inspector-title expanded">{{providerName}} ({{result.problems.length}})</div>
             <div class="inspector-problems">
-                {{#result.errors}}
-                    <div class="inspector-problem">{{message}}</div>
-                {{/result.errors}}
+                {{#result.problems}}
+                    <div class="inspector-problem" data-problem-type="{{type}}">{{message}}</div>
+                {{/result.problems}}
             </div>
         </div>
     {{/results}}

@@ -6,6 +6,7 @@
             </tr>
             {{#result.errors}}
                 <tr>
+                    <td class="line-icon" data-problem-type="{{type}}"></td>
                     <td class="line-number" data-character="{{pos.ch}}">{{friendlyLine}}</td>
                     <td class="line-text">{{message}}</td>
                     <td class="line-snippet">{{codeSnippet}}</td>

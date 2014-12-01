@@ -61,7 +61,7 @@ define(function (require, exports, module) {
      * Token is a CodeMirror token that specifies start/end information for
      * the string in CodeMirror's document
      */
-    Reporter.prototype.addGutterMarks = function(message) {
+    Reporter.prototype.addGutterMarks = function (message) {
         var mark = this.marks[message.pos.line];
 
         // gutterMark is the placehoder for the lightbulb
@@ -69,7 +69,8 @@ define(function (require, exports, module) {
 
         if (!mark) {
             mark = {
-                errors: [],
+                messages: {},
+                reducedMessages: [],
                 lineMarks: [],
                 gutterMark: {
                     element: $("<div class='interactive-linter-gutter-messages' title='Click for details'>&nbsp;</div>")
@@ -80,7 +81,17 @@ define(function (require, exports, module) {
             mark.gutterMark.line = this.cm.setGutterMarker(message.pos.line, "interactive-linter-gutter", mark.gutterMark.element[0]);
         }
 
-        mark.errors.push(message);
+
+        if (mark.messages[message.type]) {
+            mark.messages[message.type].push(message);
+        } else {
+            mark.messages[message.type] = [message];
+        }
+
+
+        mark.reducedMessages = _.reduce(mark.messages, function (accumulator, value) {
+            return accumulator.concat(value);
+        }, []);
     };
 
 
@@ -120,8 +131,7 @@ define(function (require, exports, module) {
                 delete mark.inlineWidget;
             }
 
-            delete mark.errors;
-            delete mark.warnings;
+            delete mark.messages;
             delete mark.lineMarks;
             delete mark.gutterMarks;
         });
@@ -183,7 +193,7 @@ define(function (require, exports, module) {
         var activeEditor = EditorManager.getActiveEditor();
         var inlineWidget = mark.inlineWidget;
 
-        var messages = mark.errors;
+        var messages = mark.reducedMessages;
 
         var results = [];
         _.forEach(messages, function (message) { // Allows Mustache to iterate over the messages, grouped by provider.
@@ -192,12 +202,12 @@ define(function (require, exports, module) {
                 var keyIndex = _.findKey(results, { providerName: key });
 
                 if (keyIndex) {
-                    results[keyIndex].result.errors.push(message);
+                    results[keyIndex].result.problems.push(message);
                 } else {
                     results.push({
                         providerName: key,
                         result: {
-                            errors: [message]
+                            problems: [message]
                         }
                     });
                 }

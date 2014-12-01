@@ -40,6 +40,12 @@
     user-select: @type;
 }
 
+.data-problem-type-helper(@content, @url) {
+    [data-problem-type="@{content}"] {
+        background-image: url(@url);
+    }
+}
+
 .interactive-linter-line-widget {
     margin-top: 10px;
     margin-left: 50px;
@@ -53,6 +59,16 @@
 
     .inspector-problems {
         margin-left: 20px;
+
+        [data-problem-type] {
+            background-position: left;
+            background-size: 15px;
+            background-repeat: no-repeat;
+            padding: 0 30px;
+        }
+
+        .data-problem-type-helper("problem_type_error", "img/topcoat-error-15.svg");
+        .data-problem-type-helper("problem_type_warning", "img/topcoat-warning-15.svg");
     }
 }
 
@@ -63,6 +79,16 @@
 #interactive-linter-problems-panel {
     cursor: auto;
     .user-select(text);
+
+    [data-problem-type] {
+        background-position: center;
+        background-size: 15px;
+        background-repeat: no-repeat;
+        width: 5px * 2 + 15px;
+    }
+
+    .data-problem-type-helper("problem_type_error", "img/topcoat-error-15.svg");
+    .data-problem-type-helper("problem_type_warning", "img/topcoat-warning-15.svg");
 
     .provider-name {
         .arrow-opener();
