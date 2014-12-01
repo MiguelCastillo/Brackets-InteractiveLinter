@@ -112,15 +112,6 @@
     }
 }
 
-@-webkit-keyframes pulse {
-    0% {
-        background-color: transparent;
-    }
-    50% {
-        background-color: #ffb0cd;
-    }
-}
-
 #interactive-linter-lint-indicator {
     display: none; // Hide lint indicator by default, so as not to show before show/hide code is run
     width: 13px; // Same width as default indicator
@@ -129,8 +120,6 @@
     background-repeat: no-repeat;
 
     &[status="error"] {
-        -webkit-animation: pulse 2s linear;
-        -webkit-animation-iteration-count: 3;
         background-image: url(img/topcoat-error-15.svg);
     }
 
