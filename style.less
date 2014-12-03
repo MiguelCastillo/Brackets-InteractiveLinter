@@ -27,6 +27,10 @@
     background-size: 15px 15px;
     background-repeat: no-repeat;
     margin-left: 7px;
+
+    &:hover {
+        cursor: pointer;
+    }
 }
 
 .CodeMirror .interactive-linter-gutter-errors {
@@ -35,38 +39,33 @@
     border-radius: 10px;
 }
 
-.CodeMirror .interactive-linter-gutter-messages:hover {
-    cursor: pointer;
-}
-
 .CodeMirror .interactive-linter-line-widget {
     margin-top: 10px;
     margin-left: 50px;
 
-    /*Allow cursor to display area as text*/
-    cursor: auto;
+    cursor: auto; // Allow cursor to display area as text
 
-    /* Enable text selection */
+    // Enable text selection
     -webkit-user-select: text;
     user-select: text;
+
+    .interactive-linter-line-error, .interactive-linter-line-warning {
+        background-position: left;
+        background-size: 15px;
+        background-repeat: no-repeat;
+        padding: 0 30px;
+    }
+
+    .interactive-linter-line-error {
+        background-image: url(img/topcoat-error-15.svg);
+    }
+
+    .interactive-linter-line-warning {
+        background-image: url(img/topcoat-warning-15.svg);
+    }
 }
 
-.CodeMirror .interactive-linter-line-error, .CodeMirror .interactive-linter-line-warning {
-    background-position: left;
-    background-size: 15px;
-    background-repeat: no-repeat;
-    padding: 0 30px;
-}
-
-.CodeMirror .interactive-linter-line-error {
-    background-image: url(img/topcoat-error-15.svg);
-}
-
-.CodeMirror .interactive-linter-line-warning {
-    background-image: url(img/topcoat-warning-15.svg);
-}
-
-@-webkit-keyframes pulse {
+@-webkit-keyframes interactive-linter-pulse {
     0% {
         background-color: transparent;
     }
@@ -81,41 +80,41 @@
     background-position: center;
     background-size: 15px;
     background-repeat: no-repeat;
-}
+    &[status="error"] {
+        -webkit-animation: interactive-linter-pulse 2s linear;
+        -webkit-animation-iteration-count: 3;
+        background-image: url(img/topcoat-error-15.svg);
+    }
 
-#interactive-linter-lint-indicator[status=error] {
-    -webkit-animation: pulse 2s linear;
-    -webkit-animation-iteration-count: 3;
-    background-image: url(img/topcoat-error-15.svg);
-}
+    &[status="warning"] {
+        background-image: url(img/topcoat-warning-15.svg);
+    }
 
-#interactive-linter-lint-indicator[status=warning] {
-    background-image: url(img/topcoat-warning-15.svg);
-}
+    &[status="okay"] {
+        background-image: url(img/topcoat-okay-15.svg);
+    }
 
-#interactive-linter-lint-indicator[status=okay] {
-    background-image: url(img/topcoat-okay-15.svg);
-}
-
-#interactive-linter-lint-indicator[status=inactive] {
-    background-image: url(img/topcoat-inactive-15.svg);
+    &[status=inactive] {
+        background-image: url(img/topcoat-inactive-15.svg);
+    }
 }
 
 #interactive-linter-problems-panel {
     -webkit-user-select: text;  /* allow selecting error messages for easy web searching */
+
+    .line {
+        text-align: right;  /* make line number line up with editor line numbers */
+    }
+
+    .line-text {
+        white-space: nowrap;
+        width: auto;
+    }
+
+    .line-snippet {
+        white-space: nowrap;
+        width: 100%;
+        padding-left: 10px;
+    }
 }
 
-#interactive-linter-problems-panel .line {
-    text-align: right;  /* make line number line up with editor line numbers */
-}
-
-#interactive-linter-problems-panel .line-text {
-    white-space: nowrap;
-    width: auto;
-}
-
-#interactive-linter-problems-panel .line-snippet {
-    white-space: nowrap;
-    width: 100%;
-    padding-left: 10px;
-}
