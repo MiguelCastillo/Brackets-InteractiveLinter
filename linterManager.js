@@ -8,97 +8,76 @@
 define(function (require /*, exports, module*/) {
     "use strict";
 
-    var _ = brackets.getModule("thirdparty/lodash");
-    var linterSettings = require("linterSettings"),
-        linterReporter = require("linterReporter"),
-        languages      = {},
-        linters        = {},
+    var EditorManager  = brackets.getModule("editor/EditorManager"),
+        CodeInspection = brackets.getModule("language/CodeInspection"),
+        _              = brackets.getModule("thirdparty/lodash");
+
+    var linterReporter = require("linterReporter"),
         linterManager  = {};
 
 
-    function Linter(cm, mode, fullPath) {
+    /**
+     * Represents a linter, with its reporter, codemirror, lint methods.
+     * @param {Object} cm CodeMirror instance
+     */
+    function Linter(cm) {
         this.cm            = cm;
-        this.mode          = mode;
         this.reporter      = linterReporter();
-        this.lint          = _.debounce(Linter.lint.bind(null, this, languages[mode], fullPath), 1000);
-        this.onClickGutter = gutterClick.bind(null, this);
+        this.lint          = _.debounce(Linter.lint.bind(null, this), 1000);
     }
 
 
     Linter.prototype.register = function() {
-        this.cm.on("gutterClick", this.onClickGutter);
+        this.cm.on("gutterClick", this.onGutterClick.bind(this));
     };
 
 
     Linter.prototype.unregister = function() {
-        this.cm.off("gutterClick", this.onClickGutter);
+        this.cm.off("gutterClick", this.onGutterClick.bind(this));
     };
 
 
     /**
-     * Create instance of linter to process CodeMirror documents
+     * Interface to run linters
      */
-    Linter.factory = function(cm, file) {
-        var mode = cm && cm.getDoc().getMode();
-
-        // Get the best poosible mode (document type) for the document
-        mode = mode && (mode.helperType || mode.name);
-
-        // A bit of hackery to figure out if we can process the document as typescript
-        if (/.ts|.typescript$/.test(file.name) && mode === "javascript" && languages[mode]) {
-            mode = "typescript";
-        }
-
-        if (languages[mode]) {
-            return new Linter(cm, mode, file.parentPath);
-        }
-    };
-
-
-    /**
-     * Interface that will be used for running linters
-     */
-    Linter.lint = function(linter, linterPlugin, fullPath) {
-        linterSettings.loadSettings(linterPlugin.settingsFile, fullPath, linter).always(function(settings) {
-            linterPlugin.lint(linter.cm.getDoc().getValue(), settings).done(function(result) {
-                linter.reporter.report(linter.cm, result);
-            });
+    Linter.lint = function(linter) {
+        var currentFile = EditorManager.getActiveEditor().document.file;
+        CodeInspection.inspectFile(currentFile).done(function (result) {
+            linter.reporter.report(linter.cm, result);
         });
     };
 
 
     /**
-     * Show line details
+     * Show line details when clicking on the interactive linter gutter.
+     * @param {Object} cm        CodeMirror instance
+     * @param {Number} lineIndex The line number of the line for which the gutter was clicked.
+     * @param {String} gutterId  The ID of the gutter
      */
-    function gutterClick(linter, cm, lineIndex, gutterId) {
+    Linter.prototype.onGutterClick = function onGutterClickHandler(cm, lineIndex, gutterId) {
         if (gutterId !== "interactive-linter-gutter") {
             return;
         }
 
-        linter.reporter.toggleLineDetails(lineIndex);
-    }
+        this.reporter.toggleLineDetails(lineIndex);
+    };
 
 
     /**
      * Interface to register documents that need an instance of the appropriate linter.
      *
      * @param {CodeMirror} cm Is the CodeMirror instance to enable interactive linting on.
-     * @param {File} file - Is the file for the document being registered.  This is to
-     *  load the most suitable settings file.
      *
      * @returns {Linter} Instance of linter to process the cm document
      */
-    function registerDocument(cm, file) {
+    function registerDocument(cm) {
         if (!cm) {
             throw new TypeError("Must provide an instance of CodeMirror");
         }
 
-        var linter = cm.__linter || (cm.__linter = Linter.factory(cm, file));
+        var linter = cm.__linter || (cm.__linter = new Linter(cm));
 
-        if (!linter) {
-            $(linterManager).triggerHandler("linterNotFound");
-            return;
-        }
+        $(linterManager).triggerHandler("linterNotFound"); // TODO: Check if there are linters in CodeInspection
 
         var gutters = cm.getOption("gutters").slice(0);
 
@@ -113,14 +92,6 @@ define(function (require /*, exports, module*/) {
     }
 
 
-    function registerLinter(linter) {
-        languages[linter.language] = linter;
-        linters[linter.name] = linter;
-    }
-
-
     linterManager.registerDocument = registerDocument;
-    linterManager.registerLinter = registerLinter;
     return linterManager;
 });
-

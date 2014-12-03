@@ -1,8 +1,12 @@
 <div class="interactive-linter-line-widget">
-    {{#messages}}
-        <div class="interactive-linter-line-{{type}} interactive-linter-line-{{code}}">
-            {{reason}}
-            {{#href}} - <a href="{{href}}" title="{{href}}">Details</a>{{/href}}
+    {{#results}}
+        <div class="inspector-section">
+            <div class="inspector-title expanded">{{providerName}} ({{result.problems.length}})</div>
+            <div class="inspector-problems">
+                {{#result.problems}}
+                    <div class="inspector-problem" data-problem-type="{{type}}">{{message}}</div>
+                {{/result.problems}}
+            </div>
         </div>
-    {{/messages}}
+    {{/results}}
 </div>

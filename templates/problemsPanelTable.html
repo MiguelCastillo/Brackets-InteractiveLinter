@@ -1,11 +1,17 @@
 <table class="bottom-panel-table table table-striped table-condensed row-highlight">
     <tbody>
-        {{#messages}}
-        <tr data-line="{{line}}" data-character="{{character}}">
-            <td class="line-number">{{line}}</td>
-            <td class="line-text">{{reason}}</td>
-            <td class="line-snippet">{{evidence}}</td>
-        </tr>
-        {{/messages}}
+        {{#results}}
+            <tr class="inspector-section">
+                <td colspan="3" class="provider-name expanded">{{provider.name}} ({{result.errors.length}})</td>
+            </tr>
+            {{#result.errors}}
+                <tr>
+                    <td class="line-icon" data-problem-type="{{type}}"></td>
+                    <td class="line-number" data-character="{{pos.ch}}">{{friendlyLine}}</td>
+                    <td class="line-text">{{message}}</td>
+                    <td class="line-snippet">{{codeSnippet}}</td>
+                </tr>
+            {{/result.errors}}
+        {{/results}}
     </tbody>
 </table>

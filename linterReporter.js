@@ -11,10 +11,12 @@ define(function (require, exports, module) {
     var spromise = require("libs/js/spromise");
 
     var EditorManager     = brackets.getModule("editor/EditorManager"),
+        CodeInspection    = brackets.getModule("language/CodeInspection"),
         InlineWidget      = brackets.getModule("editor/InlineWidget").InlineWidget,
         _                 = brackets.getModule("thirdparty/lodash");
 
-    var inlineWidgetLintTemplate = require("text!templates/inlineWidgetLint.html");
+    var inlineWidgetLintTemplate = require("text!templates/inlineWidgetLint.html"),
+        linterReporter;
 
 
     function Reporter() {
@@ -26,22 +28,22 @@ define(function (require, exports, module) {
      * Routine that goes through all the linter messages and adds all the gutter
      * symbols and the underlines.
      *
-     * @param messages {Array} linter messages
+     * @param result {?Array.<{provider:Object, result: ?{errors:!Array, aborted:boolean}}>} linter result
      * @param cm {CodeMirror} codemirror instance
      */
-    Reporter.prototype.report = function(cm, messages) {
+    Reporter.prototype.report = function(cm, result) {
         var _self = this;
 
-        this.lastMessages = messages;
+        this.lastResult = result;
 
         if (this.lastRequest && this.lastRequest.state() === "pending") {
             return;
         }
 
-        this.lastRequest = this._runReport(cm, messages).always(function () {
+        this.lastRequest = this._runReport(cm, result).always(function () {
             _self.lastRequest = null;
-            if (_self.lastMessages !== messages) {
-                _self.report(cm, _self.lastMessages);
+            if (_self.lastResult !== result) {
+                _self.report(cm, _self.lastResult);
             }
         });
     };
@@ -59,47 +61,49 @@ define(function (require, exports, module) {
      * Token is a CodeMirror token that specifies start/end information for
      * the string in CodeMirror's document
      */
-    Reporter.prototype.addGutterMarks = function(message, token) {
-        var mark = this.marks[token.start.line];
+    Reporter.prototype.addGutterMarks = function (message) {
+        var mark = this.marks[message.pos.line];
 
         // gutterMark is the placehoder for the lightbulb
         // lineMarks are the underlines in the places the errors are reported for
 
         if (!mark) {
             mark = {
-                warnings: [],
-                errors: [],
+                messages: {},
+                reducedMessages: [],
                 lineMarks: [],
                 gutterMark: {
                     element: $("<div class='interactive-linter-gutter-messages' title='Click for details'>&nbsp;</div>")
                 }
             };
 
-            this.marks[token.start.line] = mark;
-            mark.gutterMark.line = this.cm.setGutterMarker(token.start.line, "interactive-linter-gutter", mark.gutterMark.element[0]);
+            this.marks[message.pos.line] = mark;
+            mark.gutterMark.line = this.cm.setGutterMarker(message.pos.line, "interactive-linter-gutter", mark.gutterMark.element[0]);
         }
 
-        // Add message to warnings or errors array
-        if (mark[message.type + "s"]) {
-            mark[message.type + "s"].push(message);
+
+        if (mark.messages[message.type]) {
+            mark.messages[message.type].push(message);
+        } else {
+            mark.messages[message.type] = [message];
         }
 
-        // If the message is an error message, then add the error class to gutter
-        if (message.type === "error") {
-            mark.gutterMark.element.addClass('interactive-linter-gutter-errors');
-        }
+
+        mark.reducedMessages = _.reduce(mark.messages, function (accumulator, value) {
+            return accumulator.concat(value);
+        }, []);
     };
 
 
     /**
      * Routine to underline problems in documents
      */
-    Reporter.prototype.addLineMarks = function (message, token) {
-        var mark  = this.marks[token.start.line];
+    Reporter.prototype.addLineMarks = function (message) {
+        var mark  = this.marks[message.pos.line];
 
         // Add line marks
         mark.lineMarks.push({
-            line: this.cm.markText(token.start, token.end, {className: "interactive-linter-" + message.type}),
+            line: this.cm.markText(message.pos, message.endpos, {className: "interactive-linter-text-mark"}),
             message: message
         });
     };
@@ -127,8 +131,7 @@ define(function (require, exports, module) {
                 delete mark.inlineWidget;
             }
 
-            delete mark.errors;
-            delete mark.warnings;
+            delete mark.messages;
             delete mark.lineMarks;
             delete mark.gutterMarks;
         });
@@ -190,9 +193,28 @@ define(function (require, exports, module) {
         var activeEditor = EditorManager.getActiveEditor();
         var inlineWidget = mark.inlineWidget;
 
-        var messages = [].concat(mark.errors, mark.warnings);
+        var messages = mark.reducedMessages;
 
-        var $errorHtml = $(Mustache.render(inlineWidgetLintTemplate, {messages: messages}));
+        var results = [];
+        _.forEach(messages, function (message) { // Allows Mustache to iterate over the messages, grouped by provider.
+            if (message) {
+                var key = message.providerName;
+                var keyIndex = _.findKey(results, { providerName: key });
+
+                if (keyIndex) {
+                    results[keyIndex].result.problems.push(message);
+                } else {
+                    results.push({
+                        providerName: key,
+                        result: {
+                            problems: [message]
+                        }
+                    });
+                }
+            }
+        });
+
+        var $errorHtml = $(Mustache.render(inlineWidgetLintTemplate, {results: results}));
 
         inlineWidget.$htmlContent.append($errorHtml);
 
@@ -200,32 +222,112 @@ define(function (require, exports, module) {
             e.stopPropagation();
         });
 
+        $errorHtml.on("click", ".inspector-title", function (e) {
+            var $title = $(e.target);
+            $title.toggleClass("expanded");
+
+            var $inspectorProblems = $title.parent().find(".inspector-problems");
+            $inspectorProblems.toggle($title.hasClass("expanded"));
+
+            activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height() + 20);
+        });
+
         activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height() + 20);
+    };
+
+
+    Reporter.prototype.messageLoop = function (result, callback) {
+       _.forEach(result, function (providerObject) {
+            if (!providerObject || !providerObject.result) {
+                return;
+            }
+
+            _.forEach(providerObject.result.errors, function (message) {
+                return callback(providerObject.provider, message);
+            });
+        });
     };
 
 
     /**
      * Determines if there is a fatal error in the linting report
      */
-    Reporter.prototype.checkFatal = function (messages) {
-        // If the last message created by linter is falsy, that means
-        // that we have encoutered a fatal error...
-        if (messages.length > 2 && !messages[messages.length - 1]) {
-            $(linterReporter).triggerHandler("fatalError", messages[messages.length - 2]);
-            return true;
+    Reporter.prototype.checkFatal = function (result) {
+        var abortedProvider;
+
+        _.forEach(result, function (providerObject) {
+            if (providerObject.result && providerObject.result.aborted) {
+                abortedProvider = providerObject;
+
+                /**
+                 * Makes the first aborted provider the one we report the fatal error for, not the last.
+                 * LoDash forEach stops iterating when an explicit false is returned.
+                 */
+                return false;
+            }
+        });
+
+        if (abortedProvider) {
+            var messages = abortedProvider.result.errors;
+            if (messages.length > 2 && !messages[messages.length - 1]) {
+                $(linterReporter).triggerHandler("fatalError", messages[messages.length - 2]);
+                return true;
+            }
         }
 
-        this.clearFatalError();
+        $(linterReporter).triggerHandler("fatalError", null); // Clears a fatal error
         return false;
     };
 
 
-    Reporter.prototype.clearFatalError = function () {
-        $(linterReporter).triggerHandler("fatalError", null);
+    Reporter.prototype.groomResult = function (result) {
+        var currentDoc = EditorManager.getActiveEditor().document;
+
+        result = _.filter(result, function (resultObject) {
+            return resultObject.result && resultObject.result.errors.length !== 0;
+        });
+
+
+        // Augment error objects with additional fields needed by Mustache template
+        this.messageLoop(result, function (provider, message) {
+            // some inspectors don't always provide a line number or report a negative line number
+            var messageLine = currentDoc.getLine(message.pos.line);
+            if (!isNaN(message.pos.line) && (message.pos.line + 1) > 0 && messageLine !== undefined) {
+                message.friendlyLine = message.pos.line + 1;
+                message.codeSnippet = messageLine.substr(0, Math.min(175, messageLine.length));  // limit snippet width
+            }
+
+            var token = this.cm.getTokenAt({
+                line: message.pos.line,
+                ch: message.pos.ch + 1
+            });
+            var index = token ? token.end : -1;
+
+            if (index < message.pos.ch) {
+                index = messageLine.length;
+            }
+
+            if (index === message.pos.ch && message.pos.ch > 0) {
+                message.pos.ch--;
+            }
+
+            message.endpos = {
+                line: message.pos.line,
+                ch: index
+            };
+
+
+            message.providerName = provider.name;
+            message.cssType = _.findKey(CodeInspection.Type, function (type) {
+                return type === message.type;
+            }).toLowerCase();
+        }.bind(this));
+
+        return result;
     };
 
 
-    Reporter.prototype._runReport = function (cm, messages) {
+    Reporter.prototype._runReport = function (cm, result) {
         var _self = this;
         var deferred = spromise.defer();
 
@@ -235,24 +337,22 @@ define(function (require, exports, module) {
             cm.operation(function() {
                 _self.clearMarks();
 
-                $(linterReporter).triggerHandler("lintMessage", [messages]);
+                if (result) {
 
-                if (messages) {
-                    _self.checkFatal(messages);
                     _self.cm       = cm;
-                    _self.messages = messages;
+                    result         = _self.groomResult(result);
+                    _self.result   = result;
+                    _self.checkFatal(result);
 
-                    _.forEach(messages, function (message) {
-                        if (!message) {
-                            return;
-                        }
-
-                        if (message.token) {
-                            _self.addGutterMarks(message, message.token);
-                            _self.addLineMarks(message, message.token);
+                    _self.messageLoop(result, function (providerObject, message) {
+                        if (message) {
+                            _self.addGutterMarks(message);
+                            _self.addLineMarks(message);
                         }
                     });
                 }
+
+                $(linterReporter).triggerHandler("lintMessage", [result]);
 
                 deferred.resolve();
             });
@@ -262,7 +362,7 @@ define(function (require, exports, module) {
     };
 
 
-    function linterReporter () {
+    linterReporter = function () {
         var _reporter = new Reporter();
 
         function report(cm, messages) {
@@ -277,7 +377,7 @@ define(function (require, exports, module) {
             report: report,
             toggleLineDetails: toggleLineDetails
         };
-    }
+    };
 
 
     return linterReporter;
