@@ -84,6 +84,6 @@ define(function (require, exports, module) {
         getAmountOfProblems: getAmountOfProblems,
         getAmountOfProviders: getAmountOfProviders,
         hasProblems: hasProblems,
-        Status: Status,
+        Status: Status
     };
 });
