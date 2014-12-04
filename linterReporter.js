@@ -170,15 +170,13 @@ define(function (require, exports, module) {
 
         var mark = this.marks[cursorPos.line];
 
-        if (!mark) {
-            return;
+        if (mark) {
+            var problemWidget = new ProblemWidget(mark, cursorPos.line);
+            problemWidget.load(activeEditor);
+            activeEditor.addInlineWidget(cursorPos, problemWidget, true);
+
+            mark.inlineWidget = problemWidget;
         }
-
-        var problemWidget = new ProblemWidget(mark, cursorPos.line);
-        problemWidget.load(activeEditor);
-        activeEditor.addInlineWidget(cursorPos, problemWidget, true);
-
-        mark.inlineWidget = problemWidget;
     };
 
     /**
