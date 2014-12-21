@@ -31,7 +31,7 @@ define(function (require, exports, module) {
     var CMD_SHOW_LINE_DETAILS = "MiguelCastillo.interactive-linter.showLineDetails";
     var SHORTCUT_KEY = "Ctrl-Shift-E";
 
-    ExtensionUtils.loadStyleSheet(module, "style.css");
+    ExtensionUtils.loadStyleSheet(module, "style.less");
 
 
     function handleToggleLineDetails() {
