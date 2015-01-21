@@ -28,9 +28,6 @@ define(function (require, exports, module) {
     ProblemWidget.prototype.constructor = ProblemWidget;
     ProblemWidget.prototype.parentClass = InlineWidget.prototype;
 
-    ProblemWidget.prototype.$wrapperDiv = null;
-    ProblemWidget.prototype.$scroller = null;
-
     ProblemWidget.prototype.onAdded = function () {
         ProblemWidget.prototype.parentClass.onAdded.apply(this, arguments);
 
