@@ -11,7 +11,7 @@ define(function(require, exports, module) {
     var _               = brackets.getModule("thirdparty/lodash"),
         FileSystem      = brackets.getModule("filesystem/FileSystem"),
         pluginLoader    = require("pluginLoader"),
-        spromise        = require("libs/js/spromise"),
+        Promise         = require("libs/js/spromise"),
         pluginDirectory = module.uri.substring(0, module.uri.lastIndexOf("/"));
 
 
@@ -20,7 +20,7 @@ define(function(require, exports, module) {
      * make sure they are smoothly running in a worker thread.
      */
     function pluginManager() {
-        return spromise.all([getPluginsMeta(pluginDirectory  + "/plugins/default"), getPluginsMeta(pluginDirectory  + "/plugins/dev")])
+        return Promise.all([getPluginsMeta(pluginDirectory  + "/plugins/default"), getPluginsMeta(pluginDirectory  + "/plugins/dev")])
             .then(loadPlugins)
             .then(pluginsLoaded);
     }
@@ -31,7 +31,7 @@ define(function(require, exports, module) {
             return plugin.directories.length !== 0;
         });
 
-        return spromise.all(plugins.map(function(plugin) {
+        return Promise.all(plugins.map(function(plugin) {
             return pluginLoader.workerThreadPluginLoader(plugin);
         }));
     }
@@ -43,7 +43,7 @@ define(function(require, exports, module) {
 
 
     function getPluginsMeta(path) {
-        return spromise(function(resolve) {
+        return new Promise(function(resolve) {
             FileSystem.getDirectoryForPath(path).getContents(function(err, entries) {
                 resolve({
                     directories: _.filter(entries, 'isDirectory').map(function(dir) {return dir.name;}),

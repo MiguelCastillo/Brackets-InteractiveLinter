@@ -1,31 +1,31 @@
-define(function (require, exports, module) {
+define(function (require /*, exports, module*/) {
     "use strict";
 
     var EditorManager    = brackets.getModule("editor/EditorManager"),
         MainViewManager  = brackets.getModule("view/MainViewManager"),
         WorkspaceManager = brackets.getModule("view/WorkspaceManager"),
         Resizer          = brackets.getModule("utils/Resizer"),
-        StringUtils      = brackets.getModule("utils/StringUtils");
+        StringUtils      = brackets.getModule("utils/StringUtils"),
+        linterManager    = require("linterManager"),
+        linterReporter   = require("linterReporter"),
+        panelTemplate    = require("text!templates/problemsPanel.html"),
+        resultsTemplate  = require("text!templates/problemsPanelTable.html"),
+        collapsed        = true,
+        hasErrors        = false;
 
-
-    var linterManager   = require("linterManager"),
-        linterReporter  = require("linterReporter"),
-        panelTemplate   = require("text!templates/problemsPanel.html"),
-        resultsTemplate = require("text!templates/problemsPanelTable.html"),
-        $problemsPanel,
-        $problemsPanelTable,
-        collapsed = true,
-        hasErrors = false;
+    var $problemsPanel, $problemsPanelTable;
 
 
     function handleIndicatorClick() {
         if (!hasErrors) {
             hidePanel();
-        } else {
+        }
+        else {
             if (Resizer.isVisible($problemsPanel)) {
                 collapsed = true;
                 hidePanel();
-            } else {
+            }
+            else {
                 collapsed = false;
                 showPanel();
             }
@@ -47,30 +47,28 @@ define(function (require, exports, module) {
 
     function createPanel() {
         var $panelHtml = $(Mustache.render(panelTemplate));
-        WorkspaceManager.createBottomPanel("interactive-linter.linting.messages", $panelHtml, 100);
 
         $problemsPanel = $("#interactive-linter-problems-panel");
-        $problemsPanelTable = $problemsPanel.find(".table-container");
+        $problemsPanel.on("click", ".close", function () {
+            collapsed = true;
+            hidePanel();
+        });
 
+        $problemsPanelTable = $problemsPanel.find(".table-container");
         $problemsPanelTable.on("click", "tr", function () {
             var $target = $(this);
-            // Grab the required position data
-            var line      = $target.data("line") - 1; // Convert from friendly line to actual line number
+            var line = $target.data("line") - 1; // Convert from friendly line to actual line number
 
             // if there is no line number available, don't do anything
             if (!isNaN(line)) {
                 var character = $target.data("character") - 1; // Convert from friendly character to actual character
-
-                var editor = EditorManager.getCurrentFullEditor();
+                var editor    = EditorManager.getCurrentFullEditor();
                 editor.setCursorPos(line, character, true);
                 MainViewManager.focusActivePane();
             }
         });
 
-        $problemsPanel.on("click", ".close", function () {
-            collapsed = true;
-            hidePanel();
-        });
+        WorkspaceManager.createBottomPanel("interactive-linter.linting.messages", $panelHtml, 100);
     }
 
 

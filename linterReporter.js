@@ -5,14 +5,13 @@
  */
 
 
-define(function (require, exports, module) {
+define(function (require /*, exports, module*/) {
     "use strict";
 
-    var spromise = require("libs/js/spromise"),
+    var _             = brackets.getModule("thirdparty/lodash"),
+        EditorManager = brackets.getModule("editor/EditorManager"),
+        Promise       = require("libs/js/spromise"),
         ProblemWidget = require("ProblemWidget");
-
-    var EditorManager     = brackets.getModule("editor/EditorManager"),
-        _                 = brackets.getModule("thirdparty/lodash");
 
 
     function Reporter() {
@@ -202,7 +201,7 @@ define(function (require, exports, module) {
 
     Reporter.prototype._runReport = function (cm, messages) {
         var _self = this;
-        var deferred = spromise.defer();
+        var deferred = Promise.defer();
 
 
         // Run as operation for best performance

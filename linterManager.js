@@ -48,6 +48,9 @@ define(function (require /*, exports, module*/) {
         if (/.ts|.typescript$/.test(file.name) && mode === "javascript" && languages[mode]) {
             mode = "typescript";
         }
+        else if (/.jsx$/.test(file.name) && mode === "javascript" && languages[mode]) {
+            mode = "jsx";
+        }
 
         if (languages[mode]) {
             return new Linter(cm, mode, file.parentPath);

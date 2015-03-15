@@ -11,7 +11,7 @@ define(function (require/*, exports, module*/) {
     var Dialogs         = brackets.getModule("widgets/Dialogs"),
         ProjectManager  = brackets.getModule("project/ProjectManager"),
         FileSystem      = brackets.getModule("filesystem/FileSystem"),
-        spromise        = require("libs/js/spromise"),
+        Promise         = require("libs/js/spromise"),
         currentProject  = {},
         currentLinter   = {};
 
@@ -23,7 +23,7 @@ define(function (require/*, exports, module*/) {
 
 
     function findFile(fileName, filePath, traverse) {
-        var deferred = spromise.defer();
+        var deferred = Promise.defer();
 
         function find(filePath) {
             if (!filePath) {
@@ -55,7 +55,7 @@ define(function (require/*, exports, module*/) {
 
 
     function readFile(file) {
-        var deferred = spromise.defer();
+        var deferred = Promise.defer();
 
         file.read(function(err, content /*, stat*/) {
             if (err) {
@@ -71,7 +71,7 @@ define(function (require/*, exports, module*/) {
 
 
     function setSettings(settings) {
-        var deferred = spromise.defer();
+        var deferred = Promise.defer();
         settings = stripComments(settings);
 
         try {
@@ -99,6 +99,7 @@ define(function (require/*, exports, module*/) {
 
 
     FileSystem.on("change", function(evt, file) {
+        console.log(file);
         if (currentLinter.file && currentLinter.fileObject && file && file.fullPath === currentLinter.fileObject.fullPath) {
             loadFile().done(currentLinter.linter.lint);
         }
@@ -122,12 +123,12 @@ define(function (require/*, exports, module*/) {
 
     function loadSettings(file, path, linter) {
         if (!file) {
-            return spromise.resolve();
+            return Promise.resolve();
         }
 
         // Cache so that we are not loading up the same file when navigating in the same directory...
         if (path === currentLinter.path) {
-            return spromise.resolve(currentLinter.settings);
+            return Promise.resolve(currentLinter.settings);
         }
 
         currentLinter = {
