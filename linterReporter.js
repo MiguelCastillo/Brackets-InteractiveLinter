@@ -8,13 +8,11 @@
 define(function (require, exports, module) {
     "use strict";
 
-    var spromise = require("libs/js/spromise");
+    var spromise = require("libs/js/spromise"),
+        ProblemWidget = require("ProblemWidget");
 
     var EditorManager     = brackets.getModule("editor/EditorManager"),
-        InlineWidget      = brackets.getModule("editor/InlineWidget").InlineWidget,
         _                 = brackets.getModule("thirdparty/lodash");
-
-    var inlineWidgetLintTemplate = require("text!templates/inlineWidgetLint.html");
 
 
     function Reporter() {
@@ -118,7 +116,7 @@ define(function (require, exports, module) {
         this.cm.clearGutter("interactive-linter-gutter");
 
         _.forEach(this.marks, function (mark) {
-            _.forEach(mark.lineMarks, function (textMark) {
+            mark.lineMarks.forEach(function (textMark) {
                 textMark.line.clear();
             });
 
@@ -142,14 +140,14 @@ define(function (require, exports, module) {
         var inlineWidgets = activeEditor.getInlineWidgets();
 
         return _.find(inlineWidgets, function (widget) {
-            return widget.interactiveLinterLineNumber === line;
+            return widget instanceof ProblemWidget && widget.line === line;
         });
     };
 
 
     Reporter.prototype.toggleLineDetails = function (line) {
         var activeEditor = EditorManager.getActiveEditor();
-        var cursorPos    = line !== undefined ? {line: line, ch: 0} : activeEditor.getCursorPos();
+        var cursorPos    = line === undefined ? activeEditor.getCursorPos() : { line: line, ch: 0 };
         var lineWidget   = this.getWidgetForLine(cursorPos.line);
 
         if (lineWidget) {
@@ -172,37 +170,14 @@ define(function (require, exports, module) {
 
         var mark = this.marks[cursorPos.line];
 
-        if (!mark) {
-            return;
+        if (mark) {
+            var problemWidget = new ProblemWidget(mark, cursorPos.line);
+            problemWidget.load(activeEditor);
+            activeEditor.addInlineWidget(cursorPos, problemWidget, true);
+
+            mark.inlineWidget = problemWidget;
         }
-
-        var inlineWidget = new InlineWidget();
-        mark.inlineWidget = inlineWidget;
-        inlineWidget.load(EditorManager.getActiveEditor());
-        inlineWidget.interactiveLinterLineNumber = cursorPos.line;
-        activeEditor.addInlineWidget(cursorPos, inlineWidget, true);
-
-        this.updateLineDetails(mark);
     };
-
-
-    Reporter.prototype.updateLineDetails = function (mark) {
-        var activeEditor = EditorManager.getActiveEditor();
-        var inlineWidget = mark.inlineWidget;
-
-        var messages = [].concat(mark.errors, mark.warnings);
-
-        var $errorHtml = $(Mustache.render(inlineWidgetLintTemplate, {messages: messages}));
-
-        inlineWidget.$htmlContent.append($errorHtml);
-
-        $errorHtml.on("mousedown", function (e) {
-            e.stopPropagation();
-        });
-
-        activeEditor.setInlineWidgetHeight(inlineWidget, $errorHtml.height() + 20);
-    };
-
 
     /**
      * Determines if there is a fatal error in the linting report
