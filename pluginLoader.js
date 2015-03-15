@@ -8,15 +8,14 @@
 define(function(require, exports, module){
     "use strict";
 
-    var requireUID = 1;
-
-    var _        = brackets.getModule("thirdparty/lodash"),
-        spromise = require("libs/js/spromise");
+    var _          = brackets.getModule("thirdparty/lodash"),
+        Promise    = require("libs/js/spromise"),
+        requireUID = 1;
 
 
     function embeddedPluginLoader(pluginsMeta) {
         if (!pluginsMeta.directories.length) {
-            return spromise.resolve();
+            return Promise.resolve();
         }
 
         var requirePlugin = requirejs.config({
@@ -34,7 +33,7 @@ define(function(require, exports, module){
             var _lint = plugin.lint;
 
             function lint(text, settings) {
-                return spromise.resolve(_lint(text, settings));
+                return Promise.resolve(_lint(text, settings));
             }
 
             return {
@@ -42,7 +41,7 @@ define(function(require, exports, module){
             };
         }
 
-        return spromise(function(resolve) {
+        return new Promise(function(resolve) {
             requirePlugin(pluginsMeta.directories, function() {
                 var plugins = {};
 
@@ -62,11 +61,11 @@ define(function(require, exports, module){
 
     function workerThreadPluginLoader(pluginsMeta) {
         if (!pluginsMeta.directories.length) {
-            return spromise.resolve();
+            return Promise.resolve();
         }
 
         var currentRequest, lastMessage;
-        var pendingRequest = spromise.defer();
+        var pendingRequest = Promise.defer();
         var worker         = new Worker(module.uri.substring(0, module.uri.lastIndexOf("/")) + "/pluginWorker.js");
 
 
@@ -95,11 +94,11 @@ define(function(require, exports, module){
 
             if (currentRequest && currentRequest.isPending()) {
                 pendingRequest.resolve(); // Skip whatever is pending and queue another request
-                return (pendingRequest = spromise.defer()).then(resolveRequest.bind(null, message));
+                return (pendingRequest = Promise.defer()).then(resolveRequest.bind(null, message));
             }
             else {
                 worker.postMessage(message);
-                return (currentRequest = spromise.defer()).then(resolveRequest.bind(null, message));
+                return (currentRequest = Promise.defer()).then(resolveRequest.bind(null, message));
             }
         }
 

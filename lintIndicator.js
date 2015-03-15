@@ -1,12 +1,11 @@
 define(function (require/*, exports, module*/) {
     "use strict";
 
-    var DefaultDialogs   = brackets.getModule("widgets/DefaultDialogs"),
-        Dialogs          = brackets.getModule("widgets/Dialogs"),
-        StatusBar        = brackets.getModule("widgets/StatusBar"),
-        StringUtils      = brackets.getModule("utils/StringUtils");
-
-    var linterReporter = require("linterReporter"),
+    var DefaultDialogs = brackets.getModule("widgets/DefaultDialogs"),
+        Dialogs        = brackets.getModule("widgets/Dialogs"),
+        StatusBar      = brackets.getModule("widgets/StatusBar"),
+        StringUtils    = brackets.getModule("utils/StringUtils"),
+        linterReporter = require("linterReporter"),
         linterManager  = require("linterManager"),
         dialogTemplate = require("text!templates/errorDialog.html");
 

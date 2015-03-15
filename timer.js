@@ -6,18 +6,17 @@
  */
 
 
-define([
-], function() {
+define(function() {
   "use strict";
 
-  function timer(start) {
+  function Timer(start) {
     if(start !== false) {
       this.start();
     }
   }
 
 
-  timer.units = {
+  Timer.units = {
     msec: 1,
     secs: 1000,
     mins: 1000 * 60,
@@ -25,25 +24,25 @@ define([
   };
 
 
-  timer.prototype.start = function() {
+  Timer.prototype.start = function() {
     this._start = Date.now();
   };
 
 
-  timer.prototype.end = function() {
+  Timer.prototype.end = function() {
     this._end = Date.now();
   };
 
 
-  timer.prototype.elapsed = function(unit) {
+  Timer.prototype.elapsed = function(unit) {
     if (isNaN(unit) === true) {
-      unit = timer.units.secs;
+      unit = Timer.units.secs;
     }
 
     this.end();
     return (this._end - this._start)/unit;
   };
 
-  return timer;
+  return Timer;
 });
 
