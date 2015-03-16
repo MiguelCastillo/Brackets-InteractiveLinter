@@ -9,25 +9,25 @@ define(function(require /*, exports, module*/) {
     "use strict";
 
     /**
-    * BUG: jshint gives the wrong character index when dealing with tabs.
-    * https://github.com/jshint/jshint/issues/430
-    * I am stuck only expecting correct results when the files uses white
-    * spaces. Arrrggh!
-    */
+     * BUG: jshint gives the wrong character index when dealing with tabs.
+     * https://github.com/jshint/jshint/issues/430
+     * I am stuck only expecting correct results when the files uses white
+     * spaces. Arrrggh!
+     */
 
     require("jshint/libs/jshint");
     var utils           = require("libs/utils"),
         groomer         = require("jshint/groomer"),
-        defaultSettings = JSON.parse(require("text!jshint/default.json")),
+        defaultOptions  = JSON.parse(require("text!jshint/default.json")),
         settings        = JSON.parse(require("text!jshint/settings.json"));
 
-    function lint(text, settings) {
+    function lint(text, options) {
         var i, length;
 
-        settings = utils.mixin({}, defaultSettings, settings);
+        options = utils.mixin({}, defaultOptions, options);
 
         // Get document as a string to be passed into JSHint
-        if (!JSHINT(text, settings, settings.globals)) {
+        if (!JSHINT(text, options, options.globals)) {
             var errors = JSHINT.errors.slice(0);
 
             // If JSHINT.errors is false, then JSHint has some errors it needs to report
@@ -38,7 +38,7 @@ define(function(require /*, exports, module*/) {
                 // error while linting the file
                 if (errors[i]) {
                     delete errors[i].scope; // Some errors have scope, which breaks workers (cannot clone objects)
-                    errors[i].token = groomer.groom(errors[i], settings);
+                    errors[i].token = groomer.groom(errors[i], options);
                 }
             }
 
