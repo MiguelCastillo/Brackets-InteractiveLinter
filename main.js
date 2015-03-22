@@ -99,7 +99,7 @@ define(function (require, exports, module) {
         }
 
         if (previousEditor) {
-            $(previousEditor).off("editorChange", handleDocumentChange);
+            previousEditor.off("editorChange", handleDocumentChange);
         }
 
         if (currentEditor) {
@@ -108,7 +108,7 @@ define(function (require, exports, module) {
 
         // If a linter was successfully created, then we are safe to bind event handlers for editor changes.
         if (linter) {
-            $(currentEditor).on("editorChange", handleDocumentChange);
+            currentEditor.on("editorChange", handleDocumentChange);
             linter.lint();
             setTimeout(disableBracketsIndicator);
         }
@@ -135,7 +135,7 @@ define(function (require, exports, module) {
                 linterManager.registerLinter(plugins[iPlugin]);
             }
 
-            $(EditorManager).on("activeEditorChange.interactive-linter", setDocument);
+            EditorManager.on("activeEditorChange.interactive-linter", setDocument);
             setDocument(null, EditorManager.getActiveEditor());
         });
     }
