@@ -47,6 +47,7 @@ define(function (require /*, exports, module*/) {
 
     function createPanel() {
         var $panelHtml = $(Mustache.render(panelTemplate));
+        WorkspaceManager.createBottomPanel("interactive-linter.linting.messages", $panelHtml, 100);
 
         $problemsPanel = $("#interactive-linter-problems-panel");
         $problemsPanel.on("click", ".close", function () {
@@ -67,8 +68,6 @@ define(function (require /*, exports, module*/) {
                 MainViewManager.focusActivePane();
             }
         });
-
-        WorkspaceManager.createBottomPanel("interactive-linter.linting.messages", $panelHtml, 100);
     }
 
 
