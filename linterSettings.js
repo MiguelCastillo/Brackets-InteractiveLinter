@@ -16,10 +16,22 @@ define(function (require/*, exports, module*/) {
         currentLinter   = {};
 
 
-    function getParentPath(path) {
-        var result = stripTrailingSlashes(path);
-        return result.substr(0, result.lastIndexOf("/") + 1);
+    function Settings(linter) {
+        this._linter = linter;
     }
+
+
+    Settings.prototype.load = function(basePath) {
+        if (this._basePath === basePath) {
+            return Promise.resole(this.settings);
+        }
+
+        var fileName = this._linter.settingsFiles;
+        var filePath = resolvePath(fileName, basePath);
+
+        console.log(filePath);
+    };
+
 
 
     function findFile(fileName, filePath, traverse) {
@@ -99,7 +111,6 @@ define(function (require/*, exports, module*/) {
 
 
     FileSystem.on("change", function(evt, file) {
-        console.log(file);
         if (currentLinter.file && currentLinter.fileObject && file && file.fullPath === currentLinter.fileObject.fullPath) {
             loadFile().done(currentLinter.linter.lint);
         }
@@ -110,14 +121,10 @@ define(function (require/*, exports, module*/) {
         var traverse = currentLinter.path.indexOf(currentProject.fullPath) !== -1;
 
         return findFile(currentLinter.file, currentLinter.path, traverse)
-            .always(function(file) {
-                currentLinter.fileObject = file;
-            })
+            .always(function(file) {currentLinter.fileObject = file;})
             .then(readFile, $.noop)
             .then(setSettings, $.noop)
-            .always(function(settings) {
-                currentLinter.settings = settings;
-            });
+            .always(function(settings) {currentLinter.settings = settings;});
     }
 
 
@@ -138,6 +145,22 @@ define(function (require/*, exports, module*/) {
         };
 
         return loadFile();
+    }
+
+
+    function resolvePath(fileName, fullPath) {
+        return normalizePath(fullPath + "/" + fileName);
+    }
+
+
+    /**
+     * Removes one directory from the path passed in
+     *
+     * @returns {string} Parent path
+     */
+    function getParentPath(path) {
+        var result = stripTrailingSlashes(path);
+        return result.substr(0, result.lastIndexOf("/") + 1);
     }
 
 
@@ -172,7 +195,8 @@ define(function (require/*, exports, module*/) {
 
 
     return {
-        loadSettings: loadSettings
+        loadSettings: loadSettings,
+        Settings: Settings
     };
 
 });

@@ -9,39 +9,33 @@ importScripts("libs/js/require.js");
 
 
 function PluginLoader(settings) {
-    "use strict";
-
     var _self = this;
-    var data = settings.data;
+    this.byName = {};
 
     var pluginRequire = requirejs.config({
         "paths": {
             "text": "../../libs/js/text",
             "libs": "../../libs/js"
         },
-        "baseUrl": data.baseUrl,
-        "packages": data.packages
+        "baseUrl": settings.baseUrl,
+        "packages": settings.packages
     });
 
-    _self.byName = {};
-    _self.byLanguage = {};
 
-
-    pluginRequire(data.packages, function() {
+    pluginRequire(settings.packages, function() {
         var _plugins = Array.prototype.slice.call(arguments),
             _result = {},
             plugin = null;
 
         for (var iPlugin in _plugins) {
-            plugin = _plugins[iPlugin];
-            plugin.name = plugin.name || data.packages[iPlugin];
+            plugin      = _plugins[iPlugin];
+            plugin.name = plugin.name || settings.packages[iPlugin];
             _self.byName[plugin.name] = plugin;
-            _self.byLanguage[plugin.language] = plugin;
 
             _result[plugin.name] = {
-                "name": plugin.name,
-                "language": plugin.language,
-                "settingsFile": plugin.settingsFile
+                "name"         : plugin.name,
+                "language"     : plugin.language,
+                "settingsFile" : plugin.settingsFile
             };
         }
 
@@ -53,18 +47,12 @@ function PluginLoader(settings) {
 }
 
 
-PluginLoader.prototype.lint = function(data) {
-    var _self = this;
-
-    // Lint!
-    data = data.data;
-    var lintResult = _self.byName[data.name].lint(data.text, data.settings);
+PluginLoader.prototype.lint = function(linter) {
+    var lintResult = this.byName[linter.name].lint(linter.data, linter.settings);
 
     postMessage({
-        "type": "lint",
-        "data": {
-            result: lintResult
-        }
+        type: "lint",
+        data: linter.data
     });
 };
 
@@ -76,26 +64,27 @@ var console = {
     log: function(message) {
         postMessage({
             type: "debug",
-            message: message
+            data: message
         });
     }
 };
 
 
 onmessage = function(evt) {
-    var data = evt.data || {};
-    var method = PluginLoader.instance && PluginLoader.instance[data.type];
+    debugger;
+    var message = evt.data;
+    var method  = PluginLoader.instance && PluginLoader.instance[message.type];
 
-    if (typeof method === 'function') {
-        return method.apply(PluginLoader.instance, [data || {}]);
+    if (typeof(method) === 'function') {
+        return method.call(PluginLoader.instance, message.data || {});
     }
 
-    switch (data.type) {
+    switch (message.type) {
         case "init":
-            PluginLoader.instance = new PluginLoader(data);
+            PluginLoader.instance = new PluginLoader(message.data);
             break;
         default:
-            throw new Error("Unknown message type: " + data.type);
+            throw new Error("Unknown message type: " + message.type);
     }
 };
 

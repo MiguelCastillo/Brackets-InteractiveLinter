@@ -12,7 +12,7 @@ define(function(require /*, exports, module*/) {
         groomer         = require("jsonlint/groomer"),
         defaultSettings = JSON.parse(require("text!jsonlint/default.json")),
         settings        = JSON.parse(require("text!jsonlint/settings.json"));
-    
+
     var lastError = null;
 
     // Let's override the parseError method so that we can get access to the object
@@ -23,12 +23,12 @@ define(function(require /*, exports, module*/) {
     };
 
 
-    function lint(text, settings) {
+    function lint(data, settings) {
         var errors;
         settings = utils.mixin({}, defaultSettings, settings);
-        
+
         try {
-            jsonlint.parse(text);
+            jsonlint.parse(data.content);
         }
         catch(ex) {
             if (lastError) {
@@ -38,7 +38,7 @@ define(function(require /*, exports, module*/) {
             }
         }
 
-        return errors;
+        data.result = errors;
     }
 
     return utils.mixin(settings, {

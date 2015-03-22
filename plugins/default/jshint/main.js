@@ -21,13 +21,13 @@ define(function(require /*, exports, module*/) {
         defaultOptions  = JSON.parse(require("text!jshint/default.json")),
         settings        = JSON.parse(require("text!jshint/settings.json"));
 
-    function lint(text, options) {
+    function lint(data, options) {
         var i, length;
 
         options = utils.mixin({}, defaultOptions, options);
 
         // Get document as a string to be passed into JSHint
-        if (!JSHINT(text, options, options.globals)) {
+        if (!JSHINT(data.content, options, options.globals)) {
             var errors = JSHINT.errors.slice(0);
 
             // If JSHINT.errors is false, then JSHint has some errors it needs to report
@@ -42,7 +42,7 @@ define(function(require /*, exports, module*/) {
                 }
             }
 
-            return errors;
+            data.result = errors;
         }
     }
 

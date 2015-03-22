@@ -9,65 +9,131 @@ define(function (require /*, exports, module*/) {
     "use strict";
 
     var _ = brackets.getModule("thirdparty/lodash");
-    var linterSettings = require("linterSettings"),
-        linterReporter = require("linterReporter"),
-        languages      = {},
-        linters        = {},
-        linterManager  = {};
+    var Promise         = require("libs/js/spromise"),
+        linterReporter  = require("linterReporter"),
+        linterFactories = {},
+        linterManager   = {};
 
 
-    function Linter(cm, mode, fullPath) {
-        this.cm            = cm;
-        this.mode          = mode;
-        this.reporter      = linterReporter();
-        this.lint          = _.debounce(Linter.lint.bind(null, this, languages[mode], fullPath), 1000);
-        this.onClickGutter = gutterClick.bind(null, this);
-    }
-
-
-    Linter.prototype.register = function() {
-        this.cm.on("gutterClick", this.onClickGutter);
+    var languages = {
+        "json": ["jsonlint"],
+        "javascript": ["jsx", "jshint"]
     };
 
 
-    Linter.prototype.unregister = function() {
+    var reporters = {
+        "javascript": [linterReporter]
+    };
+
+
+    function Runner(cm, file) {
+        this._file      = file;
+        this._linters   = [];
+        this._reporters = [];
+        this.cm         = cm;
+        this.lint       = _.debounce(lintDelegate.bind(null, this, file.fullPath), 1000);
+
+        // Wire up gutter click handler
+        this.onClickGutter = gutterClick.bind(null, this);
+        this.cm.on("gutterClick", this.onClickGutter);
+    }
+
+
+    Runner.prototype.registerLinter = function(linter) {
+        this._linters.push(linter);
+    };
+
+
+    Runner.prototype.registerReporter = function(reporter) {
+        this._reporters.push(reporter);
+        this.reporter = reporter;
+    };
+
+
+    Runner.prototype.dispose = function() {
         this.cm.off("gutterClick", this.onClickGutter);
     };
 
 
-    /**
-     * Create instance of linter to process CodeMirror documents
-     */
-    Linter.factory = function(cm, file) {
-        var mode = cm && cm.getDoc().getMode();
-
-        // Get the best poosible mode (document type) for the document
-        mode = mode && (mode.helperType || mode.name);
-
-        // A bit of hackery to figure out if we can process the document as typescript
-        if (/.ts|.typescript$/.test(file.name) && mode === "javascript" && languages[mode]) {
-            mode = "typescript";
-        }
-        else if (/.jsx$/.test(file.name) && mode === "javascript" && languages[mode]) {
-            mode = "jsx";
+    Runner.create = function(cm, file) {
+        var docType = Runner.getDocumentType(cm);
+        if (!languages[docType]) {
+            return;
         }
 
-        if (languages[mode]) {
-            return new Linter(cm, mode, file.parentPath);
-        }
-    };
+        var runner = new Runner(cm, file);
 
+        // Register linter instances.
+        languages[docType].forEach(function(linterName) {
+            if (!linterFactories[linterName]) {
+                console.error("Linter " + linterName + " was not found!");
+            }
 
-    /**
-     * Interface that will be used for running linters
-     */
-    Linter.lint = function(linter, linterPlugin, fullPath) {
-        linterSettings.loadSettings(linterPlugin.settingsFile, fullPath, linter).always(function(settings) {
-            linterPlugin.lint(linter.cm.getDoc().getValue(), settings).done(function(result) {
-                linter.reporter.report(linter.cm, result);
-            });
+            runner.registerLinter(linterFactories[linterName].create());
         });
+
+        // Register reporter instances.
+        if (reporters[docType]) {
+            reporters[docType].forEach(function(reporter) {
+                runner.registerReporter(reporter(cm));
+            });
+        }
+        else {
+            runner.registerReporter(linterReporter(cm));
+        }
+
+        return runner;
     };
+
+
+    Runner.runLinters = function(runner /*, fullPath*/) {
+        return function linterDelegate(lintData) {
+            function linterSequence(prev, linter) {
+                return prev.then(function processLintResult(lintResult) {
+                    if (lintResult) {
+                        lintData.content = lintResult.content;
+                        lintData.result  = lintData.result.concat(lintResult.result);
+                    }
+
+                    return lintData.content ? linter.lint(lintData) : null;
+                });
+            }
+
+            return runner._linters.reduce(linterSequence, Promise.resolve(lintData));
+        };
+    };
+
+
+    Runner.runReporters = function(runner /*, fullPath*/) {
+        return function reporterDelegate(lintResult) {
+            function reporterSequence(prev, reporter) {
+                return prev.then(function() {
+                    return reporter.report(lintResult.result);
+                });
+            }
+
+            return runner._reporters.reduce(reporterSequence, Promise.resolve());
+        };
+    };
+
+
+    Runner.getDocumentType = function(cm) {
+        // Get the best poosible mode (document type) for the document
+        var documentType = cm && cm.getDoc().getMode();
+        return documentType && (documentType.helperType || documentType.name);
+    };
+
+
+    function lintDelegate(runner, fullPath) {
+        var lintData = {
+            fullPath : fullPath,
+            content  : stripMinified(runner.cm.getDoc().getValue()),
+            result   : []
+        };
+
+        return Runner.runLinters(runner, fullPath)(lintData)
+            .then(Runner.runReporters(runner, fullPath));
+    }
 
 
     /**
@@ -96,34 +162,39 @@ define(function (require /*, exports, module*/) {
             throw new TypeError("Must provide an instance of CodeMirror");
         }
 
-        var linter = cm.__linter || (cm.__linter = Linter.factory(cm, file));
-
-        if (!linter) {
+        var runner = cm.__lintrunner || (cm.__lintrunner = Runner.create(cm, file));
+        if (!runner) {
             $(linterManager).triggerHandler("linterNotFound");
             return;
         }
 
         var gutters = cm.getOption("gutters").slice(0);
-
-        // If a gutter for interactive linter does not exist, add one.
         if (gutters.indexOf("interactive-linter-gutter") === -1) {
             gutters.unshift("interactive-linter-gutter");
             cm.setOption("gutters", gutters);
         }
 
-        linter.register();
-        return linter;
+        return runner;
     }
 
 
     function registerLinter(linter) {
-        languages[linter.language] = linter;
-        linters[linter.name] = linter;
+        linterFactories[linter.name] = linter;
+    }
+
+
+    /**
+     * Strips out any line that longer than 250 characters as a way to guess if the code is minified
+     */
+    function stripMinified(text) {
+        // var regex = /function[ ]?\w*\([\w,]*\)\{(?:\S[\s]?){150,}\}/gm;
+        // var regex = /(?:\S[\s]?){250,}[\n]$/gm;
+        var regex = /(?:.){500,}/gm;
+        return text.replace(regex, "");
     }
 
 
     linterManager.registerDocument = registerDocument;
-    linterManager.registerLinter = registerLinter;
+    linterManager.registerLinter   = registerLinter;
     return linterManager;
 });
-

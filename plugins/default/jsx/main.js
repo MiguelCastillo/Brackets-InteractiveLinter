@@ -9,21 +9,20 @@ define(function(require /*, exports, module*/) {
     "use strict";
 
     var utils          = require("libs/utils"),
-        jshint         = require("../jshint/main"),
         reacttools     = require("jsx/libs/reacttools"),
         defaultOptions = JSON.parse(require("text!jsx/default.json")),
         settings       = JSON.parse(require("text!jsx/settings.json"));
 
 
-    function lint(source, options) {
+    function lint(data, options) {
         options = utils.mixin({}, defaultOptions, options);
-        var result;
 
         try {
-        	result = reacttools.transform(source);
+            data.content = reacttools.transform(data.content);
         }
         catch(ex) {
-            return [{
+            data.content = '';
+            data.result = [{
                 type: "error",
                 reason: ex.description,
                 token:{
@@ -38,8 +37,6 @@ define(function(require /*, exports, module*/) {
                 }
             }];
         }
-
-        return jshint.lint(result, options);
     }
 
 

@@ -94,7 +94,7 @@ define(function (require, exports, module) {
     function setDocument(event, currentEditor, previousEditor) {
         // Unregister current linter instance
         if (linter) {
-            linter.unregister();
+            linter.dispose();
             linter = null;
         }
 

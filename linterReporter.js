@@ -14,7 +14,8 @@ define(function (require /*, exports, module*/) {
         ProblemWidget = require("ProblemWidget");
 
 
-    function Reporter() {
+    function Reporter(cm) {
+        this.cm = cm;
         this.marks = {};
     }
 
@@ -26,8 +27,9 @@ define(function (require /*, exports, module*/) {
      * @param messages {Array} linter messages
      * @param cm {CodeMirror} codemirror instance
      */
-    Reporter.prototype.report = function(cm, messages) {
+    Reporter.prototype.report = function(messages) {
         var _self = this;
+        var cm = this.cm;
 
         this.lastMessages = messages;
 
@@ -236,11 +238,11 @@ define(function (require /*, exports, module*/) {
     };
 
 
-    function linterReporter () {
-        var _reporter = new Reporter();
+    function linterReporter (cm) {
+        var _reporter = new Reporter(cm);
 
-        function report(cm, messages) {
-            return _reporter.report(cm, messages);
+        function report(messages) {
+            return _reporter.report(messages);
         }
 
         function toggleLineDetails(line) {

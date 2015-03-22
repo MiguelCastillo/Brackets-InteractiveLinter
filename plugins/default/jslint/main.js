@@ -13,12 +13,12 @@ define(function(require /*, exports, module*/) {
         defaultSettings = JSON.parse(require("text!jslint/default.json")),
         settings        = JSON.parse(require("text!jslint/settings.json"));
 
-    function lint(text, settings) {
+    function lint(data, settings) {
         var i, length;
 
         settings = utils.mixin({}, defaultSettings, settings);
 
-        if (!JSLINT(text, settings)) {
+        if (!JSLINT(data.content, settings)) {
             var errors = JSLINT.errors.slice(0);
 
             // If JSHINT.errors is false, then JSHint has some errors it needs to report
@@ -32,7 +32,7 @@ define(function(require /*, exports, module*/) {
                 }
             }
 
-            return errors;
+            data.result = errors;
         }
     }
 

@@ -5,14 +5,32 @@
  */
 
 
-define(function(require, exports, module){
+define(function(require, exports, module) {
     "use strict";
 
     var _          = brackets.getModule("thirdparty/lodash"),
         Promise    = require("libs/js/spromise"),
+        Linter     = require("Linter"),
         requireUID = 1;
 
 
+    function linterFacrory(name, lint, options) {
+        function LinterPlugin() {Linter.call(this, options);}
+        LinterPlugin.prototype = Object.create(Linter.prototype);
+        LinterPlugin.prototype.constructor = LinterPlugin;
+        LinterPlugin.prototype.lint = lint;
+
+        return $.extend({}, options, {
+            create: function() {
+                return new LinterPlugin();
+            }
+        });
+    }
+
+
+    /**
+     * Plugin loader that runs plugin in the same thread
+     */
     function embeddedPluginLoader(pluginsMeta) {
         if (!pluginsMeta.directories.length) {
             return Promise.resolve();
@@ -28,29 +46,21 @@ define(function(require, exports, module){
             "packages": pluginsMeta.directories
         });
 
-        // Api for plugin linters
-        function api(plugin) {
-            var _lint = plugin.lint;
 
-            function lint(text, settings) {
-                return Promise.resolve(_lint(text, settings));
-            }
-
-            return {
-                lint: lint
+        function lintWrapper(plugin) {
+            return function lintDelegate(lintData, settings) {
+                return Promise.resolve(plugin.lint(lintData.content, settings));
             };
         }
+
 
         return new Promise(function(resolve) {
             requirePlugin(pluginsMeta.directories, function() {
                 var plugins = {};
 
                 _.toArray(arguments).forEach(function(plugin, index) {
-                    plugin.name = pluginsMeta.directories[index];
-                    plugins[plugin.name] = plugin;
-
-                    // Add a lint interface that will be just posting a message to the worker thread
-                    _.merge(plugin, api(plugin));
+                    var name = pluginsMeta.directories[index];
+                    plugins[name] = linterFacrory(name, lintWrapper(plugin), plugin);
                 });
 
                 resolve(plugins);
@@ -59,6 +69,9 @@ define(function(require, exports, module){
     }
 
 
+    /**
+     * Plugin loader that runs plugins in a web worker.
+     */
     function workerThreadPluginLoader(pluginsMeta) {
         if (!pluginsMeta.directories.length) {
             return Promise.resolve();
@@ -66,20 +79,20 @@ define(function(require, exports, module){
 
         var currentRequest, lastMessage;
         var pendingRequest = Promise.defer();
-        var worker         = new Worker(module.uri.substring(0, module.uri.lastIndexOf("/")) + "/pluginWorker.js");
+        var workerFile     = module.uri.substring(0, module.uri.lastIndexOf("/")) + "/pluginWorker.js";
+        var worker         = new Worker(workerFile);
 
 
         // Process worker thread messages
         worker.onmessage = function onmessage(evt) {
-            var data = evt.data;
-
-            if (data.type === "debug") {
-                console.log(data);
+            var message = evt.data;
+            if (message.type === "debug") {
+                console.log(message.data);
                 return;
             }
 
             if (currentRequest.state() === "pending") {
-                currentRequest.resolve(data);
+                currentRequest.resolve(message);
             }
         };
 
@@ -123,57 +136,38 @@ define(function(require, exports, module){
             var plugin;
             for (var iplugin in plugins) {
                 plugin = plugins[iplugin];
-
-                // Add a lint interface that will be just posting a message to the worker thread
-                _.merge(plugin, api(plugin));
+                plugins[iplugin] = linterFacrory(iplugin, lintWrapper(plugin), plugin);
             }
-
             return plugins;
         }
 
 
         // Api for plugin linters
-        function api(plugin) {
-            function lint(text, settings) {
+        function lintWrapper(plugin) {
+            return function lintDelegate(lintData, settings) {
                 return postMessage({
-                    type: "lint",
-                    data: {
-                        name: plugin.name,
-                        text: stripMinified(text),
-                        settings: settings
-                    }
-                })
-                .then(function(response) {
-                    return response.result;
-                });
-            }
-
-            return {
-                lint: lint
+                        type: "lint",
+                        data: {
+                            name: plugin.name,
+                            data: lintData,
+                            settings: settings || {}
+                        }
+                    });
             };
         }
 
 
-        // Send request to init
-        return postMessage({
-            "type": "init",
-            "data": {
-                "baseUrl": pluginsMeta.path,
-                "packages": pluginsMeta.directories
+        var initMessage = {
+            type: "init",
+            data: {
+                baseUrl: pluginsMeta.path,
+                packages: pluginsMeta.directories
             }
-        })
-        .then(loadPlugins);
-    }
+        };
 
 
-    /**
-     * Strips out any line that longer than 250 characters as a way to guess if the code is minified
-     */
-    function stripMinified(text) {
-        // var regex = /function[ ]?\w*\([\w,]*\)\{(?:\S[\s]?){150,}\}/gm;
-        // var regex = /(?:\S[\s]?){250,}[\n]$/gm;
-        var regex = /(?:.){500,}/gm;
-        return text.replace(regex, "");
+        // Send request to init
+        return postMessage(initMessage).then(loadPlugins);
     }
 
 
