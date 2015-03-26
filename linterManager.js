@@ -1,5 +1,5 @@
 /**
- * Interactive Linter Copyright (c) 2014 Miguel Castillo.
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
  *
  * Licensed under MIT
  */
@@ -8,78 +8,64 @@
 define(function (require /*, exports, module*/) {
     "use strict";
 
-    var _ = brackets.getModule("thirdparty/lodash");
-    var linterSettings = require("linterSettings"),
-        linterReporter = require("linterReporter"),
-        languages      = {},
-        linters        = {},
-        linterManager  = {};
+    var _                  = brackets.getModule("thirdparty/lodash"),
+        PreferencesManager = brackets.getModule("preferences/PreferencesManager"),
+        preferences        = PreferencesManager.getExtensionPrefs("interactive-linter"),
+        linterSettings     = require("linterSettings"),
+        linterReporter     = require("linterReporter"),
+        linters            = {},
+        linterManager      = {};
 
 
-    function Linter(cm, mode, fullPath) {
-        this.cm            = cm;
-        this.mode          = mode;
-        this.reporter      = linterReporter();
-        this.lint          = _.debounce(Linter.lint.bind(null, this, languages[mode], fullPath), 1000);
-        this.onClickGutter = gutterClick.bind(null, this);
+    preferences.definePreference("linters", "object",{
+        "json": ["jsonlint"],
+        "javascript": ["jshint"],
+        "jsx": ["jsx"]
+    });
+
+
+    function LintRunner(editor) {
+        this.editor   = editor;
+        this.reporter = linterReporter();
+        this.lint     = _.debounce(LintRunner.lint.bind(null, this, editor.document.file.fullPath), 1000);
     }
 
 
-    Linter.prototype.register = function() {
-        this.cm.on("gutterClick", this.onClickGutter);
-    };
+    LintRunner.prototype.getLinter = function() {
+        var language         = this.editor.document.getLanguage().getId();
+        var preferredLinters = preferences.get("linters");
+        var linterName       = preferredLinters[language] ? preferredLinters[language][0] : null;
+        var linter           = linters[linterName];
 
+//        if (/.ts|.typescript$/.test(file.name) && language === "javascript") {
+//            language = "typescript";
+//        }
+//        else if (/.jsx$/.test(file.name) && language === "javascript") {
+//            language = "jsx";
+//        }
 
-    Linter.prototype.unregister = function() {
-        this.cm.off("gutterClick", this.onClickGutter);
-    };
-
-
-    /**
-     * Create instance of linter to process CodeMirror documents
-     */
-    Linter.factory = function(cm, file) {
-        var mode = cm && cm.getDoc().getMode();
-
-        // Get the best poosible mode (document type) for the document
-        mode = mode && (mode.helperType || mode.name);
-
-        // A bit of hackery to figure out if we can process the document as typescript
-        if (/.ts|.typescript$/.test(file.name) && mode === "javascript" && languages[mode]) {
-            mode = "typescript";
-        }
-        else if (/.jsx$/.test(file.name) && mode === "javascript" && languages[mode]) {
-            mode = "jsx";
-        }
-
-        if (languages[mode]) {
-            return new Linter(cm, mode, file.parentPath);
-        }
+        return linter;
     };
 
 
     /**
      * Interface that will be used for running linters
      */
-    Linter.lint = function(linter, linterPlugin, fullPath) {
-        linterSettings.loadSettings(linterPlugin.settingsFile, fullPath, linter).always(function(settings) {
-            linterPlugin.lint(linter.cm.getDoc().getValue(), settings).done(function(result) {
-                linter.reporter.report(linter.cm, result);
-            });
-        });
-    };
+    LintRunner.lint = function(lintRunner, fullPath) {
+        var linterPlugin = lintRunner.getLinter();
 
-
-    /**
-     * Show line details
-     */
-    function gutterClick(linter, cm, lineIndex, gutterId) {
-        if (gutterId !== "interactive-linter-gutter") {
+        if (!linterPlugin) {
             return;
         }
 
-        linter.reporter.toggleLineDetails(lineIndex);
-    }
+        return linterSettings.loadSettings(linterPlugin.settingsFile, fullPath, lintRunner)
+            .always(function(settings) {
+                linterPlugin.lint(lintRunner.editor.document.getText(), settings)
+                    .done(function(result) {
+                        lintRunner.reporter.report(lintRunner.editor._codeMirror, result);
+                    });
+            });
+    };
 
 
     /**
@@ -91,39 +77,17 @@ define(function (require /*, exports, module*/) {
      *
      * @returns {Linter} Instance of linter to process the cm document
      */
-    function registerDocument(cm, file) {
-        if (!cm) {
-            throw new TypeError("Must provide an instance of CodeMirror");
-        }
-
-        var linter = cm.__linter || (cm.__linter = Linter.factory(cm, file));
-
-        if (!linter) {
-            $(linterManager).triggerHandler("linterNotFound");
-            return;
-        }
-
-        var gutters = cm.getOption("gutters").slice(0);
-
-        // If a gutter for interactive linter does not exist, add one.
-        if (gutters.indexOf("interactive-linter-gutter") === -1) {
-            gutters.unshift("interactive-linter-gutter");
-            cm.setOption("gutters", gutters);
-        }
-
-        linter.register();
-        return linter;
+    function createLintRunner(editor) {
+        return new LintRunner(editor);
     }
 
 
     function registerLinter(linter) {
-        languages[linter.language] = linter;
         linters[linter.name] = linter;
     }
 
 
-    linterManager.registerDocument = registerDocument;
-    linterManager.registerLinter = registerLinter;
+    linterManager.createLintRunner = createLintRunner;
+    linterManager.registerLinter   = registerLinter;
     return linterManager;
 });
-

@@ -1,5 +1,5 @@
 /**
- * rjasmine Copyright (c) 2014 Miguel Castillo.
+ * rjasmine Copyright (c) 2015 Miguel Castillo.
  * Licensed under MIT
  *
  * https://github.com/MiguelCastillo/rjasmine

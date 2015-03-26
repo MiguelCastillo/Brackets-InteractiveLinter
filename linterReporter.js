@@ -1,5 +1,5 @@
 /**
- * Interactive Linter Copyright (c) 2014 Miguel Castillo.
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
  *
  * Licensed under MIT
  */
@@ -35,12 +35,14 @@ define(function (require /*, exports, module*/) {
             return;
         }
 
-        this.lastRequest = this._runReport(cm, messages).always(function () {
-            _self.lastRequest = null;
-            if (_self.lastMessages !== messages) {
-                _self.report(cm, _self.lastMessages);
-            }
-        });
+        console.log(messages);
+        this.lastRequest = this._runReport(cm, messages)
+            .always(function () {
+                _self.lastRequest = null;
+                if (_self.lastMessages !== messages) {
+                    _self.report(cm, _self.lastMessages);
+                }
+            });
     };
 
     /**
@@ -247,7 +249,12 @@ define(function (require /*, exports, module*/) {
             _reporter.toggleLineDetails(line);
         }
 
+        function clear() {
+            _reporter.clearMarks();
+        }
+
         return {
+            clear: clear,
             report: report,
             toggleLineDetails: toggleLineDetails
         };
