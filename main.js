@@ -83,10 +83,12 @@ define(function (require, exports, module) {
      * Function to cause a lint operation
      */
     function handleDocumentChange() {
-        if (linter && (linter.lint() || linter.canProcess())) {
+        if (linter && linter.canProcess()) {
+            linter.lint();
             setTimeout(disableBracketsIndicator);
         }
         else {
+            linter.clear();
             setTimeout(enableBracketsIndicator);
             $(linterManager).triggerHandler("linterNotFound");
         }

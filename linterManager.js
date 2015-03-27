@@ -51,6 +51,11 @@ define(function (require /*, exports, module*/) {
     };
 
 
+    LintRunner.prototype.clear = function() {
+        this.reporter.clear();
+    };
+
+
     /**
      * Interface that will be used for running linters
      */

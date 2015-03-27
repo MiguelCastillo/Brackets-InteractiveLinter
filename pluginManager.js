@@ -8,11 +8,19 @@
 define(function(require, exports, module) {
     "use strict";
 
-    var _               = brackets.getModule("thirdparty/lodash"),
-        FileSystem      = brackets.getModule("filesystem/FileSystem"),
-        pluginLoader    = require("pluginLoader"),
-        Promise         = require("libs/js/spromise"),
-        pluginDirectory = module.uri.substring(0, module.uri.lastIndexOf("/"));
+    var _                  = brackets.getModule("thirdparty/lodash"),
+        FileSystem         = brackets.getModule("filesystem/FileSystem"),
+        pluginLoader       = require("pluginLoader"),
+        Promise            = require("libs/js/spromise"),
+        pluginDirectory    = module.uri.substring(0, module.uri.lastIndexOf("/")),
+        PreferencesManager = brackets.getModule("preferences/PreferencesManager"),
+        preferences        = PreferencesManager.getExtensionPrefs("interactive-linter");
+
+
+    var webworker;
+    preferences.definePreference("webworker", "boolean", true).on("change", function() {
+        webworker = preferences.get("webworker");
+    });
 
 
     /**
@@ -31,9 +39,17 @@ define(function(require, exports, module) {
             return plugin.directories.length !== 0;
         });
 
-        return Promise.all(plugins.map(function(plugin) {
+        return Promise.all(plugins.map(loadPlugin));
+    }
+
+
+    function loadPlugin(plugin) {
+        if (webworker) {
             return pluginLoader.workerThreadPluginLoader(plugin);
-        }));
+        }
+        else {
+            return pluginLoader.embeddedPluginLoader(plugin);
+        }
     }
 
 
