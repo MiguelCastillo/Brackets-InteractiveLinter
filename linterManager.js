@@ -48,6 +48,11 @@ define(function (require /*, exports, module*/) {
     };
 
 
+    LintRunner.prototype.canProcess = function() {
+        return !!this.getLinter();
+    };
+
+
     /**
      * Interface that will be used for running linters
      */

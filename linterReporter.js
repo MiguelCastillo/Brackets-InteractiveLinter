@@ -35,7 +35,6 @@ define(function (require /*, exports, module*/) {
             return;
         }
 
-        console.log(messages);
         this.lastRequest = this._runReport(cm, messages)
             .always(function () {
                 _self.lastRequest = null;

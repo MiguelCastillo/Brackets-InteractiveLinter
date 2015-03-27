@@ -83,7 +83,8 @@ define(function (require, exports, module) {
      * Function to cause a lint operation
      */
     function handleDocumentChange() {
-        if (linter && linter.lint()) {
+        if (linter && linter.canProcess()) {
+            linter.lint();
             setTimeout(disableBracketsIndicator);
         }
         else {
