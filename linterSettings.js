@@ -1,5 +1,5 @@
 /**
- * Interactive Linter Copyright (c) 2014 Miguel Castillo.
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
  *
  * Licensed under MIT
  */
@@ -99,7 +99,6 @@ define(function (require/*, exports, module*/) {
 
 
     FileSystem.on("change", function(evt, file) {
-        console.log(file);
         if (currentLinter.file && currentLinter.fileObject && file && file.fullPath === currentLinter.fileObject.fullPath) {
             loadFile().done(currentLinter.linter.lint);
         }
@@ -127,7 +126,7 @@ define(function (require/*, exports, module*/) {
         }
 
         // Cache so that we are not loading up the same file when navigating in the same directory...
-        if (path === currentLinter.path) {
+        if (path === currentLinter.path && file === currentLinter.file) {
             return Promise.resolve(currentLinter.settings);
         }
 

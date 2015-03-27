@@ -1,5 +1,5 @@
 /**
- * Interactive Linter Copyright (c) 2014 Miguel Castillo.
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
  *
  * Licensed under MIT
  */
@@ -8,18 +8,18 @@
 define(function (require, exports, module) {
     "use strict";
 
-    // Reference for jshint errors/warnings
-    // http://jslinterrors.com
-
-    var EditorManager     = brackets.getModule("editor/EditorManager"),
-        CodeInspection    = brackets.getModule("language/CodeInspection"),
-        AppInit           = brackets.getModule("utils/AppInit"),
-        KeyBindingManager = brackets.getModule("command/KeyBindingManager"),
-        Commands          = brackets.getModule("command/Commands"),
-        CommandManager    = brackets.getModule("command/CommandManager"),
-        ExtensionUtils    = brackets.getModule("utils/ExtensionUtils"),
-        linterManager     = require("linterManager"),
-        pluginManager     = require("pluginManager");
+    var _                  = brackets.getModule("thirdparty/lodash"),
+        EditorManager      = brackets.getModule("editor/EditorManager"),
+        CodeInspection     = brackets.getModule("language/CodeInspection"),
+        AppInit            = brackets.getModule("utils/AppInit"),
+        KeyBindingManager  = brackets.getModule("command/KeyBindingManager"),
+        Commands           = brackets.getModule("command/Commands"),
+        CommandManager     = brackets.getModule("command/CommandManager"),
+        ExtensionUtils     = brackets.getModule("utils/ExtensionUtils"),
+        PreferencesManager = brackets.getModule("preferences/PreferencesManager"),
+        preferences        = PreferencesManager.getExtensionPrefs("interactive-linter"),
+        linterManager      = require("linterManager"),
+        pluginManager      = require("pluginManager");
 
     require("lintIndicator");
     require("lintPanel");
@@ -36,6 +36,39 @@ define(function (require, exports, module) {
     AppInit.appReady(appReady);
 
 
+    function addGutter(editor) {
+        var cm = editor._codeMirror;
+        var gutters = cm.getOption("gutters").slice(0);
+        if (gutters.indexOf("interactive-linter-gutter") === -1) {
+            gutters.unshift("interactive-linter-gutter");
+            cm.setOption("gutters", gutters);
+        }
+    }
+
+
+    /**
+     * Show line details
+     */
+    function gutterClick(cm, lineIndex, gutterId) {
+        if (gutterId === "interactive-linter-gutter") {
+            linter.reporter.toggleLineDetails(lineIndex);
+        }
+    }
+
+
+    function activateEditor(editor) {
+        editor._codeMirror.on("gutterClick", gutterClick);
+        editor.on("editorChange", handleDocumentChange);
+    }
+
+
+    function deactivateEditor(editor) {
+        editor._codeMirror.off("gutterClick", gutterClick);
+        editor.off("editorChange", handleDocumentChange);
+    }
+
+
+
     /**
      * Toggles open/close the inline details widget.
      */
@@ -50,7 +83,15 @@ define(function (require, exports, module) {
      * Function to cause a lint operation
      */
     function handleDocumentChange() {
-        linter.lint();
+        if (linter && linter.canProcess()) {
+            linter.lint();
+            setTimeout(disableBracketsIndicator);
+        }
+        else {
+            linter.clear();
+            setTimeout(enableBracketsIndicator);
+            $(linterManager).triggerHandler("linterNotFound");
+        }
     }
 
 
@@ -91,29 +132,18 @@ define(function (require, exports, module) {
      * Function that gets called when there is a new document that needs
      * interactive linter registered on.
      */
-    function setDocument(event, currentEditor, previousEditor) {
-        // Unregister current linter instance
-        if (linter) {
-            linter.unregister();
-            linter = null;
-        }
-
+    function setDocument(evt, currentEditor, previousEditor) {
         if (previousEditor) {
-            previousEditor.off("editorChange", handleDocumentChange);
+            deactivateEditor(previousEditor);
         }
 
         if (currentEditor) {
-            linter = linterManager.registerDocument(currentEditor._codeMirror, currentEditor.document.file);
-        }
+            linter = currentEditor.__linter || (currentEditor.__linter = linterManager.createLintRunner(currentEditor));
 
-        // If a linter was successfully created, then we are safe to bind event handlers for editor changes.
-        if (linter) {
-            currentEditor.on("editorChange", handleDocumentChange);
-            linter.lint();
-            setTimeout(disableBracketsIndicator);
-        }
-        else {
-            setTimeout(enableBracketsIndicator);
+            // If a linter was successfully created, then we are safe to bind event handlers for editor changes.
+            activateEditor(currentEditor);
+            addGutter(currentEditor);
+            handleDocumentChange();
         }
     }
 
@@ -137,6 +167,24 @@ define(function (require, exports, module) {
 
             EditorManager.on("activeEditorChange.interactive-linter", setDocument);
             setDocument(null, EditorManager.getActiveEditor());
+
+            // If the linters change, then make sure to rebind the document with the new linter
+            var lastLinters;
+            preferences.on("change", function() {
+                var editor = EditorManager.getActiveEditor();
+                if (!editor) {
+                    return;
+                }
+
+                var language = editor.document.getLanguage().getId();
+                var linters  = preferences.get(language);
+
+                if (linters && !_.isEqual(linters, lastLinters)) {
+                    lastLinters = linters.slice(0);
+                    handleDocumentChange();
+                }
+            });
+
         });
     }
 });

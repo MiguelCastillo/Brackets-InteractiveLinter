@@ -1,4 +1,4 @@
 {
-	"language": "x-javascript",
-	"settingsFile": ".jscs.json"
+    "language": "javascript",
+    "settingsFile": ".jscs.json"
 }
