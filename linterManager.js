@@ -17,9 +17,10 @@ define(function (require /*, exports, module*/) {
         linterManager      = {};
 
 
-    preferences.definePreference("json", "array",["jsonlint"]);
-    preferences.definePreference("jsx", "array", ["jsx"]);
-    preferences.definePreference("javascript", "array", ["jshint"]);
+    preferences.definePreference("json",          "array", ["jsonlint"]);
+    preferences.definePreference("jsx",           "array", ["jsx"]);
+    preferences.definePreference("coffeescript",  "array", ["coffeelint"]);
+    preferences.definePreference("javascript",    "array", ["jshint"]);
 
 
     function LintRunner(editor) {
@@ -33,8 +34,6 @@ define(function (require /*, exports, module*/) {
         var language         = this.editor.document.getLanguage().getId();
         var preferredLinters = preferences.get(language);
         var linterName       = preferredLinters && preferredLinters[0];
-
-        console.log(language);
 
 //        if (/.ts|.typescript$/.test(file.name) && language === "javascript") {
 //            language = "typescript";
