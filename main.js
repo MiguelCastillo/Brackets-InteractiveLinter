@@ -83,8 +83,7 @@ define(function (require, exports, module) {
      * Function to cause a lint operation
      */
     function handleDocumentChange() {
-        if (linter && linter.canProcess()) {
-            linter.lint();
+        if (linter && (linter.lint() || linter.canProcess())) {
             setTimeout(disableBracketsIndicator);
         }
         else {
@@ -138,12 +137,12 @@ define(function (require, exports, module) {
 
         if (currentEditor) {
             linter = currentEditor.__linter || (currentEditor.__linter = linterManager.createLintRunner(currentEditor));
-        }
 
-        // If a linter was successfully created, then we are safe to bind event handlers for editor changes.
-        activateEditor(currentEditor);
-        addGutter(currentEditor);
-        handleDocumentChange();
+            // If a linter was successfully created, then we are safe to bind event handlers for editor changes.
+            activateEditor(currentEditor);
+            addGutter(currentEditor);
+            handleDocumentChange();
+        }
     }
 
 
@@ -168,11 +167,18 @@ define(function (require, exports, module) {
             setDocument(null, EditorManager.getActiveEditor());
 
             // If the linters change, then make sure to rebind the document with the new linter
-            var lastLinters = _.clone(preferences.get("linters") || {});
-            preferences.on("change", "linters", function() {
-                var linters = preferences.get("linters");
-                if (!_.isEqual(linters, lastLinters)) {
-                    lastLinters = _.clone(linters || {});
+            var lastLinters;
+            preferences.on("change", function() {
+                var editor = EditorManager.getActiveEditor();
+                if (!editor) {
+                    return;
+                }
+
+                var language = editor.document.getLanguage().getId();
+                var linters  = preferences.get(language);
+
+                if (linters && !_.isEqual(linters, lastLinters)) {
+                    lastLinters = linters.slice(0);
                     handleDocumentChange();
                 }
             });
