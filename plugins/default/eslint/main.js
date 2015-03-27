@@ -9,11 +9,11 @@
 define(function(require /*, exports, module*/) {
     "use strict";
 
-    var utils          = require("libs/utils"),
-        groomer        = require("eslint/groomer"),
-        eslint         = require("eslint/libs/eslint"),
-        defaultOptions = JSON.parse(require("text!eslint/default.json")),
-        settings       = JSON.parse(require("text!eslint/settings.json"));
+    var utils          = require("libs/utils");
+    var groomer        = require("eslint/groomer");
+    var eslint         = require("eslint/libs/eslint");
+    var defaultOptions = JSON.parse(require("text!eslint/default.json"));
+    var settings       = JSON.parse(require("text!eslint/settings.json"));
 
     function lint(source, options) {
         options = utils.mixin({}, defaultOptions, options);
