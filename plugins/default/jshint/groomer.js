@@ -1,30 +1,10 @@
-/*
- * Copyright (c) 2013 Miguel Castillo.
+/**
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
  *
  * Licensed under MIT
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
  */
 
-/*jslint plusplus: true, nomen: true, regexp: true, maxerr: 50 */
-
-define(function (require, exports, module) {
+define(function(/*require, exports, module*/) {
     "use strict";
 
     /**
@@ -32,7 +12,7 @@ define(function (require, exports, module) {
     * to the code from jshint
     */
     var helper = {
-        e: function(message, token) {
+        e: function(message /*, token*/) {
             message.type = "error";
             //console.log("error", message, token);
         },
@@ -41,7 +21,7 @@ define(function (require, exports, module) {
         * Used for reporting warnings.  The name is shorter to more directly match
         * to the code from jshint
         */
-        w: function(message, token) {
+        w: function(message /*, token*/) {
             message.type = "warning";
             //console.log("warning", message, token);
         }
@@ -190,7 +170,7 @@ define(function (require, exports, module) {
         var text = processMessage(message, settings);
 
         if (text === false){
-            return false;
+            return;
         }
 
         var token = {
@@ -215,11 +195,9 @@ define(function (require, exports, module) {
 
 
         // Add href for help
-        message.href = "http://jslinterrors.com/" + (message.raw || "").replace(/'*\{*(\w*)\}*'*/g, "$1").replace(/\s/g, '-').replace(/\.$/, '').toLowerCase();
+        message.href    = "http://jslinterrors.com/" + (message.raw || "").replace(/'*\{*(\w*)\}*'*/g, "$1").replace(/\s/g, "-").replace(/\.$/, "").toLowerCase();
         message.reason += " - " + message.code;
-
-        //console.log(token, message);
-        return token;
+        message.token   = token;
     }
 
 

@@ -1,9 +1,13 @@
-define(function(require, exports, module) {
+/**
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
+ *
+ * Licensed under MIT
+ */
 
+define(function(/*require, exports, module*/) {
+    "use strict";
 
-    // Groom is a callback from the reporter to give a chance at
-    // massaging the message and return a CodeMirror token.
-    function groom(message, settings) {
+    function groom(message /*, options*/) {
         message.type   = message.level;
         message.reason = message.message;
 
@@ -24,7 +28,7 @@ define(function(require, exports, module) {
             }
         }
 
-        return {
+        message.token = {
             text: message.message,
             start: {
                 line: message.lineNumber - 1,
@@ -41,6 +45,5 @@ define(function(require, exports, module) {
     return {
         groom: groom
     };
-
 });
 

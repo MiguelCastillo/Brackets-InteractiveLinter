@@ -5,30 +5,31 @@
  */
 
 define(function (require /*, exports, module*/) {
+    "use strict";
 
-    var JscsStringChecker = require("jscs/libs/jscs-browser"),
-        utils          = require("libs/utils"),
-        groomer        = require("jscs/groomer"),
-        defaultOptions = JSON.parse(require("text!jscs/default.json")),
-        settings       = JSON.parse(require("text!jscs/settings.json"));
+    var JSCS           = require("jscs/libs/jscs-browser");
+    var utils          = require("libs/utils");
+    var groomer        = require("jscs/groomer");
+    var defaultOptions = JSON.parse(require("text!jscs/default.json"));
+    var settings       = JSON.parse(require("text!jscs/settings.json"));
 
     function lint(text, options) {
         options = utils.mixin({}, defaultOptions, options);
         var i, length, jscs, errors, errList;
 
         try {
-            jscs = new JscsStringChecker();
+            jscs = new JSCS();
             jscs.registerDefaultRules();
             jscs.configure(options);
             errors = jscs.checkString(text);
             errList = errors.getErrorList().slice(0);
 
             for (i = 0, length = errList.length; i < length; i++) {
-                errList[i].token = groomer.groom(errList[i], options);
+                groomer.groom(errList[i], options);
             }
         }
         catch(ex) {
-            console.error(ex.message);
+            console.log(ex.message);
         }
 
         return errList;

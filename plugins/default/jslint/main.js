@@ -1,25 +1,25 @@
 /**
- * Interactive Linter Copyright (c) 2014 Miguel Castillo.
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
  *
  * Licensed under MIT
  */
 
-
 define(function(require /*, exports, module*/) {
+    "use strict";
 
-    var JSLINT          = require('jslint/libs/jslint'),
-        utils           = require("libs/utils"),
-        groomer         = require("jslint/groomer"),
-        defaultSettings = JSON.parse(require("text!jslint/default.json")),
-        settings        = JSON.parse(require("text!jslint/settings.json"));
+    var jslint          = require("jslint/libs/jslint");
+    var utils           = require("libs/utils");
+    var groomer         = require("jslint/groomer");
+    var defaultSettings = JSON.parse(require("text!jslint/default.json"));
+    var settings        = JSON.parse(require("text!jslint/settings.json"));
 
-    function lint(text, settings) {
+    function lint(text, options) {
         var i, length;
 
-        settings = utils.mixin({}, defaultSettings, settings);
+        options = utils.mixin({}, defaultSettings, options);
 
-        if (!JSLINT(text, settings)) {
-            var errors = JSLINT.errors.slice(0);
+        if (!jslint(text, options)) {
+            var errors = jslint.errors.slice(0);
 
             // If JSHINT.errors is false, then JSHint has some errors it needs to report
             for (i = 0, length = errors.length; i < length; i++) {
@@ -28,7 +28,7 @@ define(function(require /*, exports, module*/) {
                 // means that the max number of errors was exceeded or there was a fatal
                 // error while linting the file
                 if (errors[i]) {
-                    errors[i].token = groomer.groom(errors[i], settings);
+                    groomer.groom(errors[i], options);
                 }
             }
 

@@ -1,9 +1,8 @@
 /**
- * Interactive Linter Copyright (c) 2014 Miguel Castillo.
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
  *
  * Licensed under MIT
  */
-
 
 define(function(require /*, exports, module*/) {
     "use strict";
@@ -16,10 +15,10 @@ define(function(require /*, exports, module*/) {
      */
 
     require("jshint/libs/jshint");
-    var utils           = require("libs/utils"),
-        groomer         = require("jshint/groomer"),
-        defaultOptions  = JSON.parse(require("text!jshint/default.json")),
-        settings        = JSON.parse(require("text!jshint/settings.json"));
+    var utils           = require("libs/utils");
+    var groomer         = require("jshint/groomer");
+    var defaultOptions  = JSON.parse(require("text!jshint/default.json"));
+    var settings        = JSON.parse(require("text!jshint/settings.json"));
 
     function lint(text, options) {
         var i, length;
@@ -38,7 +37,7 @@ define(function(require /*, exports, module*/) {
                 // error while linting the file
                 if (errors[i]) {
                     delete errors[i].scope; // Some errors have scope, which breaks workers (cannot clone objects)
-                    errors[i].token = groomer.groom(errors[i], options);
+                    groomer.groom(errors[i], options);
                 }
             }
 

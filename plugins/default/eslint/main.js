@@ -1,9 +1,8 @@
 /**
- * Interactive Linter Copyright (c) 2014 Miguel Castillo.
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
  *
  * Licensed under MIT
  */
-
 
 //http://eslint.org/demo/
 define(function(require /*, exports, module*/) {

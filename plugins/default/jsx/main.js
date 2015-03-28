@@ -1,18 +1,17 @@
 /**
- * Interactive Linter Copyright (c) 2014 Miguel Castillo.
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
  *
  * Licensed under MIT
  */
 
-
 define(function(require /*, exports, module*/) {
     "use strict";
 
-    var utils          = require("libs/utils"),
-        jshint         = require("../jshint/main"),
-        reacttools     = require("jsx/libs/reacttools"),
-        defaultOptions = JSON.parse(require("text!jsx/default.json")),
-        settings       = JSON.parse(require("text!jsx/settings.json"));
+    var utils          = require("libs/utils");
+    var jshint         = require("jshint");
+    var reacttools     = require("jsx/libs/reacttools");
+    var defaultOptions = JSON.parse(require("text!jsx/default.json"));
+    var settings       = JSON.parse(require("text!jsx/settings.json"));
 
 
     function lint(source, options) {
@@ -20,7 +19,7 @@ define(function(require /*, exports, module*/) {
         var result;
 
         try {
-        	result = reacttools.transform(source);
+            result = reacttools.transform(source);
         }
         catch(ex) {
             return [{

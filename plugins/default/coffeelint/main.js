@@ -1,5 +1,5 @@
 /**
- * Interactive Linter Copyright (c) 2014 Miguel Castillo.
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
  *
  * Licensed under MIT
  */
@@ -10,11 +10,12 @@
 var window = window || {};
 
 define(function(require /*, exports, module*/) {
+    "use strict";
 
-    var utils          = require("libs/utils"),
-        groomer        = require("coffeelint/groomer"),
-        defaultOptions = JSON.parse(require("text!coffeelint/default.json")),
-        settings       = JSON.parse(require("text!coffeelint/settings.json"));
+    var utils          = require("libs/utils");
+    var groomer        = require("coffeelint/groomer");
+    var defaultOptions = JSON.parse(require("text!coffeelint/default.json"));
+    var settings       = JSON.parse(require("text!coffeelint/settings.json"));
 
     // Crazy hacks...
     // JSHINT will insert a fake window object...  This completely throws off coffeelint
@@ -24,7 +25,7 @@ define(function(require /*, exports, module*/) {
         window.addEventListener = window.addEventListener || function(){};
     }
 
-    var coffeelint = {lint:function() {}};
+    var coffeelint = {lint: function() {}};
     require(["coffeelint/libs/coffee-script-1.9.1"], function(coffeescript) {
         if (window) {
             window.CoffeeScript = coffeescript;
@@ -43,11 +44,11 @@ define(function(require /*, exports, module*/) {
         try {
             result = coffeelint.lint(text, options);
             for (var iresult in result) {
-                result[iresult].token = groomer.groom(result[iresult], options);
+                groomer.groom(result[iresult], options);
             }
         }
         catch(ex) {
-            console.log("coffeelint", ex);
+            console.log(ex.message);
         }
 
         return result;

@@ -1,19 +1,18 @@
 /**
- * Interactive Linter Copyright (c) 2014 Miguel Castillo.
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
  *
  * Licensed under MIT
  */
 
-
 define(function(require /*, exports, module*/) {
+    "use strict";
 
     require("jsonlint/libs/jsonlint");
-    var utils           = require("libs/utils"),
-        groomer         = require("jsonlint/groomer"),
-        defaultSettings = JSON.parse(require("text!jsonlint/default.json")),
-        settings        = JSON.parse(require("text!jsonlint/settings.json"));
-    
-    var lastError = null;
+    var utils          = require("libs/utils");
+    var groomer        = require("jsonlint/groomer");
+    var defaultOptions = JSON.parse(require("text!jsonlint/default.json"));
+    var settings       = JSON.parse(require("text!jsonlint/settings.json"));
+    var lastError      = null;
 
     // Let's override the parseError method so that we can get access to the object
     // with the details about it.
@@ -23,16 +22,16 @@ define(function(require /*, exports, module*/) {
     };
 
 
-    function lint(text, settings) {
+    function lint(text, options) {
         var errors;
-        settings = utils.mixin({}, defaultSettings, settings);
-        
+        options = utils.mixin({}, defaultOptions, options);
+
         try {
             jsonlint.parse(text);
         }
         catch(ex) {
             if (lastError) {
-                lastError.token = groomer.groom(lastError);
+                groomer.groom(lastError);
                 errors = [utils.mixin({}, lastError)];
                 lastError = null;
             }
