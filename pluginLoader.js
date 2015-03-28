@@ -49,7 +49,8 @@ define(function(require, exports, module){
                     plugin.name = pluginsMeta.directories[index];
                     plugins[plugin.name] = plugin;
 
-                    // Add a lint interface that will be just posting a message to the worker thread
+                    // Add a lint interface that will be just posting a message
+                    // to the worker thread
                     _.merge(plugin, api(plugin));
                 });
 
@@ -139,7 +140,7 @@ define(function(require, exports, module){
                     type: "lint",
                     data: {
                         name: plugin.name,
-                        text: stripMinified(text),
+                        text: text,
                         settings: settings
                     }
                 })
@@ -163,17 +164,6 @@ define(function(require, exports, module){
             }
         })
         .then(loadPlugins);
-    }
-
-
-    /**
-     * Strips out any line that longer than 250 characters as a way to guess if the code is minified
-     */
-    function stripMinified(text) {
-        // var regex = /function[ ]?\w*\([\w,]*\)\{(?:\S[\s]?){150,}\}/gm;
-        // var regex = /(?:\S[\s]?){250,}[\n]$/gm;
-        var regex = /(?:.){500,}/gm;
-        return text.replace(regex, "");
     }
 
 

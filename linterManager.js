@@ -65,9 +65,12 @@ define(function (require /*, exports, module*/) {
             return;
         }
 
+        // Strip out minified text
+        var text = stripMinified(lintRunner.editor.document.getText());
+
         return linterSettings.loadSettings(linterPlugin.settingsFile, fullPath, lintRunner)
             .always(function(settings) {
-                linterPlugin.lint(lintRunner.editor.document.getText(), settings)
+                linterPlugin.lint(text, settings)
                     .done(function(result) {
                         lintRunner.reporter.report(lintRunner.editor._codeMirror, result);
                     });
@@ -91,6 +94,20 @@ define(function (require /*, exports, module*/) {
 
     function registerLinter(linter) {
         linters[linter.name] = linter;
+    }
+
+
+    /**
+     * Strips out any line that longer than 250 characters as a way to guess if
+     * the code is minified
+     */
+    function stripMinified(text) {
+        // https://regex101.com/r/oE3nP0/2
+        if (/function[ ]?\w*\([\w,]*\)\{(?:\S[ \n]?){100,}\}/gm.test(text)) {
+            return text.replace(/(?:.){100,}/gm, "");
+        }
+
+        return text;
     }
 
 
