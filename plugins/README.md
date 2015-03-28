@@ -65,7 +65,7 @@ That basically tells interactive linter to display the first item in the array a
 
 This is what is looks like:
 
-<img src="https://raw.githubusercontent.com/MiguelCastillo/Interactive-Linter/master/plugins/img/warning.png" alt="Linter warning"></img>
+<img src="https://raw.githubusercontent.com/MiguelCastillo/Brackets-InteractiveLinter/master/plugins/img/warning.png" alt="Linter warning"></img>
 
 
 You can also add a CodeMirror token that will be used by interactive linter reporter to decorate the document with *underlines*. This is a sample of a `lint` result with a CodeMirror token.
@@ -102,4 +102,4 @@ You can also add a CodeMirror token that will be used by interactive linter repo
 
 That adds the underline at the beginning of the word `brackets`, and this is what it looks like:
 
-<img src="https://raw.githubusercontent.com/MiguelCastillo/Interactive-Linter/master/plugins/img/underline.png" alt="Linter underline"></img>
+<img src="https://raw.githubusercontent.com/MiguelCastillo/Brackets-InteractiveLinter/master/plugins/img/underline.png" alt="Linter underline"></img>
