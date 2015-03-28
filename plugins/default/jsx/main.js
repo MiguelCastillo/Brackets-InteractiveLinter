@@ -8,7 +8,7 @@ define(function(require /*, exports, module*/) {
     "use strict";
 
     var utils          = require("libs/utils");
-    var jshint         = require("../jshint/main");
+    var jshint         = require("jshint");
     var reacttools     = require("jsx/libs/reacttools");
     var defaultOptions = JSON.parse(require("text!jsx/default.json"));
     var settings       = JSON.parse(require("text!jsx/settings.json"));
