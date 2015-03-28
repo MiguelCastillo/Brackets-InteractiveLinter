@@ -1,3 +1,9 @@
+/**
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
+ *
+ * Licensed under MIT
+ */
+
 define(function (/*require, exports, module*/) {
     "use strict";
 
@@ -20,7 +26,7 @@ define(function (/*require, exports, module*/) {
             return;
         }
 
-        text = message.message + '';
+        text = message.message + "";
         message.reason = text;
         message.type   = getType(message);
         message.token  = {

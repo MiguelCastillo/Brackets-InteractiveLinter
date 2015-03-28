@@ -22,45 +22,34 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-define(function (require, exports, module) {
-	"use strict";
+define(function (/*require, exports, module*/) {
+    "use strict";
 
-	/**
-	 * Breaks up the message from jshint into something that can be used
-	 * by codemirror.
-	 *
-	 * @param message {Object} jshint message
-	 * @param settings {Object} jshint settings
-	 */
-	function groom(message, settings) {
-		var text, token;
+    function groom(message /*, options*/) {
+        var text;
 
-		if (!message) {
-			return;
-		}
-		text = message.message + '';
+        if (!message) {
+            return;
+        }
 
-		if (text === false) {
-			return false;
-		}
-		message.type = message.type || 'warning';
-		message.reason = text;
-		token = {
-			text: text,
-			start: {
-				line: (message.line - 1),
-				ch: (message.column - 1)
-			},
-			end: {
-				line: (message.line - 1),
-				ch: (message.column - 1) + text.length
-			}
-		};
-		return token;
-	}
+        text = message.message + "";
+        message.type   = message.type || "warning";
+        message.reason = text;
+        message.token  = {
+            text: text,
+            start: {
+                line: (message.line - 1),
+                ch: (message.column - 1)
+            },
+            end: {
+                line: (message.line - 1),
+                ch: (message.column - 1) + text.length
+            }
+        };
+    }
 
-	return {
-		groom: groom
-	};
+    return {
+        groom: groom
+    };
 
 });
