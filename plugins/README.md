@@ -5,13 +5,18 @@ Interactive linter has a plugin system that allows you to integrate with custome
 
 ## Current linters
 
-* coffeelint
-* eslint
-* jscs
-* jshint
-* jslint
-* jsonlint
-* jsx
+coffeescript:
+- coffeelint
+
+javascript:
+- eslint
+- jscs
+- jshint
+- jslint
+- jsx
+
+json:
+- jsonlint
 
 They are all located in the [default](https://github.com/MiguelCastillo/Brackets-InteractiveLinter/tree/master/plugins/default) directory.
 
@@ -25,7 +30,9 @@ They are all located in the [default](https://github.com/MiguelCastillo/Brackets
 
 ## Plugin anatomy and authoring
 
-Plugins are automatically loaded and registered by interactive linter by reading the content of `default` and `dev` directories. Internally in interactive linter, plugins are loaded as requirejs [packages](http://requirejs.org/docs/api.html#packages). So, you need a directory which is used as the name of the plugin, and a `main.js` which is the entry point to your code.
+Plugins are automatically loaded and registered by interactive linter by reading the content of `default` and `dev` directories. Internally in interactive linter, plugins are loaded as requirejs [packages](http://requirejs.org/docs/api.html#packages). So, you need a directory which is used as the name of the plugin, and a `main.js` which is the entry point to your plugin code.
+
+> Plugins execute in a web worker, so you need to be mindful of what features are available in a web worker environment.
 
 The most basic main.js looks like this:
 
@@ -73,28 +80,28 @@ You can also add a CodeMirror token that will be used by interactive linter repo
 ``` javascript
 [{
     "type": "error",
-    "reason": "more cowbell"
+    "reason": "more cowbell",
     "token": {
-        start: {
-            line: 21,
-            ch: 13
+        "start": {
+            "line": 21,
+            "ch": 13
         },
-        end: {
-            line: 21,
-            ch: 23
+        "end": {
+            "line": 21,
+            "ch": 23
         }
     }
 },{
     "type": "warning",
-    "reason" "'brackets' is not defined"
+    "reason" "'brackets' is not defined",
     "token": {
-        start: {
-            line: 12,
-            ch: 8
+        "start": {
+            "line": 12,
+            "ch": 8
         },
-        end: {
-            line: 12,
-            ch: 9
+        "end": {
+            "line": 12,
+            "ch": 9
         }
     }
 }]
