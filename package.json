@@ -12,5 +12,19 @@
     },
     "engines": {
         "brackets": ">=0.42.0"
-    }
+    },
+    "keywords":[
+        "coffeelint",
+        "csslint",
+        "eslint",
+        "htmlhint",
+        "jscs",
+        "jshint",
+        "jslint",
+        "jsonlint",
+        "jsx",
+        "lint",
+        "linter",
+        "linting"
+    ]
 }
