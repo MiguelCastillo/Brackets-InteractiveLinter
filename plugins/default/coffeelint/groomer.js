@@ -8,11 +8,11 @@ define(function(/*require, exports, module*/) {
     "use strict";
 
     function groom(message /*, options*/) {
-        message.type   = message.level;
-        message.reason = message.message;
+        message.type = message.level;
+        message.line = message.lineNumber;
 
         if (message.context) {
-            message.reason += " - " + message.context;
+            message.message += " - " + message.context;
         }
 
         if (message.type === "warn") {

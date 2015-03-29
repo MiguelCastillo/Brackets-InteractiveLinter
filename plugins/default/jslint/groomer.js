@@ -19,10 +19,10 @@ define(function(require /*, exports, module*/) {
     */
     function groom(message, settings) {
         var token = new JSLintError(message, settings);
-        message.type  = message.type || "warning";
-        message.href  = "http://jslinterrors.com/" + (message.raw || "").replace(/'*\{*(\w*)\}*'*/g, "$1").replace(/\s/g, "-").replace(/\.$/, "").toLowerCase();
-        message.token = {
-            text: token.evidence,
+        message.message = message.reason;
+        message.type    = message.type || "warning";
+        message.href    = "http://jslinterrors.com/" + (message.raw || "").replace(/'*\{*(\w*)\}*'*/g, "$1").replace(/\s/g, "-").replace(/\.$/, "").toLowerCase();
+        message.token   = {
             start: token.startPosition,
             end: token.endPosition
         };

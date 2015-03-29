@@ -8,9 +8,9 @@ define(function(/*require, exports, module*/) {
     "use strict";
 
     function groom(message) {
-        message.reason = "Expected: " + message.expected.join(", ") + ". Instead saw: " + message.text + ".";
-        message.type   = "error";
-        message.token  = {
+        message.message = "Expected: " + message.expected.join(", ") + ". Instead saw: " + message.text + ".";
+        message.type    = "error";
+        message.token   = {
             start: {
                 line: (message.loc.first_line - 1),
                 ch: message.loc.first_column
