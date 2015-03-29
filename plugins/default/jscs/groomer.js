@@ -36,7 +36,6 @@ define(function (/*require, exports, module*/) {
         message.type   = message.type || "warning";
         message.reason = text;
         message.token  = {
-            text: text,
             start: {
                 line: (message.line - 1),
                 ch: (message.column - 1)

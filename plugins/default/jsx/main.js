@@ -25,7 +25,7 @@ define(function(require /*, exports, module*/) {
             return [{
                 type: "error",
                 reason: ex.description,
-                token:{
+                token: {
                     start: {
                         line: ex.lineNumber - 1,
                         ch: ex.column ? ex.column - 1 : ex.column

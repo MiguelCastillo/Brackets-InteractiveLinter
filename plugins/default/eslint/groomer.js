@@ -30,7 +30,6 @@ define(function (/*require, exports, module*/) {
         message.reason = text;
         message.type   = getType(message);
         message.token  = {
-            text: text,
             start: {
                 line: (message.line - 1),
                 ch: (message.column)

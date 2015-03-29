@@ -11,7 +11,6 @@ define(function(/*require, exports, module*/) {
         message.reason = "Expected: " + message.expected.join(", ") + ". Instead saw: " + message.text + ".";
         message.type   = "error";
         message.token  = {
-            text: message.text,
             start: {
                 line: (message.loc.first_line - 1),
                 ch: message.loc.first_column

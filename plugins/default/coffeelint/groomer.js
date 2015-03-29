@@ -29,7 +29,6 @@ define(function(/*require, exports, module*/) {
         }
 
         message.token = {
-            text: message.message,
             start: {
                 line: message.lineNumber - 1,
                 ch: 0

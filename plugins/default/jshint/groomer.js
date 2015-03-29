@@ -174,7 +174,6 @@ define(function(/*require, exports, module*/) {
         }
 
         var token = {
-            text: text,
             start: {
                 line: (message.line - 1),
                 ch: (message.character - 1)
