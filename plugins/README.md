@@ -5,18 +5,24 @@ Interactive linter has a plugin system that allows you to integrate with custome
 
 ## Current linters
 
-coffeescript:
-- coffeelint
+#### coffeescript
+- [coffeelint](http://www.coffeelint.org/)
 
-javascript:
-- eslint
-- jscs
-- jshint
-- jslint
-- jsx
+#### css
+- [csslint](http://csslint.net/)
 
-json:
-- jsonlint
+#### html
+- [htmlhint](http://htmlhint.com/)
+
+#### javascript
+- [eslint](http://eslint.org/)
+- [jscs](http://jscs.info/)
+- [jshint](http://jshint.com/)
+- [jslint](http://www.jslint.com/)
+- [jsx](https://www.npmjs.com/package/react-tools)
+
+#### json
+- [jsonlint](http://jsonlint.com/)
 
 They are all located in the [default](https://github.com/MiguelCastillo/Brackets-InteractiveLinter/tree/master/plugins/default) directory.
 

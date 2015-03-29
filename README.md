@@ -17,20 +17,24 @@ Brackets integration with linters such as JSHint, JSLint, ESLint, JSCS, CoffeeLi
 
 A list of available linters can be found [here](https://github.com/MiguelCastillo/Brackets-InteractiveLinter/tree/master/plugins), along with information about authoring your own plugins.
 
-A quick list is:
+#### coffeescript
+- [coffeelint](http://www.coffeelint.org/)
 
-coffeescript:
-- coffeelint
+#### css
+- [csslint](http://csslint.net/)
 
-javascript:
-- eslint
-- jscs
-- jshint
-- jslint
-- jsx
+#### html
+- [htmlhint](http://htmlhint.com/)
 
-json:
-- jsonlint
+#### javascript
+- [eslint](http://eslint.org/)
+- [jscs](http://jscs.info/)
+- [jshint](http://jshint.com/)
+- [jslint](http://www.jslint.com/)
+- [jsx](https://www.npmjs.com/package/react-tools)
+
+#### json
+- [jsonlint](http://jsonlint.com/)
 
 
 ### Configuration
