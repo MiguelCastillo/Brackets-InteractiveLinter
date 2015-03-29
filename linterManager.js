@@ -17,12 +17,6 @@ define(function (require /*, exports, module*/) {
         linterManager      = {};
 
 
-    preferences.definePreference("json",         "array", ["jsonlint"]);
-    preferences.definePreference("coffeescript", "array", ["coffeelint"]);
-    preferences.definePreference("javascript",   "array", ["jshint"]);
-    preferences.definePreference("html",         "array", ["htmlhint"]);
-
-
     function LintRunner(editor) {
         this.editor   = editor;
         this.reporter = linterReporter();
@@ -93,8 +87,14 @@ define(function (require /*, exports, module*/) {
     }
 
 
+    var registeredLanguage = {};
     function registerLinter(linter) {
         linters[linter.name] = linter;
+
+        if (linter.language && !registeredLanguage[linter.language]) {
+            registeredLanguage[linter.language] = true;
+            preferences.definePreference(linter.language, "array", [linter.name]);
+        }
     }
 
 
