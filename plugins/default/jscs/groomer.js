@@ -26,23 +26,19 @@ define(function (/*require, exports, module*/) {
     "use strict";
 
     function groom(message /*, options*/) {
-        var text;
-
         if (!message) {
             return;
         }
 
-        text = message.message + "";
-        message.type   = message.type || "warning";
-        message.reason = text;
-        message.token  = {
+        message.type  = message.type || "warning";
+        message.token = {
             start: {
                 line: (message.line - 1),
                 ch: (message.column - 1)
             },
             end: {
                 line: (message.line - 1),
-                ch: (message.column - 1) + text.length
+                ch: (message.column - 1) + message.message.length
             }
         };
     }

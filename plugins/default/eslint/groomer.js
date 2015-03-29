@@ -20,16 +20,12 @@ define(function (/*require, exports, module*/) {
      * @param settings {Object} settings - Settings used during the linting step
      */
     function groom(message /*, settings*/) {
-        var text;
-
         if (!message) {
             return;
         }
 
-        text = message.message + "";
-        message.reason = text;
-        message.type   = getType(message);
-        message.token  = {
+        message.type  = getType(message);
+        message.token = {
             start: {
                 line: (message.line - 1),
                 ch: (message.column)

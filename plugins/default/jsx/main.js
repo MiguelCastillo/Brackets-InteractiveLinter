@@ -16,15 +16,14 @@ define(function(require /*, exports, module*/) {
 
     function lint(source, options) {
         options = utils.mixin({}, defaultOptions, options);
-        var result;
 
         try {
-            result = reacttools.transform(source);
+            source = reacttools.transform(source);
         }
         catch(ex) {
             return [{
                 type: "error",
-                reason: ex.description,
+                message: ex.description,
                 token: {
                     start: {
                         line: ex.lineNumber - 1,
@@ -38,7 +37,7 @@ define(function(require /*, exports, module*/) {
             }];
         }
 
-        return jshint.lint(result, options);
+        return jshint.lint(source, options);
     }
 
 
