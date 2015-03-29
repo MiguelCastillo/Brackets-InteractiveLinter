@@ -23,6 +23,7 @@ define(function(require /*, exports, module*/) {
         catch(ex) {
             return [{
                 type: "error",
+                line: ex.lineNumber,
                 message: ex.description,
                 token: {
                     start: {
