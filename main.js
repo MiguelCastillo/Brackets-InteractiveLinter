@@ -32,7 +32,7 @@ define(function (require, exports, module) {
 
     ExtensionUtils.loadStyleSheet(module, "style.less");
     KeyBindingManager.addBinding(CMD_SHOW_LINE_DETAILS, SHORTCUT_KEY);
-    CommandManager.register("Show Line Details", CMD_SHOW_LINE_DETAILS , handleToggleLineDetails);
+    CommandManager.register("Show Line Details", CMD_SHOW_LINE_DETAILS, handleToggleLineDetails);
     AppInit.appReady(appReady);
 
 

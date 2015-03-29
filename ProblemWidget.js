@@ -1,3 +1,10 @@
+/**
+ * Interactive Linter Copyright (c) 2015 Miguel Castillo.
+ *
+ * Licensed under MIT
+ */
+
+
 define(function (require, exports, module) {
     "use strict";
 
