@@ -20,6 +20,7 @@ define(function (require /*, exports, module*/) {
     preferences.definePreference("json",         "array", ["jsonlint"]);
     preferences.definePreference("coffeescript", "array", ["coffeelint"]);
     preferences.definePreference("javascript",   "array", ["jshint"]);
+    preferences.definePreference("html",         "array", ["htmlhint"]);
 
 
     function LintRunner(editor) {
