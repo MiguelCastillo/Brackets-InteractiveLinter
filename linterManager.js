@@ -8,13 +8,14 @@
 define(function (require /*, exports, module*/) {
     "use strict";
 
-    var _               = brackets.getModule("thirdparty/lodash"),
-        LanguageManager = brackets.getModule("language/LanguageManager"),        PreferencesManager = brackets.getModule("preferences/PreferencesManager"),
-        preferences     = PreferencesManager.getExtensionPrefs("interactive-linter"),
-        linterSettings  = require("linterSettings"),
-        linterReporter  = require("linterReporter"),
-        linters         = {},
-        linterManager   = {};
+    var _                  = brackets.getModule("thirdparty/lodash"),
+        LanguageManager    = brackets.getModule("language/LanguageManager"),
+        PreferencesManager = brackets.getModule("preferences/PreferencesManager"),
+        preferences        = PreferencesManager.getExtensionPrefs("interactive-linter"),
+        linterSettings     = require("linterSettings"),
+        linterReporter     = require("linterReporter"),
+        linters            = {},
+        linterManager      = {};
 
 
     function LintRunner(editor) {
