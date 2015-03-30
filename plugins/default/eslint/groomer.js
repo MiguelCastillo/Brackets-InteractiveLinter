@@ -24,8 +24,9 @@ define(function (/*require, exports, module*/) {
             return;
         }
 
-        message.type  = getType(message);
-        message.token = {
+        message.type     = getType(message);
+        message.evidence = "[" + message.ruleId + "] - " + message.source;
+        message.token    = {
             start: {
                 line: (message.line - 1),
                 ch: (message.column)
@@ -40,5 +41,4 @@ define(function (/*require, exports, module*/) {
     return {
         groom: groom
     };
-
 });
