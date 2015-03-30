@@ -18,10 +18,15 @@ define(function (require /*, exports, module*/) {
         linterManager      = {};
 
 
+    // Default delay is 1/2 a second
+    preferences.definePreference("delay", "integer", 500);
+
+
     function LintRunner(editor) {
+        var delay     = preferences.get("delay") || 500;
         this.editor   = editor;
         this.reporter = linterReporter();
-        this.lint     = _.debounce(LintRunner.lint.bind(null, this, editor.document.file.fullPath), 1000);
+        this.lint     = _.debounce(LintRunner.lint.bind(null, this, editor.document.file.fullPath), delay);
     }
 
 

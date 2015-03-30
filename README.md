@@ -39,9 +39,12 @@ A list of available linters can be found [here](https://github.com/MiguelCastill
 
 ### Configuration
 
-Interactive Linter can be configured via Brackets preferences system. You can specify which linter to run for each language independently. The settings can be set in the global `brackets.json` or in your project specific `.brackets.json`.
+Interactive Linter can be configured via Brackets preferences system, and settings can be set in the global `brackets.json` or in your project specific `.brackets.json`. Some settings are applied at run time, which eliminates the need to restart Brackets for your changes to take effect.
 
-Changes take effect immediately. So, if you change the javascript linter from `jshint` to `eslint` via `brackets.json` or `.brackets.json`, the linter will be switched at run time, which eliminates the need to restart Brackets.
+
+#### Linter per language [run time]
+
+You can specify which linter to run for each language independently, and changes are applied at run time.
 
 This is what a configuration looks like to specify `eslint` as your javascript linter.
 
@@ -68,8 +71,18 @@ You can customize other linters the same way by following the convention `intera
 }
 ```
 
+#### Delay [restart]
 
-#### JSHint/JSLint
+You can configure the delay for linting your documents. The value is specified in milliseconds, and by default it is `500`. In the example below, the delay is configured to 1000 milliseconds (1 second):
+
+```
+{
+    "interactive-linter.delay": 1000
+}
+```
+
+
+### JSHint/JSLint
 Interactive Linter automatically loads `.jshintrc` and `.jslintrc` files in your project.
 
 All JSHint settings that already exists inline in your JavaScript files will continue to work along side any `.jshintrc`/`.jslintrc` file.
@@ -79,10 +92,10 @@ Integration with <http://jslinterrors.com/> to find out details about what's rep
 Inspired by Joachim's extensions [brackets-continuous-compilation](https://github.com/JoachimK/brackets-continuous-compilation).
 
 
-#### CoffeeLint
+### CoffeeLint
 Support for loading `coffeelint.json` as defined [here](http://www.coffeelint.org/#usage).
 
-##### Screenshots
+### Screenshots
 
 ![jshint](https://raw.github.com/wiki/MiguelCastillo/Brackets-InteractiveLinter/images/jshint.png)
 
