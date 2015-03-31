@@ -93,7 +93,8 @@ define(function (require /*, exports, module*/) {
     }
 
 
-    var registeredLanguage = {};
+    preferences.definePreference("javascript", "array", ["jshint"]);
+    var registeredLanguage = {"javascript": true};
     function registerLinter(linter) {
         linters[linter.name] = linter;
 
