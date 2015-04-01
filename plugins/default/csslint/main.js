@@ -20,8 +20,8 @@ define(function(require) {
         var i, length;
 
         for (i = 0, length = results.length; i < length; i++) {
-            delete results[0].rule;
-            groomer.groom(results[0]);
+            delete results[i].rule;
+            groomer.groom(results[i]);
         }
 
         return results;
