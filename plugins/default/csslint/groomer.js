@@ -16,24 +16,26 @@ define(function (/*require, exports, module*/) {
      * @param settings {Object} settings - Settings used during the linting step
      */
     function groom(message /*, settings*/) {
-        if (!message) {
-            return;
-        }
+        console.log(message);
 
         message.token = {
             start: {
                 line: (message.line - 1),
-                ch: (message.col)
+                ch: (message.col - 1)
             },
             end: {
                 line: (message.line - 1),
-                ch: (message.col + 1)
+                ch: (message.col)
             }
+        };
+
+        message.pos = {
+            line: message.line,
+            ch: message.col
         };
     }
 
     return {
         groom: groom
     };
-
 });

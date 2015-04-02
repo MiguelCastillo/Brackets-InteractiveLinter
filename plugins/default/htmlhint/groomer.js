@@ -30,10 +30,14 @@ define(function (/*require, exports, module*/) {
                 ch: (message.col + 1)
             }
         };
+
+        message.pos = {
+            line: message.line,
+            ch: message.col
+        };
     }
 
     return {
         groom: groom
     };
-
 });

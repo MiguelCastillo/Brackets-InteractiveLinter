@@ -65,13 +65,15 @@ define(function (require /*, exports, module*/) {
         $problemsPanelTable = $problemsPanel.find(".table-container");
         $problemsPanelTable.on("click", "tr", function () {
             var $target = $(this);
-            var line = $target.data("line") - 1; // Convert from friendly line to actual line number
-
+            var line = $target.data("line"); // Convert from friendly line to actual line number
+            var ch   = $target.data("character");
+            
             // if there is no line number available, don't do anything
-            if (!isNaN(line)) {
-                var character = $target.data("character") - 1; // Convert from friendly character to actual character
+            if (!isNaN(line) && !isNaN(ch)) {
+                line -= 1;
+                ch -= 1;
                 var editor    = EditorManager.getCurrentFullEditor();
-                editor.setCursorPos(line, character, true);
+                editor.setCursorPos(line, ch, true);
                 MainViewManager.focusActivePane();
             }
         });

@@ -156,8 +156,8 @@ define(function(/*require, exports, module*/) {
     * Breaks up the message from jshint into something that can be used
     * by codemirror.
     *
-    * @param message {Object} jshint message
-    * @param settings {Object} jshint settings
+    * @param {Object} message - jshint message
+    * @param {Object} settings - jshint settings
     */
     function groom(message, settings) {
         if (!message || !message.evidence) {
@@ -169,7 +169,7 @@ define(function(/*require, exports, module*/) {
         // in the rest of the token
         var text = processMessage(message, settings);
 
-        if (text === false){
+        if (text === false) {
             return;
         }
 
@@ -197,11 +197,14 @@ define(function(/*require, exports, module*/) {
         message.href    = "http://jslinterrors.com/" + (message.raw || "").replace(/'*\{*(\w*)\}*'*/g, "$1").replace(/\s/g, "-").replace(/\.$/, "").toLowerCase();
         message.message = message.reason + " - " + message.code;
         message.token   = token;
-    }
 
+        message.pos = {
+            line: message.line,
+            ch: message.character
+        };
+    }
 
     return {
         groom: groom
     };
-
 });

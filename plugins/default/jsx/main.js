@@ -34,6 +34,10 @@ define(function(require /*, exports, module*/) {
                         line: ex.lineNumber - 1,
                         ch: ex.column
                     }
+                },
+                pos: {
+                    line: ex.lineNumber,
+                    ch: ex.column
                 }
             }];
         }
