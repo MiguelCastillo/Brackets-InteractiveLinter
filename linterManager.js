@@ -34,14 +34,6 @@ define(function (require /*, exports, module*/) {
         var language         = this.editor.document.getLanguage().getId();
         var preferredLinters = preferences.get(language);
         var linterName       = preferredLinters && preferredLinters[0];
-
-//        if (/.ts|.typescript$/.test(file.name) && language === "javascript") {
-//            language = "typescript";
-//        }
-//        else if (/.jsx$/.test(file.name) && language === "javascript") {
-//            language = "jsx";
-//        }
-
         return linters[linterName];
     };
 
