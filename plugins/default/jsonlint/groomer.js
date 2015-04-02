@@ -20,11 +20,14 @@ define(function(/*require, exports, module*/) {
                 ch: message.loc.last_column
             }
         };
-    }
 
+        message.pos = {
+            line: message.loc.first_line,
+            ch: message.loc.first_column + 1
+        };
+    }
 
     return {
         groom: groom
     };
-
 });

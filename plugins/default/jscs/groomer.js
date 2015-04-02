@@ -23,28 +23,32 @@
  */
 
 define(function (/*require, exports, module*/) {
-    "use strict";
+	"use strict";
 
-    function groom(message /*, options*/) {
-        if (!message) {
-            return;
-        }
+	function groom(message /*, options*/) {
+		if (!message) {
+			return;
+		}
 
-        message.type  = message.type || "warning";
-        message.token = {
-            start: {
-                line: (message.line - 1),
-                ch: (message.column - 1)
-            },
-            end: {
-                line: (message.line - 1),
-                ch: (message.column - 1) + message.message.length
-            }
-        };
-    }
+		message.type  = message.type || "warning";
+		message.token = {
+			start: {
+				line: (message.line - 1),
+				ch: (message.column - 1)
+			},
+			end: {
+				line: (message.line - 1),
+				ch: (message.column)
+			}
+		};
 
-    return {
-        groom: groom
-    };
+		message.pos = {
+			line: message.line,
+			ch: message.column
+		};
+	}
 
+	return {
+		groom: groom
+	};
 });

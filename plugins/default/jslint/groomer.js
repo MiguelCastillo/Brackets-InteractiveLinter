@@ -26,11 +26,14 @@ define(function(require /*, exports, module*/) {
             start: token.startPosition,
             end: token.endPosition
         };
-    }
 
+        message.pos = {
+            line: token.startPosition.line + 1,
+            ch: token.startPosition.ch + 1
+        };
+    }
 
     return {
         groom: groom
     };
-
 });

@@ -20,10 +20,6 @@ define(function (/*require, exports, module*/) {
      * @param settings {Object} settings - Settings used during the linting step
      */
     function groom(message /*, settings*/) {
-        if (!message) {
-            return;
-        }
-
         message.type     = getType(message);
         message.evidence = "[" + message.ruleId + "] - " + message.source;
         message.token    = {
@@ -35,6 +31,11 @@ define(function (/*require, exports, module*/) {
                 line: (message.line - 1),
                 ch: (message.column + 1)
             }
+        };
+
+        message.pos = {
+            line: message.line,
+            ch: message.column + 1
         };
     }
 
