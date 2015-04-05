@@ -11,6 +11,7 @@ define(function (require/*, exports, module*/) {
     var Dialogs         = brackets.getModule("widgets/Dialogs"),
         ProjectManager  = brackets.getModule("project/ProjectManager"),
         FileSystem      = brackets.getModule("filesystem/FileSystem"),
+        FileUtils       = brackets.getModule("file/FileUtils"),
         Promise         = require("libs/js/spromise"),
         currentProject  = {},
         currentLinter   = {};
@@ -24,6 +25,8 @@ define(function (require/*, exports, module*/) {
 
     function findFile(fileName, filePath, traverse) {
         var deferred = Promise.defer();
+
+        filePath = FileUtils.getDirectoryPath(stripTrailingSlashes(filePath));
 
         function find(filePath) {
             if (!filePath) {
