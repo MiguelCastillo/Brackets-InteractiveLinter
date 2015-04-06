@@ -17,16 +17,8 @@ define(function (require/*, exports, module*/) {
         currentLinter   = {};
 
 
-    function getParentPath(path) {
-        var result = stripTrailingSlashes(path);
-        return result.substr(0, result.lastIndexOf("/") + 1);
-    }
-
-
     function findFile(fileName, filePath, traverse) {
         var deferred = Promise.defer();
-
-        filePath = FileUtils.getDirectoryPath(stripTrailingSlashes(filePath));
 
         function find(filePath) {
             if (!filePath) {
@@ -43,7 +35,7 @@ define(function (require/*, exports, module*/) {
                         deferred.reject(false);
                     }
                     else {
-                        find(getParentPath(filePath));
+                        find(FileUtils.getParentPath(filePath));
                     }
                 });
             }
@@ -52,7 +44,7 @@ define(function (require/*, exports, module*/) {
             }
         }
 
-        find(filePath);
+        find(FileUtils.getDirectoryPath(filePath));
         return deferred.promise;
     }
 
@@ -144,18 +136,10 @@ define(function (require/*, exports, module*/) {
 
 
     /**
-    * Make sure we only have forward slashes and we dont have any duplicate slashes
-    */
+     * Make sure we only have forward slashes and we dont have any duplicate slashes
+     */
     function normalizePath(path) {
-        return path.replace(/\/+|\\+/g, "/");
-    }
-
-
-    /**
-    * Lets get rid of the trailing slash
-    */
-    function stripTrailingSlashes(path) {
-        return path.replace(/\/$/, "");
+        return path.replace(/[\/\\]+/g, "/");
     }
 
 
