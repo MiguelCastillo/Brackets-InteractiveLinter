@@ -49,6 +49,8 @@ function PluginLoader(settings) {
             type: "ready",
             data: _result
         });
+    }, function (err) {
+        console.log(JSON.parse(JSON.stringify(err)));
     });
 }
 
