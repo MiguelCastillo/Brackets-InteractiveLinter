@@ -26,7 +26,7 @@ define(function (require, exports, module) {
             });
 
         this.line = line;
-        this._sizeEditorToContent = _.debounce(sizeEditorToContent.bind(this), 20);
+        this._sizeEditorToContent = _.debounce(sizeEditorToContent.bind(this), 250);
     }
 
 
