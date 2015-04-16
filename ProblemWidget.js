@@ -26,14 +26,14 @@ define(function (require, exports, module) {
             });
 
         this.line = line;
-        this._sizeEditorToContent = _.debounce(sizeEditorToContent.bind(this), 0);
+        this._sizeEditorToContent = _.debounce(sizeEditorToContent.bind(this), 20);
     }
 
 
     ProblemWidget.prototype = Object.create(InlineWidget.prototype);
     ProblemWidget.prototype.constructor = ProblemWidget;
 
-    ProblemWidget.prototype.onAdded = function () {
+    ProblemWidget.prototype.onAdded = function() {
         InlineWidget.prototype.onAdded.apply(this, arguments);
 
         // Set height initially, and again whenever width might have changed (word wrap)
@@ -41,9 +41,13 @@ define(function (require, exports, module) {
         $(window).on("resize", this._sizeEditorToContent);
     };
 
-    ProblemWidget.prototype.onClosed = function () {
+    ProblemWidget.prototype.onClosed = function() {
         InlineWidget.prototype.onClosed.apply(this, arguments);
         $(window).off("resize", this._sizeEditorToContent);
+    };
+
+    ProblemWidget.prototype.refresh = function() {
+        this._sizeEditorToContent();
     };
 
     function sizeEditorToContent () {
