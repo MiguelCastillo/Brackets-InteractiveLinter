@@ -18,7 +18,7 @@ define(function(require /*, exports, module*/) {
         options = utils.mixin({}, defaultOptions, options);
 
         try {
-            source = reacttools.transform(source);
+            source = reacttools.transform(source, {harmony: true, es6module: true});
         }
         catch(ex) {
             return [{
