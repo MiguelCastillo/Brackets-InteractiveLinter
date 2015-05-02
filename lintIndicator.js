@@ -58,7 +58,7 @@ define(function (require/*, exports, module*/) {
     }
 
     function lintMessageHandler(messages) {
-        if (messages) {
+        if (messages && messages.length) {
             setStatus(INDICATOR_STATUS.WARNING);
             $statusBarIndicator.attr('title', StringUtils.format(INDICATOR_TOOLTIPS.WARNING, messages.length));
         }
