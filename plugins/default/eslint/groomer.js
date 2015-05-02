@@ -8,7 +8,7 @@ define(function (/*require, exports, module*/) {
     "use strict";
 
     function getType(message) {
-        return message.fatal || message.severity === 1 ? "error" : "warning";
+        return (message.fatal || message.severity === 2) ? "error" : "warning";
     }
 
 
