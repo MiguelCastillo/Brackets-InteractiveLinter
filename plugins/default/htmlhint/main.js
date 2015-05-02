@@ -18,8 +18,12 @@ define(function(require) {
         options = utils.mixin({}, defaultOptions, options);
         var results = HTMLHint.verify(text, options);
 
-        var i, length;
-        for (i = 0, length = results.length; i < length; i++) {
+        var length = results.length;
+        if (length == 0) {
+            return;
+        }
+        var i;
+        for (i = 0; i < length; i++) {
             groomer.groom(results[i]);
         }
 

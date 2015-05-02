@@ -17,10 +17,13 @@ define(function(require) {
     function lint(text, options) {
         options = utils.mixin({}, defaultOptions, options);
         var results = CSSLint.verify(text, options).messages;
-        var i, length;
 
-        for (i = 0, length = results.length; i < length; i++) {
-            delete results[i].rule;
+        var length = results.length;
+        if (length == 0) {
+            return;
+        }
+        var i;
+        for (i = 0; i < length; i++) {
             groomer.groom(results[i]);
         }
 
