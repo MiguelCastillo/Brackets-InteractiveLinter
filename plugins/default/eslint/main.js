@@ -16,7 +16,7 @@ define(function(require /*, exports, module*/) {
 
     function lint(source, options) {
         options = utils.mixin({}, defaultOptions, options);
-        var results, i, length;
+        var results = [], i, length;
 
         try {
             results = eslint.verify(source, options);
