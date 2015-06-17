@@ -136,10 +136,10 @@ define(function (require/*, exports, module*/) {
 
 
     /**
-     * Make sure we only have forward slashes and we dont have any duplicate slashes
+     * Make sure we only have forward slashes 
      */
     function normalizePath(path) {
-        return path.replace(/[\/\\]+/g, "/");
+        return path.replace(/[\/\\]/g, "/");
     }
 
 
