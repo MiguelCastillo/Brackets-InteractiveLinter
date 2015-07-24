@@ -25,23 +25,28 @@ define(function(require /*, exports, module*/) {
 
         options = utils.mixin({}, defaultOptions, options);
 
-        // Get document as a string to be passed into JSHint
-        if (!JSHINT(text, options, options.globals)) {
-            var errors = JSHINT.errors.slice(0);
+        try {
+          // Get document as a string to be passed into JSHint
+          if (!JSHINT(text, options, options.globals)) {
+              var errors = JSHINT.errors.slice(0);
 
-            // If JSHINT.errors is false, then JSHint has some errors it needs to report
-            for (i = 0, length = errors.length; i < length; i++) {
+              // If JSHINT.errors is false, then JSHint has some errors it needs to report
+              for (i = 0, length = errors.length; i < length; i++) {
 
-                // If an error is empty, it should be the last error in the array which
-                // means that the max number of errors was exceeded or there was a fatal
-                // error while linting the file
-                if (errors[i]) {
-                    delete errors[i].scope; // Some errors have scope, which breaks workers (cannot clone objects)
-                    groomer.groom(errors[i], options);
-                }
-            }
+                  // If an error is empty, it should be the last error in the array which
+                  // means that the max number of errors was exceeded or there was a fatal
+                  // error while linting the file
+                  if (errors[i]) {
+                      delete errors[i].scope; // Some errors have scope, which breaks workers (cannot clone objects)
+                      groomer.groom(errors[i], options);
+                  }
+              }
 
-            return errors;
+              return errors;
+          }
+        }
+        catch(ex) {
+            console.log(ex.message);
         }
     }
 
