@@ -25,17 +25,17 @@ define(function (/*require, exports, module*/) {
         message.token    = {
             start: {
                 line: (message.line - 1),
-                ch: (message.column)
+                ch: (message.column - 1)
             },
             end: {
                 line: (message.line - 1),
-                ch: (message.column + 1)
+                ch: (message.column)
             }
         };
 
         message.pos = {
             line: message.line,
-            ch: message.column + 1
+            ch: message.column
         };
     }
 
