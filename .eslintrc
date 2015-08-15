@@ -5,7 +5,7 @@
   },
   "rules": {
     "semi": 1,
-    "global-strict": 0,
+    "strict": 0,
     "quotes": [2, "double"],
     "key-spacing": 0,
     "no-trailing-spaces": 0,
