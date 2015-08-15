@@ -39,14 +39,14 @@ A list of available linters can be found [here](https://github.com/MiguelCastill
 
 ### Configuration
 
-Interactive Linter can be configured via Brackets preferences system, and settings can be set in the global `brackets.json` or in your project specific `.brackets.json`. Some settings are applied at run time, which eliminates the need to restart Brackets for your changes to take effect.
+Interactive Linter can be configured via Brackets' preferences system. For details on the brackets preferences, please take a look [here](https://github.com/adobe/brackets/wiki/How-to-Use-Brackets#preferences).
 
 
 #### Linter per language [run time]
 
-You can specify which linter to run for each language independently, and changes are applied at run time.
+You can specify which linter to run for each language independently, and changes are applied at run time. You can take a look at [this](https://github.com/MiguelCastillo/Brackets-InteractiveLinter/blob/master/.brackets.json) sample configuration.
 
-This is what a configuration looks like to specify `eslint` as your javascript linter.
+To specify `eslint` as your javascript linter, you need the follow changes to your `.brackets.json`.
 
 ``` javascript
 {
