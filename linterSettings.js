@@ -148,7 +148,7 @@ define(function (require/*, exports, module*/) {
      */
     function stripComments(text) {
         // Regex from requirejs.  Thanks James!
-        return  (text || "").replace(/(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg, '');
+        return  (text || "").replace(/(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg, "");
     }
 
 
