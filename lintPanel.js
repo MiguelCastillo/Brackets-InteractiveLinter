@@ -81,13 +81,8 @@ define(function (require /*, exports, module*/) {
 
 
     function updateTitle(numProblems) {
-        var message;
-        if (numProblems === 1) {
-            message = 'Interactive Linter: 1 Linter Problem';
-        }
-        else {
-            message = StringUtils.format('Interactive Linter: {0} Linter Problems', numProblems);
-        }
+        var isPlural = numProblems !== 1;
+        var message = StringUtils.format("Interactive Linter: {0} Linter Problem{1}", numProblems, isPlural ? "s" : "");
         $problemsPanel.find(".title").text(message);
     }
 
