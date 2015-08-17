@@ -37,7 +37,16 @@ gulp.task("jscs", function () {
 });
 
 gulp.task("coffeelint", function () {
-    return gulp.src("./node_modules/coffeelint/lib/coffeelint.js")
+    var coffeeScript = request("https://github.com/jashkenas/coffeescript/tarball/533ad8afe920b2dbf64ffb00efda45648242cc24")
+        .pipe(source("*.tar.gz"))
+        .pipe(gunzip())
+        .pipe(untar())
+        .pipe(gulpFilter(["**/extras/coffee-script.js"]))
+        .pipe(rename("coffee-script-1.9.1.js"));
+
+    var coffeelint = gulp.src("./node_modules/coffeelint/lib/coffeelint.js");
+
+    return merge2(coffeeScript, coffeelint)
         .pipe(gulp.dest("./plugins/default/coffeelint/libs"));
 });
 
