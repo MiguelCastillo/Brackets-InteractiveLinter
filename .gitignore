@@ -7,9 +7,8 @@ plugins/default/jsonlint/libs/
 plugins/default/htmlhint/libs/
 plugins/default/jscs/libs/
 plugins/default/coffeelint/libs/coffeelint.js
-libs/js/require.js
-libs/js/text.js
-libs/js/spromise.js
+libs/
+!libs/js/utils.js
 
 #################
 ## NodeJs
