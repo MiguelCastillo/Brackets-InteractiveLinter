@@ -1,9 +1,12 @@
 /*eslint-env node */
 var gulp = require("gulp");
 
-gulp.task("default", ["jshint", "jsonlint", "htmlhint", "jscs", "coffeelint", "requirejs"], function () {
-    console.log("Installed plugins");
-    return;
+
+gulp.task("default",
+    ["jshint", "jsonlint", "htmlhint", "jscs", "coffeelint", "requirejs", "requirejs-text"],
+    function () {
+      console.log("Installed plugins");
+      return;
 });
 
 gulp.task("jshint", function () {
@@ -33,5 +36,10 @@ gulp.task("coffeelint", function () {
 
 gulp.task("requirejs", function () {
     return gulp.src("./node_modules/requirejs/require.js")
+        .pipe(gulp.dest("./libs/js/"));
+});
+
+gulp.task("requirejs-text", function () {
+    return gulp.src("./node_modules/requirejs-text/text.js")
         .pipe(gulp.dest("./libs/js/"));
 });

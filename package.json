@@ -35,7 +35,8 @@
     "jscs": "^1.12.0",
     "jshint": "^2.6.3",
     "jsonlint": "^1.6.2",
-    "requirejs": "^2.1.14"
+    "requirejs": "^2.1.14",
+    "requirejs-text": "^2.0.12"
   },
   "devDependencies": {
     "gulp": "^3.9.0"
