@@ -5,6 +5,7 @@ plugins/disabled/*
 plugins/default/jshint/libs/
 plugins/default/jsonlint/libs/
 plugins/default/htmlhint/libs/
+plugins/default/jscs/libs/
 
 #################
 ## NodeJs
