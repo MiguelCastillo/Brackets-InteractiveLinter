@@ -4,6 +4,7 @@ plugins/disabled/*
 !plugins/disabled/README.md
 plugins/default/jshint/libs/
 plugins/default/jsonlint/libs/
+plugins/default/htmlhint/libs/
 
 #################
 ## NodeJs

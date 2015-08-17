@@ -30,6 +30,7 @@
     "linting"
   ],
   "dependencies": {
+    "htmlhint": "^0.9.7",
     "jshint": "^2.6.3",
     "jsonlint": "^1.6.2"
   },
