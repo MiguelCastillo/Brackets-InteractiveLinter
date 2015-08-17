@@ -39,6 +39,7 @@
     "requirejs-text": "^2.0.12"
   },
   "devDependencies": {
-    "gulp": "^3.9.0"
+    "gulp": "^3.9.0",
+    "gulp-rename": "^1.2.2"
   }
 }

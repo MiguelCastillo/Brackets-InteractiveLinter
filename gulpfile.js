@@ -1,9 +1,10 @@
 /*eslint-env node */
 var gulp = require("gulp");
+var rename = require("gulp-rename");
 
 
 gulp.task("default",
-    ["jshint", "jsonlint", "htmlhint", "jscs", "coffeelint", "requirejs", "requirejs-text"],
+    ["jshint", "jsonlint", "htmlhint", "jscs", "coffeelint", "requirejs", "requirejs-text", "spromise"],
     function () {
       console.log("Installed plugins");
       return;
@@ -41,5 +42,11 @@ gulp.task("requirejs", function () {
 
 gulp.task("requirejs-text", function () {
     return gulp.src("./node_modules/requirejs-text/text.js")
+        .pipe(gulp.dest("./libs/js/"));
+});
+
+gulp.task("spromise", function () {
+    return gulp.src("./node_modules/spromise/dist/spromise.min.js")
+        .pipe(rename("spromise.js"))
         .pipe(gulp.dest("./libs/js/"));
 });
