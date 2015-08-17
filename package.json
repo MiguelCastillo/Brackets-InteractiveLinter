@@ -30,7 +30,8 @@
     "linting"
   ],
   "dependencies": {
-    "jshint": "^2.6.3"
+    "jshint": "^2.6.3",
+    "jsonlint": "^1.6.2"
   },
   "devDependencies": {
     "gulp": "^3.9.0"
