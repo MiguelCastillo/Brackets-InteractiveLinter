@@ -40,6 +40,13 @@
   },
   "devDependencies": {
     "gulp": "^3.9.0",
-    "gulp-rename": "^1.2.2"
+    "gulp-rename": "^1.2.2",
+    "gulp-filter": "^3.0.0",
+    "gulp-gunzip": "0.0.3",
+    "gulp-rename": "^1.2.2",
+    "gulp-untar": "0.0.4",
+    "merge2": "^0.3.6",
+    "request": "^2.60.0",
+    "vinyl-source-stream": "^1.1.0"
   }
 }

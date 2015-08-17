@@ -1,10 +1,16 @@
 /*eslint-env node */
 var gulp = require("gulp");
 var rename = require("gulp-rename");
+var request = require("request");
+var source = require("vinyl-source-stream");
+var gunzip = require("gulp-gunzip");
+var untar = require("gulp-untar");
+var gulpFilter = require("gulp-filter");
+var merge2 = require("merge2");
 
 
 gulp.task("default",
-    ["jshint", "jsonlint", "htmlhint", "jscs", "coffeelint", "requirejs", "requirejs-text", "spromise"],
+    ["jshint", "jsonlint", "htmlhint", "jscs", "coffeelint", "csslint", "requirejs", "requirejs-text", "spromise"],
     function () {
       console.log("Installed plugins");
       return;
@@ -49,4 +55,18 @@ gulp.task("spromise", function () {
     return gulp.src("./node_modules/spromise/dist/spromise.min.js")
         .pipe(rename("spromise.js"))
         .pipe(gulp.dest("./libs/js/"));
+});
+
+gulp.task("csslint", function() {
+    var csslint = request("https://github.com/CSSLint/csslint/tarball/f69cf12e2")
+        .pipe(source("*.tar.gz"))
+        .pipe(gunzip())
+        .pipe(untar())
+        .pipe(gulpFilter(["**/release/csslint.js"]))
+        .pipe(rename("csslint.js"));
+
+    var htmlhint = gulp.src(["./node_modules/htmlhint/lib/htmlhint.js"]);
+
+    return merge2(csslint, htmlhint)
+           .pipe(gulp.dest("./plugins/default/csslint/libs"));
 });
