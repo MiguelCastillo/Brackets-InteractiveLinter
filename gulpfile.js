@@ -7,10 +7,11 @@ var gunzip = require("gulp-gunzip");
 var untar = require("gulp-untar");
 var gulpFilter = require("gulp-filter");
 var merge2 = require("merge2");
-
+var run = require("gulp-run");
+var install = require("gulp-install");
 
 gulp.task("default",
-    ["jshint", "jsonlint", "htmlhint", "jscs", "coffeelint", "csslint", "requirejs", "requirejs-text", "spromise"],
+    ["jshint", "jsonlint", "htmlhint", "jscs", "coffeelint", "csslint", "requirejs", "requirejs-text", "spromise", "eslint"],
     function () {
       console.log("Installed plugins");
       return;
@@ -78,4 +79,18 @@ gulp.task("csslint", function() {
 
     return merge2(csslint, htmlhint)
            .pipe(gulp.dest("./plugins/default/csslint/libs"));
+});
+
+gulp.task("eslint", ["eslint:install-dev-dependencies"], function (cb) {
+    return gulp.src("./node_modules/eslint/build/eslint.js")
+        .pipe(gulp.dest("./plugins/default/eslint/libs"));
+});
+
+gulp.task("eslint:build", ["eslint:install-dev-dependencies"], function (cb) {
+    run("cd ./node_modules/eslint && npm run browserify").exec();
+});
+
+gulp.task("eslint:install-dev-dependencies", function () {
+    return gulp.src("./node_modules/eslint/package.json")
+        .pipe(install());
 });
