@@ -31,6 +31,7 @@
   ],
   "dependencies": {
     "coffeelint": "^1.9.1",
+    "coffee-script": "https://github.com/jashkenas/coffeescript/tarball/1.9.1",
     "eslint": "https://github.com/eslint/eslint/tarball/v1.0.0-rc-3",
     "htmlhint": "^0.9.7",
     "jscs": "^1.12.0",
