@@ -65,7 +65,7 @@ gulp.task("spromise", function () {
 });
 
 gulp.task("csslint", function() {
-    var csslint = request("https://github.com/CSSLint/csslint/tarball/f69cf12e2")
+    var csslint = gulp.src("https://github.com/CSSLint/csslint/tarball/v0.10.0")
         .pipe(source("*.tar.gz"))
         .pipe(gunzip())
         .pipe(untar())
