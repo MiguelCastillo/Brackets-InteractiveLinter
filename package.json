@@ -29,6 +29,9 @@
     "linter",
     "linting"
   ],
+  "scripts": {
+    "restore": "gulp"
+  },
   "dependencies": {
     "coffeelint": "^1.9.1",
     "coffee-script": "https://github.com/jashkenas/coffeescript/tarball/1.9.1",
