@@ -11,7 +11,7 @@ var run = require("gulp-run");
 var install = require("gulp-install");
 
 gulp.task("default",
-    ["jshint", "jsonlint", "htmlhint", "jscs", "coffeelint", "csslint", "requirejs", "requirejs-text", "spromise", "eslint"],
+    ["jshint", "jsonlint", "htmlhint", "jscs", "coffeelint", "csslint", "requirejs", "requirejs-text", "spromise", "eslint", "belty"],
     function () {
       console.log("Installed plugins");
       return;
@@ -90,4 +90,10 @@ gulp.task("eslint:build", ["eslint:install-dev-dependencies"], function (cb) {
 gulp.task("eslint:install-dev-dependencies", function () {
     return gulp.src("./node_modules/eslint/package.json")
         .pipe(install());
+});
+
+gulp.task("belty", function () {
+    return gulp.src("./node_modules/belty/dist/index.js")
+        .pipe(rename("belty.js"))
+        .pipe(gulp.dest("./libs/js/"));
 });

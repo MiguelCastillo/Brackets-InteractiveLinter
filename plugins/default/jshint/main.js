@@ -15,7 +15,7 @@ define(function(require /*, exports, module*/) {
      */
 
     require("jshint/libs/jshint");
-    var utils           = require("libs/utils");
+    var belty           = require("libs/belty");
     var groomer         = require("jshint/groomer");
     var defaultOptions  = JSON.parse(require("text!jshint/default.json"));
     var settings        = JSON.parse(require("text!jshint/settings.json"));
@@ -23,7 +23,7 @@ define(function(require /*, exports, module*/) {
     function lint(text, options) {
         var i, length;
 
-        options = utils.mixin({}, defaultOptions, options);
+        options = belty.extend({}, defaultOptions, options);
 
         try {
           // Get document as a string to be passed into JSHint
@@ -50,7 +50,7 @@ define(function(require /*, exports, module*/) {
         }
     }
 
-    return utils.mixin(settings, {
+    return belty.extend(settings, {
         lint: lint
     });
 });

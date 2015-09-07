@@ -10,7 +10,6 @@ plugins/default/csslint/libs/
 plugins/default/eslint/libs/
 plugins/default/coffeelint/libs/
 libs/
-!libs/js/utils.js
 
 #################
 ## NodeJs

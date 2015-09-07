@@ -12,7 +12,7 @@ var window = window || {};
 define(function(require /*, exports, module*/) {
     "use strict";
 
-    var utils          = require("libs/utils");
+    var belty          = require("libs/belty");
     var groomer        = require("coffeelint/groomer");
     var defaultOptions = JSON.parse(require("text!coffeelint/default.json"));
     var settings       = JSON.parse(require("text!coffeelint/settings.json"));
@@ -38,7 +38,7 @@ define(function(require /*, exports, module*/) {
 
 
     function lint(text, options) {
-        options = utils.mixin({}, defaultOptions, options);
+        options = belty.extend({}, defaultOptions, options);
         var result;
 
         try {
@@ -54,7 +54,7 @@ define(function(require /*, exports, module*/) {
         return result;
     }
 
-    return utils.mixin(settings, {
+    return belty.extend(settings, {
         lint: lint
     });
 });

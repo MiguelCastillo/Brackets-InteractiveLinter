@@ -8,13 +8,13 @@ define(function (require /*, exports, module*/) {
     "use strict";
 
     var JSCS           = require("jscs/libs/jscs-browser");
-    var utils          = require("libs/utils");
+    var belty          = require("libs/belty");
     var groomer        = require("jscs/groomer");
     var defaultOptions = JSON.parse(require("text!jscs/default.json"));
     var settings       = JSON.parse(require("text!jscs/settings.json"));
 
     function lint(text, options) {
-        options = utils.mixin({}, defaultOptions, options);
+        options = belty.extend({}, defaultOptions, options);
         var i, length, jscs, errors, errList;
 
         try {
@@ -35,7 +35,7 @@ define(function (require /*, exports, module*/) {
         return errList;
     }
 
-    return utils.mixin(settings, {
+    return belty.extend(settings, {
         lint: lint
     });
 });
