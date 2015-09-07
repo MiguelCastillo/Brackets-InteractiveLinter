@@ -122,6 +122,12 @@ Interactive Linter in available through Brackets extensions' registry.
 }
 ```
 
+### Development
+
+Install and restore the dependencies:
+
+    $ npm install
+    $ npm run restore
 
 ### Links
 
