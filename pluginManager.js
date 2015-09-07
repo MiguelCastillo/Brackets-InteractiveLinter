@@ -62,7 +62,7 @@ define(function(require, exports, module) {
         return new Promise(function(resolve) {
             FileSystem.getDirectoryForPath(path).getContents(function(err, entries) {
                 resolve({
-                    directories: _.filter(entries, 'isDirectory').map(function(dir) {return dir.name;}),
+                    directories: _.filter(entries, "isDirectory").map(function(dir) {return dir.name;}),
                     path: path
                 });
             });

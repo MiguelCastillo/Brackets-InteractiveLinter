@@ -84,7 +84,7 @@ define(function (require /*, exports, module*/) {
 
         // If the message is an error message, then add the error class to gutter
         if (message.type === "error") {
-            mark.gutterMark.element.addClass('interactive-linter-gutter-errors');
+            mark.gutterMark.element.addClass("interactive-linter-gutter-errors");
         }
     };
 
