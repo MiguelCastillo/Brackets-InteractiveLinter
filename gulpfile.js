@@ -9,9 +9,11 @@ var gulpFilter = require("gulp-filter");
 var merge2 = require("merge2");
 var run = require("gulp-run");
 var install = require("gulp-install");
+var browserify = require("browserify");
 
 gulp.task("default",
-    ["jshint", "jsonlint", "htmlhint", "jscs", "coffeelint", "csslint", "requirejs", "requirejs-text", "spromise", "eslint", "belty"],
+    ["jshint", "jsonlint", "htmlhint", "jscs", "coffeelint", "csslint", "requirejs", "requirejs-text", "spromise",
+     "eslint", "belty", "jsx"],
     function () {
       console.log("Installed plugins");
       return;
@@ -96,4 +98,15 @@ gulp.task("belty", function () {
     return gulp.src("./node_modules/belty/dist/index.js")
         .pipe(rename("belty.js"))
         .pipe(gulp.dest("./libs/js/"));
+});
+
+gulp.task("jsx", function () {
+  var b = browserify({
+    entries: "./node_modules/react-tools/main.js",
+    standalone: "reacttools"
+  });
+
+  return b.bundle()
+    .pipe(source("reacttools.js"))
+    .pipe(gulp.dest("./plugins/default/jsx/libs/"));
 });

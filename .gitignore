@@ -9,6 +9,7 @@ plugins/default/jscs/libs/
 plugins/default/csslint/libs/
 plugins/default/eslint/libs/
 plugins/default/coffeelint/libs/
+plugins/default/jsx/libs/
 libs/
 
 #################
