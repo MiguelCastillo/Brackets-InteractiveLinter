@@ -10,6 +10,7 @@ plugins/default/csslint/libs/
 plugins/default/eslint/libs/
 plugins/default/coffeelint/libs/
 plugins/default/jsx/libs/
+plugins/default/jslint/libs/
 libs/
 
 #################

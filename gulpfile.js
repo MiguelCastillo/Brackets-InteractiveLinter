@@ -13,7 +13,7 @@ var browserify = require("browserify");
 
 gulp.task("default",
     ["jshint", "jsonlint", "htmlhint", "jscs", "coffeelint", "csslint", "requirejs", "requirejs-text", "spromise",
-     "eslint", "belty", "jsx"],
+     "eslint", "belty", "jsx", "jslint"],
     function () {
       console.log("Installed plugins");
       return;
@@ -109,4 +109,11 @@ gulp.task("jsx", function () {
   return b.bundle()
     .pipe(source("reacttools.js"))
     .pipe(gulp.dest("./plugins/default/jsx/libs/"));
+});
+
+gulp.task("jslint", function () {
+    return request("https://jslinterrors.com/linters/jslint/2013-02-18.js")
+        .pipe(source("*.js"))
+        .pipe(rename("jslint.js"))
+        .pipe(gulp.dest("./plugins/default/jslint/libs"));
 });
