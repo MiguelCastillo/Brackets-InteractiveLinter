@@ -8,14 +8,14 @@
 define(function(require /*, exports, module*/) {
     "use strict";
 
-    var utils          = require("libs/utils");
+    var belty          = require("libs/belty");
     var groomer        = require("eslint/groomer");
     var eslint         = require("eslint/libs/eslint");
     var defaultOptions = JSON.parse(require("text!eslint/default.json"));
     var settings       = JSON.parse(require("text!eslint/settings.json"));
 
     function lint(source, options) {
-        options = utils.mixin({}, defaultOptions, options);
+        options = belty.extend({}, defaultOptions, options);
         var results = [], i, length;
 
         try {
@@ -32,7 +32,7 @@ define(function(require /*, exports, module*/) {
         return results;
     }
 
-    return utils.mixin(settings, {
+    return belty.extend(settings, {
         lint: lint
     });
 });

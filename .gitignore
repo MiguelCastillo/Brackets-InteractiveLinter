@@ -2,6 +2,16 @@ plugins/dev/*
 plugins/disabled/*
 !plugins/dev/README.md
 !plugins/disabled/README.md
+plugins/default/jshint/libs/
+plugins/default/jsonlint/libs/
+plugins/default/htmlhint/libs/
+plugins/default/jscs/libs/
+plugins/default/csslint/libs/
+plugins/default/eslint/libs/
+plugins/default/coffeelint/libs/
+plugins/default/jsx/libs/
+plugins/default/jslint/libs/
+libs/
 
 #################
 ## NodeJs

@@ -7,7 +7,7 @@
 define(function(require /*, exports, module*/) {
     "use strict";
 
-    var utils          = require("libs/utils");
+    var belty          = require("libs/belty");
     var jshint         = require("jshint");
     var reacttools     = require("jsx/libs/reacttools");
     var defaultOptions = JSON.parse(require("text!jsx/default.json"));
@@ -15,7 +15,7 @@ define(function(require /*, exports, module*/) {
 
 
     function lint(source, options) {
-        options = utils.mixin({}, defaultOptions, options);
+        options = belty.extend({}, defaultOptions, options);
 
         try {
             source = reacttools.transform(source, {harmony: true, es6module: true});
@@ -46,7 +46,7 @@ define(function(require /*, exports, module*/) {
     }
 
 
-    return utils.mixin(settings, {
+    return belty.extend(settings, {
         lint: lint
     });
 });

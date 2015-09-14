@@ -7,7 +7,7 @@
 define(function(require) {
     "use strict";
 
-    var utils          = require("libs/utils");
+    var belty          = require("libs/belty");
     var groomer        = require("csslint/groomer");
     var defaultOptions = JSON.parse(require("text!csslint/default.json"));
     var settings       = JSON.parse(require("text!csslint/settings.json"));
@@ -15,7 +15,7 @@ define(function(require) {
     require("csslint/libs/csslint");
 
     function lint(text, options) {
-        options = utils.mixin({}, defaultOptions, options);
+        options = belty.extend({}, defaultOptions, options);
         var results = CSSLint.verify(text, options).messages;
         var i, length;
 
@@ -27,7 +27,7 @@ define(function(require) {
         return results;
     }
 
-    return utils.mixin(settings, {
+    return belty.extend(settings, {
         lint: lint
     });
 });

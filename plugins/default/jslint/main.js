@@ -8,7 +8,7 @@ define(function(require /*, exports, module*/) {
     "use strict";
 
     var jslint          = require("jslint/libs/jslint");
-    var utils           = require("libs/utils");
+    var belty           = require("libs/belty");
     var groomer         = require("jslint/groomer");
     var defaultSettings = JSON.parse(require("text!jslint/default.json"));
     var settings        = JSON.parse(require("text!jslint/settings.json"));
@@ -16,7 +16,7 @@ define(function(require /*, exports, module*/) {
     function lint(text, options) {
         var i, length;
 
-        options = utils.mixin({}, defaultSettings, options);
+        options = belty.extend({}, defaultSettings, options);
 
         if (!jslint(text, options)) {
             var errors = jslint.errors.slice(0);
@@ -36,7 +36,7 @@ define(function(require /*, exports, module*/) {
         }
     }
 
-    return utils.mixin(settings, {
+    return belty.extend(settings, {
         lint: lint
     });
 });
