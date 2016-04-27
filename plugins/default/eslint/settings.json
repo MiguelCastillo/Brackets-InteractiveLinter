@@ -1,4 +1,4 @@
 {
     "language": "javascript",
-    "settingsFile": ".eslintrc"
+    "settingsFile": ".eslintrc.json"
 }
