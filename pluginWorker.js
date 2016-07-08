@@ -88,7 +88,7 @@ onmessage = function(evt) {
     var data = evt.data || {};
     var method = PluginLoader.instance && PluginLoader.instance[data.type];
 
-    if (typeof method === 'function') {
+    if (typeof method === "function") {
         return method.apply(PluginLoader.instance, [data || {}]);
     }
 
