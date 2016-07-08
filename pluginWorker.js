@@ -16,8 +16,8 @@ function PluginLoader(settings) {
 
     var pluginRequire = requirejs.config({
         "paths": {
-            "text": "../../libs/js/text",
-            "libs": "../../libs/js"
+            "text": "../../../libs/js/text",
+            "libs": "../../../libs/js"
         },
         "baseUrl": data.baseUrl,
         "packages": data.packages
@@ -88,7 +88,7 @@ onmessage = function(evt) {
     var data = evt.data || {};
     var method = PluginLoader.instance && PluginLoader.instance[data.type];
 
-    if (typeof method === "function") {
+    if (typeof method === 'function') {
         return method.apply(PluginLoader.instance, [data || {}]);
     }
 
