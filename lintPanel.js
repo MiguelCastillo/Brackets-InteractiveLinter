@@ -13,6 +13,7 @@ define(function (require /*, exports, module*/) {
         WorkspaceManager = brackets.getModule("view/WorkspaceManager"),
         Resizer          = brackets.getModule("utils/Resizer"),
         StringUtils      = brackets.getModule("utils/StringUtils"),
+        Mustache         = brackets.getModule("thirdparty/mustache/mustache"),
         linterManager    = require("linterManager"),
         linterReporter   = require("linterReporter"),
         panelTemplate    = require("text!templates/problemsPanel.html"),
