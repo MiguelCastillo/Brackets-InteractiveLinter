@@ -9,6 +9,7 @@ define(function (require, exports, module) {
     "use strict";
 
     var _              = brackets.getModule("thirdparty/lodash");
+    var Mustache       = brackets.getModule("thirdparty/mustache/mustache");
     var InlineWidget   = brackets.getModule("editor/InlineWidget").InlineWidget;
     var widgetTemplate = require("text!templates/inlineWidgetLint.html");
 
