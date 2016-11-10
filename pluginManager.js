@@ -28,7 +28,7 @@ define(function(require, exports, module) {
      * make sure they are smoothly running in a worker thread.
      */
     function pluginManager() {
-        return Promise.all([getPluginsMeta(pluginDirectory  + "/plugins/default"), getPluginsMeta(pluginDirectory  + "/plugins/dev")])
+        return Promise.all([getPluginsMeta(pluginDirectory  + "/plugins/default/threaded",'webworker'), getPluginsMeta(pluginDirectory  + "/plugins/dev/threaded",'webworker'),getPluginsMeta(pluginDirectory  + "/plugins/default/embedded",'embedded'), getPluginsMeta(pluginDirectory  + "/plugins/dev/embedded",'embedded')])
             .then(loadPlugins)
             .then(pluginsLoaded);
     }
@@ -44,7 +44,7 @@ define(function(require, exports, module) {
 
 
     function loadPlugin(plugin) {
-        if (webworker) {
+        if (webworker && plugin.type === 'webworker') {
             return pluginLoader.workerThreadPluginLoader(plugin);
         }
         else {
@@ -58,12 +58,13 @@ define(function(require, exports, module) {
     }
 
 
-    function getPluginsMeta(path) {
+    function getPluginsMeta(path,type) {
         return new Promise(function(resolve) {
             FileSystem.getDirectoryForPath(path).getContents(function(err, entries) {
                 resolve({
-                    directories: _.filter(entries, "isDirectory").map(function(dir) {return dir.name;}),
-                    path: path
+                    directories: _.filter(entries, 'isDirectory').map(function(dir) {return dir.name;}),
+                    path: path,
+                    type : type
                 });
             });
         });

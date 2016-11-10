@@ -21,8 +21,8 @@ define(function(require, exports, module){
         var requirePlugin = requirejs.config({
             "context": "interactive-linter-plugins-" + (requireUID++),
             "paths": {
-                "text": "../../libs/js/text",
-                "libs": "../../libs/js"
+                "text": "../libs/js/text",
+                "libs": "libs/js"
             },
             "baseUrl": pluginsMeta.path,
             "packages": pluginsMeta.directories
@@ -33,7 +33,12 @@ define(function(require, exports, module){
             var _lint = plugin.lint;
 
             function lint(text, settings) {
-                return Promise.resolve(_lint(text, settings));
+                var results = _lint(text, settings,pluginsMeta);
+                if(results.promise !== undefined && results.promise !== null){
+                    return results;
+                } else {
+                    return Promise.resolve(results);
+                }
             }
 
             return {
