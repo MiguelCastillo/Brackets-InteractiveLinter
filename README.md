@@ -87,7 +87,7 @@ Interactive Linter automatically loads `.jshintrc` and `.jslintrc` files in your
 
 All JSHint settings that already exists inline in your JavaScript files will continue to work along side any `.jshintrc`/`.jslintrc` file.
 
-Integration with <http://jslinterrors.com/> to find out details about what's reported by JSHint.
+Integration with <http://linterrors.com/> to find out details about what's reported by JSHint.
 
 Inspired by Joachim's extensions [brackets-continuous-compilation](https://github.com/JoachimK/brackets-continuous-compilation).
 
