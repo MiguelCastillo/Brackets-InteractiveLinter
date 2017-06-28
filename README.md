@@ -48,7 +48,7 @@ You can specify which linter to run for each language independently, and changes
 
 To specify `eslint` as your javascript linter, you need the follow changes to your `.brackets.json`.
 
-``` javascript
+``` JSON
 {
     "interactive-linter.javascript": ["eslint"]
 }
@@ -56,7 +56,7 @@ To specify `eslint` as your javascript linter, you need the follow changes to yo
 
 If you actually want to disable interactive linter javascript linting, you can set the linter language to `null`.
 
-``` javascript
+``` JSON
 {
     "interactive-linter.javascript": null
 }
@@ -64,7 +64,7 @@ If you actually want to disable interactive linter javascript linting, you can s
 
 You can customize other linters the same way by following the convention `interactive-linter.[language]: ['linter-name']`.  For example, to disable linting for `coffeescript` you can do so with the following:
 
-``` javascript
+``` JSON
 {
     "interactive-linter.javascript": ["eslint"],
     "interactive-linter.coffeescript": null
@@ -75,7 +75,7 @@ You can customize other linters the same way by following the convention `intera
 
 You can configure the delay for linting your documents. The value is specified in milliseconds, and by default it is `500`. In the example below, the delay is configured to 1000 milliseconds (1 second):
 
-```
+``` JSON
 {
     "interactive-linter.delay": 1000
 }
@@ -116,7 +116,7 @@ Interactive Linter in available through Brackets extensions' registry.
 #### Do you support JSX linting??
 - Yes. That's currently done via the `jsx` plugin. So you will need to set the `javascript` linter to `jsx` in your Brackets preferences file. The `jsx` linter will also lint your javascript document with `JSHint`. Good thing is that your `.jshintrc` will be used during the linting process. Bad thing is that you cannot specify another javascript linter besides `JSHint` to process your javscript document.
 
-``` javascript
+``` JSON
 {
     "interactive-linter.javascript": ["jsx"]
 }

@@ -152,7 +152,7 @@ define(function (require/*, exports, module*/) {
     }
 
 
-    $(ProjectManager).on("projectOpen", function(e, project) {
+    ProjectManager.on("projectOpen", function(e, project) {
         currentProject = project;
     });
 
